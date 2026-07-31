@@ -1,24 +1,28 @@
-#!/usr/bin/env bash
-# Run one command inside a fresh ephemeral container over the bind-mounted repo.
-# Usage: ./docker/exec.sh "<command>"
+#!/bin/bash
 set -euo pipefail
+
 cd "$(dirname "$0")"
-. ./config.sh
+
+ARCH=$(uname -m)
+if [ "$ARCH" = "x86_64" ]; then
+  IMAGE_NAME="myproject:latest-amd64"
+else
+  echo "Error: Unsupported architecture: $ARCH"
+  exit 1
+fi
 
 HOST_MOUNT="$(pwd)/.."
 
-# Attach GPUs only when the runtime is actually present.
 GPU_FLAGS=()
 if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1 &&
   docker info -f '{{json .Runtimes}}' 2>/dev/null | grep -q '"nvidia"'; then
   GPU_FLAGS=(--gpus all)
 fi
 
-# Chown the mount back to the host user on exit (container writes as root).
-trap './chown.sh >/dev/null 2>&1 || true' EXIT
+trap './chown.sh >/dev/null 2>&1' EXIT
 
 docker run --rm --entrypoint bash \
-  --name "${PROJECT_SLUG}-exec-$$-${RANDOM}" \
+  --name "myproject-exec-$$-${RANDOM}" \
   "${GPU_FLAGS[@]}" \
   -v "${HOST_MOUNT}:/workspace:rw" \
   -w /workspace \

@@ -13,7 +13,7 @@ CLAUDE.md                 thin loader: @-includes the three rule files
   project.md              the ONE file you fill in per project
   skills/                 review-diff, commit, delegate, format, comment-style
 format/                   one formatter dispatcher + per-language configs
-docker/                   config.sh (edit point), exec, build, chown, entrypoint, Dockerfile, environment.yml
+docker/                   build, run, cleanup, exec, chown, entrypoint scripts + Dockerfile.amd64 + environment.yml
 ```
 
 ## Enforcement: rules and skills, not hooks
@@ -37,10 +37,10 @@ Formatting is the `/format` skill; running the toolchain through the container w
 In the target repo, either follow the manual steps or hand them to an agent.
 
 **Agent-driven (recommended):** launch an Opus session in the target repo and ask:
-> Set up the Claude Code workflow from `github.com/devansh-dvj/.claude`: copy `.claude/`, `format/`, and `docker/` in; fill `.claude/project.md` for this repo; then edit `docker/config.sh` and `docker/Dockerfile` for the toolchain.
+> Set up the Claude Code workflow from `github.com/devansh-dvj/.claude`: copy `.claude/`, `format/`, and `docker/` in; fill `.claude/project.md` for this repo; set the project name in the docker scripts (`sed -i 's/myproject/<slug>/g' docker/*.sh`); then edit `docker/Dockerfile.amd64` for the toolchain.
 
 **Manual:**
 1. Copy `.claude/`, `format/`, and `docker/` into the repo root.
 2. Fill in `.claude/project.md` (what the project is, vocab, layout, commands, docs map).
-3. Edit `docker/config.sh` (`PROJECT_SLUG`) and `docker/Dockerfile` for the project's toolchain.
+3. Set the project name in the docker scripts: `sed -i 's/myproject/<your-slug>/g' docker/*.sh`. Then edit `docker/Dockerfile.amd64` for the toolchain.
 4. Use the skills: `/format` before commits, `/review-diff` before finishing, `/commit` to commit.
