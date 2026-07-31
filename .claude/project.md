@@ -35,9 +35,9 @@
 <Per-language conventions live in `.claude/rules/*.md` (path-scoped). Put project-wide
  toolchain facts here: compiler versions, feature flags, anything a rule file shouldn't own.>
 
-## Vendored / upstream (if any)
+## Upstream / external (if any)
 
-<What is vendored, from where, how it is reproduced, and the regen command. Delete if none.>
+<What external or upstream code is carried, from where, how it is reproduced, and the regen command. Delete if none.>
 
 ## Docs map
 

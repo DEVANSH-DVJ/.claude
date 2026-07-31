@@ -34,9 +34,10 @@ Language- and toolchain-specific rules live in path-scoped `.claude/rules/*.md` 
 - After editing, run the build or typecheck. Before finishing, run the linter and treat warnings as failures.
 - Format edited files before committing, using the project's formatter (`format/format.sh`). Per-language style lives in `format/` and the language's `.claude/rules/*.md`.
 
-## Vendored / upstream code
+## Upstream / external code
 
-- If the project vendors upstream code, keep it reproducible and minimal: patch only where genuinely required, prefer changing our own files over upstream ones, and regenerate the patch set after any edit. Layout and commands in `project.md`.
+- If the project carries external or upstream code, keep it reproducible and minimal: patch only where genuinely required, prefer changing our own files over the upstream ones, and regenerate the patch set after any edit. Layout and commands in `project.md`.
+- Say "upstream" or "external", never "vendor" or "vendored": the word is ambiguous about who wrote and who owns the code.
 
 ## Things to avoid
 
