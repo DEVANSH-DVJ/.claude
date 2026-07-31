@@ -1,8 +1,6 @@
 ---
 name: review-diff
-description: Review the current working diff (unstaged, staged, and untracked) against
-  this project's own engineering rules. Reports findings; changes nothing. Invoke before
-  asking to commit, or when the user asks to review changes.
+description: Review the working diff (unstaged, staged, untracked) against this project's engineering rules. Reports findings; changes nothing. Invoke before committing, or when asked to review changes.
 disable-model-invocation: false
 user-invocable: true
 context: fork
