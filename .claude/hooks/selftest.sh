@@ -30,5 +30,22 @@ check "commit -a sweep"           '{"tool_input":{"command":"git commit -am wip"
 check "clean pathspec commit"     '{"tool_input":{"command":"git commit -m ok -- a.rs"}}'                 ask
 check "non-git bash"              '{"tool_input":{"command":"ls -la"}}'                                   pass
 
-[ "$fail" = 0 ] && echo "ok: git-guard selftest passed"
+# --- docker-route (needs EXEC_WRAPPER; run against a scratch conf) ---
+droute="$HOOK_DIR/docker-route.sh"
+tmpconf="$(mktemp)"
+printf '%s\n' 'DOCKER_ROUTING="block"' 'EXEC_WRAPPER="docker/exec.sh"' 'CONTAINER_BINS="cargo npm pytest"' > "$tmpconf"
+dcheck() {
+  local label="$1" json="$2" expect="$3" out got=pass
+  out="$(printf '%s' "$json" | WORKFLOW_CONF="$tmpconf" "$droute" 2>/dev/null)"
+  printf '%s' "$out" | grep -q '"permissionDecision":"deny"' && got=deny
+  printf '%s' "$out" | grep -q '"permissionDecision":"ask"' && got=ask
+  if [ "$got" != "$expect" ]; then echo "FAIL: $label -> expected $expect, got $got"; fail=1; fi
+}
+dcheck "bare cargo build"      '{"tool_input":{"command":"cargo build"}}'                    deny
+dcheck "wrapped cargo build"   '{"tool_input":{"command":"docker/exec.sh \"cargo build\""}}' pass
+dcheck "env-prefixed pytest"   '{"tool_input":{"command":"FOO=1 pytest -q"}}'                deny
+dcheck "non-toolchain ls"      '{"tool_input":{"command":"ls -la"}}'                         pass
+rm -f "$tmpconf"
+
+[ "$fail" = 0 ] && echo "ok: hook selftests passed"
 exit "$fail"
