@@ -44,9 +44,3 @@ In the target repo, either follow the manual steps or hand them to an agent.
 2. Fill in `.claude/project.md` (what the project is, vocab, layout, commands, docs map).
 3. Edit `docker/config.sh` (`PROJECT_SLUG`) and `docker/Dockerfile` for the project's toolchain.
 4. Use the skills: `/format` before commits, `/review-diff` before finishing, `/commit` to commit.
-
-## House rules carried by these docs
-
-- One sentence per line, no character limit, in markdown (README and docs) and LaTeX.
-- No em-dashes or en-dashes anywhere; use `--` or `---`.
-- Say "upstream" or "external", never "vendor".
