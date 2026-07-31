@@ -141,7 +141,7 @@ fi
 # Build
 echo
 echo "Building ${IMAGE_NAME}..."
-docker build -f "${DOCKERFILE}" -t "${IMAGE_NAME}" ..
+docker build -f "${DOCKERFILE}" -t "${IMAGE_NAME}" .
 
 # Prune dangling images
 echo "Pruning dangling images..."

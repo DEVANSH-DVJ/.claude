@@ -1,5 +1,5 @@
 # Template dev image. Edit the blocks below for the project's toolchain.
-# build.sh builds this with context `..` (the repo root), so COPY paths start with docker/.
+# build.sh builds this with the docker/ directory as context; keep build artifacts (environment.yml, entrypoint.sh) here.
 # Runtime code is bind-mounted at /workspace; exec.sh overrides the entrypoint with bash.
 FROM ubuntu:24.04
 
@@ -18,7 +18,7 @@ ENV PATH=$CONDA_DIR/bin:$PATH
 RUN curl -fsSL "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-$(uname -m).sh" -o /tmp/miniconda.sh \
     && bash /tmp/miniconda.sh -b -p "$CONDA_DIR" \
     && rm /tmp/miniconda.sh
-COPY docker/environment.yml /tmp/environment.yml
+COPY environment.yml /tmp/environment.yml
 RUN conda env update -n base -f /tmp/environment.yml && conda clean -afy
 
 # rust / cargo
@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends shfmt clang-for
     && rustup component add rustfmt
 
 # interactive entrypoint (exec.sh overrides this with bash)
-COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 WORKDIR /workspace
