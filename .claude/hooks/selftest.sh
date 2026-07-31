@@ -47,5 +47,23 @@ dcheck "env-prefixed pytest"   '{"tool_input":{"command":"FOO=1 pytest -q"}}'   
 dcheck "non-toolchain ls"      '{"tool_input":{"command":"ls -la"}}'                         pass
 rm -f "$tmpconf"
 
+# --- format-dispatch (PostToolUse; exit 2 == file changed on disk) ---
+fdisp="$HOOK_DIR/format-dispatch.sh"
+tmpd="$(mktemp -d)"
+printf '%s\n' '#!/bin/sh' 'printf "\n" >> "$1"' > "$tmpd/fmt.sh"; chmod +x "$tmpd/fmt.sh"
+fconf="$tmpd/conf"
+printf '%s\n' 'FORMAT_MODE="fix"' 'FORMAT_EXTENSIONS="py"' "FORMAT_CMD=\"$tmpd/fmt.sh {FILE}\"" > "$fconf"
+fcheck() {
+  local label="$1" json="$2" expect="$3"
+  printf '%s' "$json" | WORKFLOW_CONF="$fconf" "$fdisp" >/dev/null 2>&1
+  local got=$?
+  if [ "$got" != "$expect" ]; then echo "FAIL: $label -> expected exit $expect, got $got"; fail=1; fi
+}
+echo "print(1)" > "$tmpd/x.py"
+fcheck "py reformatted -> exit 2" "{\"tool_input\":{\"file_path\":\"$tmpd/x.py\"}}" 2
+echo "text" > "$tmpd/x.md"
+fcheck "md not listed -> exit 0" "{\"tool_input\":{\"file_path\":\"$tmpd/x.md\"}}" 0
+rm -rf "$tmpd"
+
 [ "$fail" = 0 ] && echo "ok: hook selftests passed"
 exit "$fail"
