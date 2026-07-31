@@ -1,10 +1,10 @@
 # Project context
 
-<!-- This is the ONE file you fill in per project. session.md and engineering.md
-     are shared and agnostic, normally left untouched.
+<!-- This is the ONE file you fill in per project.
+     session.md and engineering.md are shared and agnostic, normally left untouched.
      Keep this lean: durable facts and pointers, not the current task.
-     The current focus/goal belongs in the PROMPT (and the living status/plan
-     docs), never in this file. Delete any section that doesn't apply. -->
+     The current focus or goal belongs in the PROMPT and the living status/plan docs, never in this file.
+     Delete any section that doesn't apply. -->
 
 ## What this project is
 
@@ -12,13 +12,13 @@
 
 ## Vocabulary
 
-<The load-bearing terms a session must know to read the code and talk to you:
- the words you use that aren't obvious from the code. Keep it to real terms, not a glossary dump.>
+<The load-bearing terms a session must know to read the code and talk to you.>
+<The words you use that aren't obvious from the code; keep it to real terms, not a glossary dump.>
 
 ## Layout
 
-<A short map of where the main pieces live. Point to README.md for the full version
- rather than duplicating it here.>
+<A short map of where the main pieces live.>
+<Point to README.md for the full version rather than duplicating it here.>
 
 ## Environment & commands
 
@@ -32,12 +32,13 @@
 
 ## Language & toolchain specifics
 
-<Per-language style lives in `format/`. Put project-wide toolchain facts here:
- compiler versions, feature flags, indent exceptions.>
+<Per-language style lives in `format/`.>
+<Put project-wide toolchain facts here: compiler versions, feature flags, indent exceptions.>
 
 ## Upstream / external (if any)
 
-<What external or upstream code is carried, from where, how it is reproduced, and the regen command. Delete if none.>
+<What external or upstream code is carried, from where, how it is reproduced, and the regen command.>
+<Delete if none.>
 
 ## Docs map
 
@@ -49,5 +50,5 @@
 
 ## Overrides to the shared rules
 
-<Anywhere this project deliberately deviates from session.md / engineering.md:
- state the rule and why. If empty, the shared rules apply as written.>
+<Anywhere this project deliberately deviates from session.md / engineering.md, state the rule and why.>
+<If empty, the shared rules apply as written.>
