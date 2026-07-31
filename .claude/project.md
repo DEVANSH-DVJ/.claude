@@ -34,6 +34,7 @@
 
 <!-- Link the living docs so nothing is duplicated here. Adjust to this project.
      Avoid a top-level docs/ folder: it collides with docker/ on tab-completion. Prefer notes/, guides/, or reference/. -->
+
 - `README.md`: orientation + layout
 - `run.md`: every run command
 - `notes/`: deeper guides

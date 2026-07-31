@@ -24,22 +24,24 @@ Formatting is the `/format` skill; running the toolchain through the container w
 
 ## Skills
 
-| Skill | What it does |
-|---|---|
-| `/review-diff` | review the working diff against this project's own rule files |
-| `/commit` | guided, pathspec-safe commit |
-| `/format` | format files, folders, or globs with the project formatter |
-| `/delegate` | subagent orchestration playbook |
-| `comment-style` | terse-comment doctrine, auto-loads when editing source files |
+| Skill           | What it does                                                  |
+| --------------- | ------------------------------------------------------------- |
+| `/review-diff`  | review the working diff against this project's own rule files |
+| `/commit`       | guided, pathspec-safe commit                                  |
+| `/format`       | format files, folders, or globs with the project formatter    |
+| `/delegate`     | subagent orchestration playbook                               |
+| `comment-style` | terse-comment doctrine, auto-loads when editing source files  |
 
 ## Adopting this template
 
 In the target repo, either follow the manual steps or hand them to an agent.
 
 **Agent-driven (recommended):** launch an Opus session in the target repo and ask:
+
 > Set up the Claude Code workflow from `github.com/devansh-dvj/.claude`: copy `.claude/`, `format/`, and `docker/` in; fill `.claude/project.md` for this repo; set the project name in the docker scripts (`sed -i 's/myproject/<slug>/g' docker/*.sh`); then edit `docker/Dockerfile.amd64` for the toolchain.
 
 **Manual:**
+
 1. Copy `.claude/`, `format/`, and `docker/` into the repo root.
 2. Fill in `.claude/project.md` (what the project is, vocab, layout, commands, docs map).
 3. Set the project name in the docker scripts: `sed -i 's/myproject/<your-slug>/g' docker/*.sh`. Then edit `docker/Dockerfile.amd64` for the toolchain.
