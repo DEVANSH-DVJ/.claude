@@ -1,9 +1,8 @@
 ---
 name: commit
-description: Guided safe commit -- stage explicit paths, check the diff, commit by pathspec with a clean message. User-invoked only.
-disable-model-invocation: true
+description: Guided safe commit -- stage explicit paths, check the diff, commit by pathspec with a clean message. Use when the user asks to commit.
 user-invocable: true
-argument-hint: [paths...]
+argument-hint: "[paths...]"
 allowed-tools: Bash(git status *), Bash(git diff *), Bash(git add -- *), Bash(git commit *), Bash(git show *), Read
 ---
 
