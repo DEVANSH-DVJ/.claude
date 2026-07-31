@@ -12,6 +12,6 @@ Orchestration playbook. The main session owns reasoning, planning, verdicts, and
 - Prefer a fresh launch over resuming for substantial follow-ups: a resumed subagent can silently continue on the parent model.
 - Launch long runs in the background and rely on the completion notification; do not poll status or logs from the main session.
 - Run independent subagents in parallel (one message, multiple launches); keep dependent work sequential.
-- Subagents never run git writes or commit -- they report changes back for the main session to handle.
+- In every subagent prompt, tell it not to run git writes or commit and to report changes back instead: subagents don't reliably read the repo rules, so it must be stated inline.
 
 See `session.md` for the standing rules; this skill is the how-to.
