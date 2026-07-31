@@ -37,7 +37,6 @@
      Avoid a top-level docs/ folder: it collides with docker/ on tab-completion. Prefer notes/, guides/, or reference/. -->
 - `README.md`: orientation + layout
 - `run.md`: every run command
-- `<PLAN/STATUS>.md`: living per-goal status
 - `notes/`: deeper guides
 
 ## Overrides to the shared rules
