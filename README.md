@@ -1,6 +1,6 @@
 # .claude template
 
-A portable Claude Code workflow for R&D repos: agnostic rule docs, deterministic enforcement hooks, judgment skills, and formatter/container tooling.
+A portable Claude Code workflow for R&D repos: agnostic rule docs, judgment skills, and formatter/container tooling.
 Canonical source: `github.com/devansh-dvj/.claude`.
 
 ## What is in here
@@ -11,47 +11,45 @@ CLAUDE.md                 thin loader: @-includes the three rule files
   session.md              how I work in any session (agnostic)
   engineering.md          code/diff/comment/docs conventions (agnostic)
   project.md              the ONE file you fill in per project
-  rules/                  path-scoped rules (per-language), auto-loaded on matching edits
-  settings.json           wires the hooks
-  workflow.conf           the per-project knob file the hooks read
-  hooks/                  deterministic enforcement (git-guard, docker-route, format, comment-lint, stop-gate)
-  skills/                 judgment playbooks (review-diff, commit, delegate, comment-style)
+  skills/                 review-diff, commit, delegate, format, comment-style
 format/                   one formatter dispatcher + per-language configs
 docker/                   exec wrapper, build, chown, entrypoint, Dockerfile
 ```
 
-## The model: hooks are the tripwire, skills are the playbook
+## No hooks, by choice
 
-- **Hooks** (deterministic, host-side) enforce what must always happen: block unsafe git, route toolchain commands through the container, format edited files. All fail open, all honor `WORKFLOW_HOOKS_DISABLE=1`.
-- **Skills** (judgment, on-demand) carry the rules a human must apply: review a diff, make a safe commit, delegate to subagents. They surface at the right moment via `paths:` auto-load or explicit invocation.
+Enforcement is through rules the agent applies with judgment (the `.claude/*.md` docs) and skills you invoke, not blocking hooks.
+We tried deterministic hooks (format-on-edit, docker-routing, a commit guard) and dropped them.
+A research workflow has too many legitimate exceptions: running a toolchain on the host, skipping a trivial format, rebasing to consolidate history.
+Commit permission is per-session (your in-conversation grant, not a repo flag), so a repo-level commit gate either nags the session you authorized or blocks it.
+And a hook that mutates files or blocks commands gets in the way more than it helps.
+Commit hygiene (pathspec commits, no identity override, no `Co-Authored-By`) lives in `session.md` and the `/commit` skill.
 
-Only `git-guard` is active by default. `docker-route`, `format-dispatch`, `comment-lint`, and `stop-gate` are dormant until you opt in through `.claude/workflow.conf`.
+## Skills
+
+| Skill | What it does |
+|---|---|
+| `/review-diff` | review the working diff against this project's own rule files |
+| `/commit` | guided, pathspec-safe commit |
+| `/format` | format files, folders, or globs with the project formatter |
+| `/delegate` | subagent orchestration playbook |
+| `comment-style` | terse-comment doctrine, auto-loads when editing source files |
 
 ## Adopting this template
 
 In the target repo, either follow the manual steps or hand them to an agent.
 
 **Agent-driven (recommended):** launch an Opus session in the target repo and ask:
-> Set up the Claude Code workflow from `github.com/devansh-dvj/.claude`: copy `.claude/`, `format/`, and `docker/` in; fill `.claude/project.md` and `.claude/workflow.conf` for this repo; then run `.claude/hooks/selftest.sh`.
+> Set up the Claude Code workflow from `github.com/devansh-dvj/.claude`: copy `.claude/`, `format/`, and `docker/` in; fill `.claude/project.md` for this repo; then edit `docker/config.sh` and `docker/Dockerfile` for the toolchain.
 
 **Manual:**
 1. Copy `.claude/`, `format/`, and `docker/` into the repo root.
 2. Fill in `.claude/project.md` (what the project is, vocab, layout, commands, docs map).
-3. Edit `.claude/workflow.conf`: set `COMMIT_POLICY`, and opt in to `EXEC_WRAPPER` / `FORMAT_CMD` / `COMMENT_LINT` / `STOP_GATE` as wanted.
-4. Edit `docker/config.sh` (`PROJECT_SLUG`) and `docker/Dockerfile` for the project's toolchain.
-5. Add per-language rules under `.claude/rules/` if the defaults need extending.
-6. Run `.claude/hooks/selftest.sh` and confirm it prints `ok`.
+3. Edit `docker/config.sh` (`PROJECT_SLUG`) and `docker/Dockerfile` for the project's toolchain.
+4. Use the skills: `/format` before commits, `/review-diff` before finishing, `/commit` to commit.
 
-## workflow.conf knobs
+## House rules carried by these docs
 
-| Knob | Default | Effect |
-|---|---|---|
-| `COMMIT_POLICY` | `ask` | `deny` (never commit) / `ask` (user approves each) / `allow` |
-| `SUBAGENT_GIT_WRITE` | `deny` | subagents never run git writes |
-| `DENY_INDEX_WIDE_ADD` | `1` | block `git add -A` / `.` |
-| `EXEC_WRAPPER` | `` | set to `docker/exec.sh` to route toolchain commands |
-| `FORMAT_MODE` / `FORMAT_CMD` | `off` / `` | auto-format edited files |
-| `COMMENT_LINT` | `off` | warn on change-log comments |
-| `STOP_GATE` | `off` | non-blocking end-of-turn reminder |
-
-House rule carried by these docs: no em-dashes or en-dashes anywhere; use `--` or `---`.
+- One sentence per line, no character limit, in markdown (README and docs) and LaTeX.
+- No em-dashes or en-dashes anywhere; use `--` or `---`.
+- Say "upstream" or "external", never "vendor".
