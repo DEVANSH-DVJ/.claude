@@ -1,7 +1,7 @@
 # Engineering rules
 
 Project-agnostic engineering conventions.
-Language- and toolchain-specific rules live in path-scoped `.claude/rules/*.md` (loaded only when a matching file is touched); project commands and layout live in `project.md`.
+Project commands, layout, and any language-specific conventions live in `project.md`.
 
 ## Diff discipline
 
@@ -32,7 +32,7 @@ Language- and toolchain-specific rules live in path-scoped `.claude/rules/*.md` 
 
 - All build / lint / test / run commands go through the project's runner (e.g. a `docker/exec.sh` wrapper), never the host toolchain directly. The exact commands live in `project.md`.
 - After editing, run the build or typecheck. Before finishing, run the linter and treat warnings as failures.
-- Format edited files before committing, using the project's formatter (`format/format.sh`). Per-language style lives in `format/` and the language's `.claude/rules/*.md`.
+- Format edited files before committing, using the project's formatter (`format/format.sh`). Per-language style lives in `format/`.
 
 ## Upstream / external code
 

@@ -32,8 +32,8 @@
 
 ## Language & toolchain specifics
 
-<Per-language conventions live in `.claude/rules/*.md` (path-scoped). Put project-wide
- toolchain facts here: compiler versions, feature flags, anything a rule file shouldn't own.>
+<Per-language style lives in `format/`. Put project-wide toolchain facts here:
+ compiler versions, feature flags, indent exceptions.>
 
 ## Upstream / external (if any)
 
