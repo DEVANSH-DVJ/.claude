@@ -3,7 +3,6 @@
 <!-- This is the ONE file you fill in per project.
      session.md and engineering.md are shared and agnostic, normally left untouched.
      Keep this lean: durable facts and pointers, not the current task, and not a spec.
-     Trust the setup agent to fill each section for this project; do not over-prescribe.
      The current focus or goal belongs in the PROMPT and the living status/plan docs, never here.
      Delete any section that doesn't apply. -->
 
