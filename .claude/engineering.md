@@ -23,8 +23,9 @@ Project commands, layout, and any language-specific conventions live in `project
 
 ## Docs discipline
 
-- Rationale, design, and "why" live in the project's living docs (status / plan / README), not in code comments.
-- Those docs are prunable: trim them periodically to only what is critical for future review. A lossy prune is fine and expected.
+- Never leak session discussion or decision history into any committed file: code, README, configs, or these rule docs. State what a thing IS, not how we arrived at it or what we tried.
+- Rationale and "why" that must persist go only to the living status/plan docs, kept minimal; code comments and core files (README, configs) stay free of it.
+- Those living docs are prunable: trim them to only what is critical for future review. A lossy prune is fine and expected.
 - Don't hoard dead-ends ("tried X, it didn't work"). They go stale and steer future sessions away from now-viable routes. Record what is true and what is next, not the graveyard.
 - When rewriting a doc, preserve the old text under an "Old \<doc\>" section until the new version is confirmed working (see `session.md`).
 
