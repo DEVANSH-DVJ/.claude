@@ -3,7 +3,7 @@ name: format
 description: Format code with the project formatter. Use before committing or when asked to format; format only the files you touched. Fine to skip for trivial edits.
 user-invocable: true
 argument-hint: [paths...]
-allowed-tools: Bash(format/format.sh *), Bash(./format/format.sh *), Bash(docker/exec.sh *)
+allowed-tools: Bash(format/format.sh *), Bash(./format/format.sh *), Bash(docker/exec.sh *), Bash(./docker/exec.sh *)
 ---
 
 Format with the project formatter (`format/format.sh`), which skips any formatter not on PATH.

@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # Format source files. Silently skips any formatter not on PATH.
 #   whole tree:   ./format/format.sh
-#   paths/globs:  ./format/format.sh src/ lib/util.py *.rs      (shell expands globs)
-#   single file:  ./format/format.sh --file <path>             (used by the format hook)
+#   paths/globs:  ./format/format.sh src/ lib/util.py *.rs      (shell expands globs; a single file works too)
 set -euo pipefail
 
 FORMAT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -56,12 +55,6 @@ fmt_tree() {
     fi
   fi
 }
-
-# Single-file mode (the format hook calls this): dispatch one file, no clean guard.
-if [ "${1:-}" = "--file" ]; then
-  fmt_file "${2:?usage: format.sh --file <path>}"
-  exit 0
-fi
 
 # Explicit paths/globs: format just those files and directories, no clean guard.
 if [ "$#" -gt 0 ]; then

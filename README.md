@@ -13,7 +13,7 @@ CLAUDE.md                 thin loader: @-includes the three rule files
   project.md              the ONE file you fill in per project
   skills/                 review-diff, commit, delegate, format, comment-style
 format/                   one formatter dispatcher + per-language configs
-docker/                   exec wrapper, build, chown, entrypoint, Dockerfile
+docker/                   config.sh (edit point), exec, build, chown, entrypoint, Dockerfile, environment.yml
 ```
 
 ## Enforcement: rules and skills, not hooks

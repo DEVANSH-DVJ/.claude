@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # --- miniconda + conda env (edit environment.yml) ---
 ENV CONDA_DIR=/opt/conda
 ENV PATH=$CONDA_DIR/bin:$PATH
-RUN curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh \
+RUN curl -fsSL "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-$(uname -m).sh" -o /tmp/miniconda.sh \
     && bash /tmp/miniconda.sh -b -p "$CONDA_DIR" \
     && rm /tmp/miniconda.sh
 COPY environment.yml /tmp/environment.yml
