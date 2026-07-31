@@ -13,7 +13,7 @@ allowed-tools: Read, Grep, Glob, Bash(git diff *), Bash(git status *), Bash(git 
 Review the working diff of this repository and report findings. Change nothing.
 
 1. Collect the diff: `git diff`, `git diff --cached`, `git status --porcelain`. Read untracked files directly.
-2. Load the project's own rules as the checklist: `.claude/engineering.md`, `.claude/project.md`, any matching `.claude/rules/*.md`, and `CONTRIBUTING.md` if present.
+2. Load the project's own rules as the checklist: `.claude/engineering.md` and `.claude/project.md`.
 3. Review every hunk, in priority order:
    - correctness bugs and behavior changes not implied by the task,
    - violations of the loaded rules (diff discipline, comment style, dependency additions, upstream-patch minimality),
