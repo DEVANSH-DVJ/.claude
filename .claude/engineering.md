@@ -49,5 +49,5 @@ Language- and toolchain-specific rules live in path-scoped `.claude/rules/*.md` 
 
 ## Prose and house style
 
-- One sentence per line. Never hard-wrap mid-sentence for width.
+- One sentence per line, with no character limit, in markdown (README and docs) and LaTeX (`.tex`). Never hard-wrap mid-sentence for width.
 - No em-dashes or en-dashes anywhere, in code, markdown, or commit messages. Use `--` or `---` instead.
