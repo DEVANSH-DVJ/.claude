@@ -16,14 +16,11 @@ format/                   one formatter dispatcher + per-language configs
 docker/                   exec wrapper, build, chown, entrypoint, Dockerfile
 ```
 
-## No hooks, by choice
+## Enforcement: rules and skills, not hooks
 
-Enforcement is through rules the agent applies with judgment (the `.claude/*.md` docs) and skills you invoke, not blocking hooks.
-We tried deterministic hooks (format-on-edit, docker-routing, a commit guard) and dropped them.
-A research workflow has too many legitimate exceptions: running a toolchain on the host, skipping a trivial format, rebasing to consolidate history.
-Commit permission is per-session (your in-conversation grant, not a repo flag), so a repo-level commit gate either nags the session you authorized or blocks it.
-And a hook that mutates files or blocks commands gets in the way more than it helps.
+This template ships no hooks. Enforcement is the `.claude/*.md` rules the agent follows and the skills you invoke.
 Commit hygiene (pathspec commits, no identity override, no `Co-Authored-By`) lives in `session.md` and the `/commit` skill.
+Formatting is the `/format` skill; running the toolchain through the container wrapper is a preference in `engineering.md`.
 
 ## Skills
 
