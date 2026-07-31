@@ -22,8 +22,8 @@ fmt_file() {
   return 0
 }
 
-# Directory names every tree walk skips: VCS, build output, caches, deps.
-PRUNE=(! -path "*/.git/*" ! -path "*/target/*" ! -path "*/node_modules/*" ! -path "*/.cache/*")
+# Directory names every tree walk skips: VCS, build output, deps.
+PRUNE=(! -path "*/.git/*" ! -path "*/target/*" ! -path "*/node_modules/*")
 
 # Format all matching files under one or more directory roots.
 fmt_tree() {
