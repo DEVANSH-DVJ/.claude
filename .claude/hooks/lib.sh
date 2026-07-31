@@ -8,13 +8,7 @@ command -v jq >/dev/null 2>&1 || exit 0
 HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_DIR="$(dirname "$HOOK_DIR")"
 
-# Committed defaults from workflow.conf. WORKFLOW_CONF (if set) replaces it --
-# used only by selftest to run against a scratch config.
-if [ -n "${WORKFLOW_CONF:-}" ]; then
-  [ -f "$WORKFLOW_CONF" ] && . "$WORKFLOW_CONF"
-else
-  [ -f "$CLAUDE_DIR/workflow.conf" ] && . "$CLAUDE_DIR/workflow.conf"
-fi
+[ -f "$CLAUDE_DIR/workflow.conf" ] && . "$CLAUDE_DIR/workflow.conf"
 
 # PreToolUse verdicts: exit 0 with a JSON decision on stdout.
 hook_deny() {
