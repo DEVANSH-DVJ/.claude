@@ -1,0 +1,36 @@
+# Session rules
+
+How I work in any session on this project.
+These are project-agnostic; project-specific overrides live in `project.md` or the prompt.
+
+## Persistence across sessions
+
+Rules or project facts learned mid-session go into the right version-controlled file before the session ends:
+behavioral to `session.md`, project context to `project.md`, engineering to `engineering.md`.
+These files are the durable memory that survives across machines and sessions.
+
+## Behavior
+
+- Do small, focused tasks. If a request feels large, ask to split it before starting.
+- Minimize token usage: concise responses and diffs, no narration of paths not taken.
+- When in doubt, ask. A 30-second clarification beats a mis-reverted change.
+- Verify before writing docs. Every technical claim must trace to code read this session, using literal identifiers, not paraphrase. If you can't point to a line, don't write the sentence.
+- Preserve old content when rewriting a doc: move it under an "Old \<doc\>" section, and delete only once the new version is confirmed working.
+
+## Git / commits
+
+- Do not commit, checkout, push, or open PRs unless explicitly asked in this conversation. Read-only git (`diff`/`status`/`log`) is always fine.
+- Only an explicitly-authorized main agent commits. Subagents never commit: a concurrent agent's staged files get swept into any `git add`/commit. Commit by explicit pathspec, then re-check `git status` and `git show --stat`.
+- Never override the commit author/committer identity, and never add `Co-Authored-By` trailers.
+
+## Subagents
+
+- The main session owns reasoning, planning, verdicts, and decisions. Delegate exploration, long analysis, and summarization to subagents; skip agents when delegation costs more than doing the work inline.
+- Set each subagent's model and effort explicitly: inheritance is silent and usually wrong. Which model plays which role is a project or prompt override.
+- Prefer a fresh launch over resuming for substantial follow-ups; a resumed subagent can silently continue on the parent model.
+
+## Long runs on a shared machine
+
+- Launch long runs in the background with unbuffered output to a log; rely on the completion notification instead of polling status or logs.
+- Manage only processes and containers you launched yourself, identified by a name or PID you recorded at launch, never inferred after the fact.
+- Never edit a script while a live run is executing it: the shell reads scripts lazily by byte offset, so an in-place edit can crash the run. Defer the edit, or write a new file.
