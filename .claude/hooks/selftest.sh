@@ -65,5 +65,21 @@ echo "text" > "$tmpd/x.md"
 fcheck "md not listed -> exit 0" "{\"tool_input\":{\"file_path\":\"$tmpd/x.md\"}}" 0
 rm -rf "$tmpd"
 
+# --- comment-lint (PostToolUse; exit 2 == banned comment) ---
+clint="$HOOK_DIR/comment-lint.sh"
+cconf="$(mktemp)"
+printf '%s\n' 'COMMENT_LINT="warn"' 'COMMENT_LINT_EXTENSIONS="rs"' \
+  "COMMENT_BANNED_REGEX='(//|#)[[:space:]]*(added |fix(es|ed) |previously)'" > "$cconf"
+ccheck() {
+  local label="$1" json="$2" expect="$3"
+  printf '%s' "$json" | WORKFLOW_CONF="$cconf" "$clint" >/dev/null 2>&1
+  local got=$?
+  if [ "$got" != "$expect" ]; then echo "FAIL: $label -> expected exit $expect, got $got"; fail=1; fi
+}
+ccheck "banned // added -> exit 2"  '{"tool_input":{"file_path":"a.rs","new_string":"// added retry\nfn f(){}"}}' 2
+ccheck "clean comment -> exit 0"    '{"tool_input":{"file_path":"a.rs","new_string":"// retry once on timeout\nfn f(){}"}}' 0
+ccheck "md not linted -> exit 0"    '{"tool_input":{"file_path":"a.md","new_string":"// added note"}}' 0
+rm -f "$cconf"
+
 [ "$fail" = 0 ] && echo "ok: hook selftests passed"
 exit "$fail"

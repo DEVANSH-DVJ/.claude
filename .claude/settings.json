@@ -25,6 +25,11 @@
             "type": "command",
             "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/format-dispatch.sh",
             "timeout": 120
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/comment-lint.sh",
+            "timeout": 10
           }
         ]
       }
