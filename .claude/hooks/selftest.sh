@@ -81,5 +81,14 @@ ccheck "clean comment -> exit 0"    '{"tool_input":{"file_path":"a.rs","new_stri
 ccheck "md not linted -> exit 0"    '{"tool_input":{"file_path":"a.md","new_string":"// added note"}}' 0
 rm -f "$cconf"
 
+# --- stop-gate (Stop; non-blocking, loop-guarded) ---
+sgate="$HOOK_DIR/stop-gate.sh"
+sconf="$(mktemp)"; printf '%s\n' 'STOP_GATE="on"' > "$sconf"
+out="$(printf '%s' '{"stop_hook_active":true}' | WORKFLOW_CONF="$sconf" "$sgate" 2>/dev/null)"
+[ -z "$out" ] || { echo "FAIL: stop-gate must stay silent when stop_hook_active"; fail=1; }
+out="$(printf '%s' '{}' | "$sgate" 2>/dev/null)"
+[ -z "$out" ] || { echo "FAIL: stop-gate must be silent when STOP_GATE=off (default)"; fail=1; }
+rm -f "$sconf"
+
 [ "$fail" = 0 ] && echo "ok: hook selftests passed"
 exit "$fail"
