@@ -26,10 +26,6 @@
 
 <Anything a session needs beyond the defaults: toolchain versions, feature flags, per-language style not covered by `format/`.>
 
-## Upstream / external (if any)
-
-<Any external or upstream code the project carries, and how it is kept in sync. Delete if none.>
-
 ## Docs map
 
 <!-- Link the living docs so nothing is duplicated here. Adjust to this project.

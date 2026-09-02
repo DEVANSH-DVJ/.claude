@@ -14,8 +14,8 @@ Review the working diff of this repository and report findings. Change nothing.
 2. Load the project's own rules as the checklist: `.claude/engineering.md` and `.claude/project.md`.
 3. Review every hunk, in priority order:
    - correctness bugs and behavior changes not implied by the task,
-   - violations of the loaded rules (diff discipline, comment style, dependency additions, upstream-patch minimality),
-   - missing symmetry the rules imply (edited upstream code without regenerating patches; a "why" comment that belongs in the living docs),
+   - violations of the loaded rules (diff discipline, comment style, dependency additions),
+   - missing symmetry the rules imply (a "why" comment that belongs in the living docs),
    - style only when it obscures meaning.
 4. Report one line per finding: `SEVERITY file:line -- issue -- suggested fix`. Severities: BLOCKER / MAJOR / MINOR / NIT. End with a one-paragraph verdict.
 

@@ -35,11 +35,6 @@ Project commands, layout, and any language-specific conventions live in `project
 - After editing, run the build or typecheck. Before finishing, run the linter and treat warnings as failures.
 - Format edited files before committing, using the project's formatter (`format/format.sh`). Per-language style lives in `format/`.
 
-## Upstream / external code
-
-- If the project carries external or upstream code, keep it reproducible and minimal: patch only where genuinely required, prefer changing our own files over the upstream ones, and regenerate the patch set after any edit. Layout and commands in `project.md`.
-- Say "upstream" or "external", never "vendor" or "vendored": the word is ambiguous about who wrote and who owns the code.
-
 ## Things to avoid
 
 - Speculative generality: extra abstraction, generics, or knobs for futures not reached. Add abstraction at the second use site, not the first.
