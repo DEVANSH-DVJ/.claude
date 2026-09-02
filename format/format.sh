@@ -48,7 +48,7 @@ fmt_tree() {
     echo "[format] skipping shfmt: not on PATH" >&2
   fi
   if has prettier; then
-    echo "[format] markdown/web"
+    echo "[format] markdown/json/yaml"
     find "${roots[@]}" \( -name "*.md" -o -name "*.json" -o -name "*.yaml" -o -name "*.yml" \) "${PRUNE[@]}" -print0 |
       xargs -0 -r prettier --write --log-level warn --config "$FORMAT_DIR/.prettierrc.json"
   else
