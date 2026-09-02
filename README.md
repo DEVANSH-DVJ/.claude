@@ -11,7 +11,8 @@ CLAUDE.md                 thin loader: @-includes the three rule files
   session.md              how I work in any session (agnostic)
   engineering.md          code/diff/comment/docs conventions (agnostic)
   project.md              the ONE file you fill in per project
-  skills/                 review-diff, commit, delegate, format, comment-style
+  settings.json           registers the anthropic-agent-skills marketplace and enables its document-skills plugin
+  skills/                 review-diff, commit, delegate, format, comment-style, pptx-addon, drawio
 format/                   one formatter dispatcher + per-language configs
 docker/                   build, run, cleanup, exec, chown, entrypoint scripts + Dockerfile.amd64 + environment.yml
 ```
@@ -24,13 +25,18 @@ Formatting is the `/format` skill; running the toolchain through the container w
 
 ## Skills
 
-| Skill           | What it does                                                  |
-| --------------- | ------------------------------------------------------------- |
-| `/review-diff`  | review the working diff against this project's own rule files |
-| `/commit`       | guided, pathspec-safe commit                                  |
-| `/format`       | format files, folders, or globs with the project formatter    |
-| `/delegate`     | subagent orchestration playbook                               |
-| `comment-style` | terse-comment doctrine, auto-loads when editing source files  |
+| Skill           | What it does                                                                                                      |
+| --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `/review-diff`  | review the working diff against this project's own rule files                                                     |
+| `/commit`       | guided, pathspec-safe commit                                                                                      |
+| `/format`       | format files, folders, or globs with the project formatter                                                        |
+| `/delegate`     | subagent orchestration playbook                                                                                   |
+| `comment-style` | terse-comment doctrine, auto-loads when editing source files                                                      |
+| `pptx-addon`    | slide decks: render, edit only the requested slides, prove the rest unchanged; image requirements in its SKILL.md |
+| `drawio`        | native `.drawio` diagrams; export needs the draw.io desktop CLI                                                   |
+
+Claude Code loads a personal `~/.claude/skills/<name>` over a project skill of the same name, so keep no personal copies of these.
+Anthropic's document skills (`/document-skills:pptx` and friends) are source-available, not open source, so they are not copied here; `settings.json` installs them as a plugin on each machine instead.
 
 ## Adopting this template
 
