@@ -38,6 +38,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends shfmt clang-for
     && npm install -g prettier \
     && rustup component add rustfmt
 
+# draw.io desktop for headless diagram export (docker/drawio-export.sh)
+ARG DRAWIO_VERSION=31.3.2
+RUN curl -fsSL "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -o /tmp/drawio.deb \
+    && apt-get update && apt-get install -y --no-install-recommends xvfb /tmp/drawio.deb \
+    && rm -rf /var/lib/apt/lists/* /tmp/drawio.deb
+
 # interactive entrypoint (exec.sh overrides this with bash)
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh

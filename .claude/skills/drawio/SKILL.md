@@ -5,6 +5,13 @@ description: Always use when user asks to create, generate, draw, or design a di
 
 Copied from github.com/jgraph/drawio-mcp (plugins/claude-code), Apache-2.0; license text in LICENSE next to this file.
 
+## This repo
+
+- Export only inside the container: `./docker/exec.sh ".claude/skills/drawio/scripts/export.sh <in.drawio> <out.png or out.pdf> [scale] [page]"`; a multi-page diagram exports one page per call. There is no host draw.io CLI, so the steps below that locate one do not apply.
+- Never open the result; report its path.
+- Keep every `.drawio` source beside its export and never delete it.
+- The image needs the draw.io block: xvfb and the draw.io desktop package.
+
 # Draw.io Diagram Skill
 
 Generate draw.io diagrams as native `.drawio` files. Optionally export to PNG, SVG, or PDF with the diagram XML embedded (so the exported file remains editable in draw.io).
@@ -30,12 +37,12 @@ If no format is mentioned, just write the `.drawio` file and open it in draw.io.
 
 ### Supported export formats
 
-| Format | Embed XML | Notes |
-|--------|-----------|-------|
-| `png` | Yes (`-e`) | Viewable everywhere, editable in draw.io |
-| `svg` | Yes (`-e`) | Scalable, editable in draw.io |
-| `pdf` | Yes (`-e`) | Printable, editable in draw.io |
-| `jpg` | No | Lossy, no embedded XML support |
+| Format | Embed XML  | Notes                                    |
+| ------ | ---------- | ---------------------------------------- |
+| `png`  | Yes (`-e`) | Viewable everywhere, editable in draw.io |
+| `svg`  | Yes (`-e`) | Scalable, editable in draw.io            |
+| `pdf`  | Yes (`-e`) | Printable, editable in draw.io           |
+| `jpg`  | No         | Lossy, no embedded XML support           |
 
 PNG, SVG, and PDF all support `--embed-diagram` -- the exported file contains the full diagram XML, so opening it in draw.io recovers the editable diagram.
 
@@ -106,6 +113,7 @@ drawio -x -f <format> -e -b 10 -o <output> <input.drawio>
 ```
 
 Key flags:
+
 - `-x` / `--export`: export mode
 - `-f` / `--format`: output format (png, svg, pdf, jpg)
 - `-e` / `--embed-diagram`: embed diagram XML in the output (PNG, SVG, PDF only)
@@ -119,14 +127,15 @@ Key flags:
 
 ### Opening the result
 
-| Environment | Command |
-|-------------|---------|
-| macOS | `open <file>` |
-| Linux (native) | `xdg-open <file>` |
-| WSL2 | `cmd.exe /c start "" "$(wslpath -w <file>)"` |
-| Windows | `start <file>` |
+| Environment    | Command                                      |
+| -------------- | -------------------------------------------- |
+| macOS          | `open <file>`                                |
+| Linux (native) | `xdg-open <file>`                            |
+| WSL2           | `cmd.exe /c start "" "$(wslpath -w <file>)"` |
+| Windows        | `start <file>`                               |
 
 **WSL2 notes:**
+
 - `wslpath -w <file>` converts a WSL2 path (e.g. `/home/user/diagram.drawio`) to a Windows path (e.g. `C:\Users\...`). This is required because `cmd.exe` cannot resolve `/mnt/c/...` style paths.
 - The empty string `""` after `start` is required to prevent `start` from interpreting the filename as a window title.
 
@@ -172,13 +181,13 @@ https://raw.githubusercontent.com/jgraph/drawio-mcp/main/shared/xml-reference.md
 
 ## Troubleshooting
 
-| Problem | Cause | Solution |
-|---------|-------|----------|
-| draw.io CLI not found | Desktop app not installed or not on PATH | Keep the `.drawio` file and tell the user to install the draw.io desktop app, or open the file manually |
-| Export produces empty/corrupt file | Invalid XML (e.g. double hyphens in comments, unescaped special characters) | Validate XML well-formedness before writing; see the XML well-formedness section below |
-| Diagram opens but looks blank | Missing root cells `id="0"` and `id="1"` | Ensure the basic mxGraphModel structure is complete |
-| Edges not rendering | Edge mxCell is self-closing (no child mxGeometry element) | Every edge must have `<mxGeometry relative="1" as="geometry" />` as a child element |
-| File won't open after export | Incorrect file path or missing file association | Print the absolute file path so the user can open it manually |
+| Problem                            | Cause                                                                       | Solution                                                                                                |
+| ---------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| draw.io CLI not found              | Desktop app not installed or not on PATH                                    | Keep the `.drawio` file and tell the user to install the draw.io desktop app, or open the file manually |
+| Export produces empty/corrupt file | Invalid XML (e.g. double hyphens in comments, unescaped special characters) | Validate XML well-formedness before writing; see the XML well-formedness section below                  |
+| Diagram opens but looks blank      | Missing root cells `id="0"` and `id="1"`                                    | Ensure the basic mxGraphModel structure is complete                                                     |
+| Edges not rendering                | Edge mxCell is self-closing (no child mxGeometry element)                   | Every edge must have `<mxGeometry relative="1" as="geometry" />` as a child element                     |
+| File won't open after export       | Incorrect file path or missing file association                             | Print the absolute file path so the user can open it manually                                           |
 
 ## CRITICAL: XML well-formedness
 

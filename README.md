@@ -34,7 +34,7 @@ Formatting is the `/format` skill; running the toolchain through the container w
 | `comment-style` | terse-comment doctrine, auto-loads when editing source files                                                      |
 | `pptx-addon`    | slide decks: render, edit only the requested slides, prove the rest unchanged; image requirements in its SKILL.md |
 | `pdf-addon`     | PDF review: render pages with a contact sheet, diff two versions page by page by text and pixels                  |
-| `drawio`        | native `.drawio` diagrams; export needs the draw.io desktop CLI                                                   |
+| `drawio`        | native `.drawio` diagrams; the image exports them headlessly through `.claude/skills/drawio/scripts/export.sh`                                                   |
 
 Claude Code loads a personal `~/.claude/skills/<name>` over a project skill of the same name, so keep no personal copies of these.
 Anthropic's document skills (`/document-skills:pptx` and friends) are source-available, not open source, so they are not copied here; `settings.json` installs them as a plugin on each machine instead.
