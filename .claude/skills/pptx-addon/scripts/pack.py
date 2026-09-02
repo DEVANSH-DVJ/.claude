@@ -7,6 +7,7 @@ Usage:
     python pack.py work/<name> out.pptx
 """
 
+import os
 import sys
 import zipfile
 from pathlib import Path
@@ -50,12 +51,20 @@ def main():
     files = sorted(p for p in src.rglob("*") if p.is_file())
     # content types first, as Office writes it
     files.sort(key=lambda p: p.name != "[Content_Types].xml")
-    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
-        for f in files:
-            name = f.relative_to(src).as_posix()
-            data = minified(f) if f.suffix in (".xml", ".rels") else f.read_bytes()
-            z.writestr(name, data)
-    print(f"packed {src}/ -> {out}: {check(out)}")
+    # build beside the target; the deck changes only after a complete, checked archive exists
+    tmp = out.with_name(out.name + ".tmp")
+    try:
+        with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
+            for f in files:
+                name = f.relative_to(src).as_posix()
+                data = minified(f) if f.suffix in (".xml", ".rels") else f.read_bytes()
+                z.writestr(name, data)
+        report = check(tmp)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
+    os.replace(tmp, out)
+    print(f"packed {src}/ -> {out}: {report}")
 
 
 if __name__ == "__main__":
