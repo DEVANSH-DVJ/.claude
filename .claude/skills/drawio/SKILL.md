@@ -3,6 +3,8 @@ name: drawio
 description: Always use when user asks to create, generate, draw, or design a diagram, flowchart, architecture diagram, ER diagram, sequence diagram, class diagram, network diagram, mockup, wireframe, or UI sketch, or mentions draw.io, drawio, drawoi, .drawio files, or diagram export to PNG/SVG/PDF.
 ---
 
+Copied from github.com/jgraph/drawio-mcp (plugins/claude-code), Apache-2.0; license text in LICENSE next to this file.
+
 # Draw.io Diagram Skill
 
 Generate draw.io diagrams as native `.drawio` files. Optionally export to PNG, SVG, or PDF with the diagram XML embedded (so the exported file remains editable in draw.io).
@@ -11,18 +13,18 @@ Generate draw.io diagrams as native `.drawio` files. Optionally export to PNG, S
 
 1. **Generate draw.io XML** in mxGraphModel format for the requested diagram
 2. **Write the XML** to a `.drawio` file in the current working directory using the Write tool
-3. **Post-process edge routing** (optional): If `npx @drawio/postprocess` is available, run it on the `.drawio` file to optimize edge routing (simplify waypoints, fix edge-vertex collisions, straighten approach angles). Skip silently if not available — do not install it or ask the user about it
+3. **Post-process edge routing** (optional): If `npx @drawio/postprocess` is available, run it on the `.drawio` file to optimize edge routing (simplify waypoints, fix edge-vertex collisions, straighten approach angles). Skip silently if not available -- do not install it or ask the user about it
 4. **If the user requested an export format** (png, svg, pdf), locate the draw.io CLI (see below), export with `--embed-diagram`, then delete the source `.drawio` file. If the CLI is not found, keep the `.drawio` file and tell the user they can install the draw.io desktop app to enable export, or open the `.drawio` file directly
-5. **Open the result** — the exported file if exported, or the `.drawio` file otherwise. If the open command fails, print the file path so the user can open it manually
+5. **Open the result** -- the exported file if exported, or the `.drawio` file otherwise. If the open command fails, print the file path so the user can open it manually
 
 ## Choosing the output format
 
 Check the user's request for a format preference. Examples:
 
-- `/drawio create a flowchart` → `flowchart.drawio`
-- `/drawio png flowchart for login` → `login-flow.drawio.png`
-- `/drawio svg: ER diagram` → `er-diagram.drawio.svg`
-- `/drawio pdf architecture overview` → `architecture-overview.drawio.pdf`
+- `/drawio create a flowchart` -> `flowchart.drawio`
+- `/drawio png flowchart for login` -> `login-flow.drawio.png`
+- `/drawio svg: ER diagram` -> `er-diagram.drawio.svg`
+- `/drawio pdf architecture overview` -> `architecture-overview.drawio.pdf`
 
 If no format is mentioned, just write the `.drawio` file and open it in draw.io. The user can always ask to export later.
 
@@ -35,7 +37,7 @@ If no format is mentioned, just write the `.drawio` file and open it in draw.io.
 | `pdf` | Yes (`-e`) | Printable, editable in draw.io |
 | `jpg` | No | Lossy, no embedded XML support |
 
-PNG, SVG, and PDF all support `--embed-diagram` — the exported file contains the full diagram XML, so opening it in draw.io recovers the editable diagram.
+PNG, SVG, and PDF all support `--embed-diagram` -- the exported file contains the full diagram XML, so opening it in draw.io recovers the editable diagram.
 
 ## draw.io CLI
 
@@ -138,12 +140,12 @@ cmd.exe /c start "" "$(wslpath -w diagram.drawio)"
 
 - Use a descriptive filename based on the diagram content (e.g., `login-flow`, `database-schema`)
 - Use lowercase with hyphens for multi-word names
-- For export, use double extensions: `name.drawio.png`, `name.drawio.svg`, `name.drawio.pdf` — this signals the file contains embedded diagram XML
-- After a successful export, delete the intermediate `.drawio` file — the exported file contains the full diagram
+- For export, use double extensions: `name.drawio.png`, `name.drawio.svg`, `name.drawio.pdf` -- this signals the file contains embedded diagram XML
+- After a successful export, delete the intermediate `.drawio` file -- the exported file contains the full diagram
 
 ## XML format
 
-A `.drawio` file is native mxGraphModel XML. Always generate XML directly — Mermaid and CSV formats require server-side conversion and cannot be saved as native files.
+A `.drawio` file is native mxGraphModel XML. Always generate XML directly -- Mermaid and CSV formats require server-side conversion and cannot be saved as native files.
 
 ### Basic structure
 
@@ -180,6 +182,6 @@ https://raw.githubusercontent.com/jgraph/drawio-mcp/main/shared/xml-reference.md
 
 ## CRITICAL: XML well-formedness
 
-- **NEVER include ANY XML comments (`<!-- -->`) in the output.** XML comments are strictly forbidden — they waste tokens, can cause parse errors, and serve no purpose in diagram XML.
+- **NEVER include ANY XML comments (`<!-- -->`) in the output.** XML comments are strictly forbidden -- they waste tokens, can cause parse errors, and serve no purpose in diagram XML.
 - Escape special characters in attribute values: `&amp;`, `&lt;`, `&gt;`, `&quot;`
 - Always use unique `id` values for each `mxCell`
