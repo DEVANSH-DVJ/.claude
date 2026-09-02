@@ -27,4 +27,4 @@ docker run --rm --entrypoint bash \
   -v "${HOST_MOUNT}:/workspace:rw" \
   -w /workspace \
   "${IMAGE_NAME}" \
-  -ilc "$*"
+  -lc "$*"
