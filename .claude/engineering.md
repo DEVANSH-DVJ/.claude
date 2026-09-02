@@ -46,4 +46,5 @@ Project commands, layout, and any language-specific conventions live in `project
 ## Prose and house style
 
 - One sentence per line, with no character limit, in markdown (README and docs) and LaTeX (`.tex`). Never hard-wrap mid-sentence for width.
-- No em-dashes or en-dashes anywhere, in code, markdown, or commit messages. Use `--` or `---` instead.
+- ASCII only in every text file: no em or en dashes, arrows, curly quotes, bullets, check marks, emoji, or other non-ASCII glyphs, in code, markdown, configs, or commit messages. Write `--`, `->`, straight quotes, `...`, and words instead. Binary assets are the only exception.
+- Check with `git ls-files | xargs grep -nP '[^\x00-\x7F]'`; the output must be empty.
