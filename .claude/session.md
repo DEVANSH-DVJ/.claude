@@ -21,6 +21,7 @@ These files are the durable memory that survives across machines and sessions.
 
 - Do not commit, checkout, push, or open PRs unless explicitly asked in this conversation. Read-only git (`diff`/`status`/`log`) is always fine.
 - Only an explicitly-authorized main agent commits; subagents report changes instead of running git writes. Stage and commit by explicit pathspec, never `git add -A`: otherwise a concurrent session's staged files get swept into your commit. Re-check `git status` and `git show --stat` after.
+- Commit messages are one line, `<area>: <short lowercase imperative>`, where the area is the directory or component touched; no body, no trailers.
 - Never override the commit author/committer identity, and never add `Co-Authored-By` trailers.
 - No AI references anywhere that ships: not in code, comments, filenames, or naming.
 - For a living notes or status doc, amend successive edits into its single local commit rather than stacking per-update commits, while the commits are still local-only.
