@@ -12,7 +12,7 @@ CLAUDE.md                 thin loader: @-includes the three rule files
   engineering.md          code/diff/comment/docs conventions (agnostic)
   project.md              the ONE file you fill in per project
   settings.json           registers the anthropic-agent-skills marketplace and enables its document-skills plugin
-  skills/                 review-diff, commit, delegate, format, comment-style, pptx-addon, drawio
+  skills/                 review-diff, commit, delegate, format, comment-style, pptx-addon, pdf-addon, drawio
 format/                   one formatter dispatcher + per-language configs
 docker/                   build, run, cleanup, exec, chown, entrypoint scripts + Dockerfile.amd64 + environment.yml
 ```
@@ -33,6 +33,7 @@ Formatting is the `/format` skill; running the toolchain through the container w
 | `/delegate`     | subagent orchestration playbook                                                                                   |
 | `comment-style` | terse-comment doctrine, auto-loads when editing source files                                                      |
 | `pptx-addon`    | slide decks: render, edit only the requested slides, prove the rest unchanged; image requirements in its SKILL.md |
+| `pdf-addon`     | PDF review: render pages with a contact sheet, diff two versions page by page by text and pixels                  |
 | `drawio`        | native `.drawio` diagrams; export needs the draw.io desktop CLI                                                   |
 
 Claude Code loads a personal `~/.claude/skills/<name>` over a project skill of the same name, so keep no personal copies of these.
