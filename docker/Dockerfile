@@ -4,6 +4,7 @@
 # OS image; build.sh passes BASE_OS (a CUDA image works too)
 ARG OS=ubuntu:24.04
 FROM ${OS}
+ARG TARGETARCH
 
 ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-lc"]
@@ -13,9 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       sudo curl wget git ca-certificates build-essential pkg-config xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# node from the official tarball
+# node from the official tarball; amd64 maps to x64
 ARG NODE_VERSION=22.14.0
-RUN curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" \
+RUN curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${TARGETARCH/amd64/x64}.tar.xz" \
     | tar -xJ -C /usr/local --strip-components=1 --exclude='*/CHANGELOG.md' --exclude='*/README.md' --exclude='*/LICENSE'
 
 # miniconda pinned to py311, matching environment.yml
@@ -48,7 +49,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # draw.io desktop; export runs through .claude/skills/drawio/scripts/export.sh
 ARG DRAWIO_VERSION=31.3.2
-RUN curl -fsSL "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" -o /tmp/drawio.deb \
+RUN curl -fsSL "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-${TARGETARCH}-${DRAWIO_VERSION}.deb" -o /tmp/drawio.deb \
     && apt-get update && apt-get install -y --no-install-recommends xvfb /tmp/drawio.deb \
       libasound2t64 libgbm1 libnss3 libgtk-3-0t64 libxss1 libxtst6 libsecret-1-0 libnotify4 \
     && rm -rf /var/lib/apt/lists/* /tmp/drawio.deb

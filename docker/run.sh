@@ -5,14 +5,15 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 # Detect architecture
-ARCH=$(uname -m)
-
-if [ "$ARCH" = "x86_64" ]; then
-  IMAGE_NAME="myproject:latest-amd64"
-else
-  echo "Error: Unsupported architecture: $ARCH"
-  exit 1
-fi
+case "$(uname -m)" in
+  x86_64) ARCH="amd64" ;;
+  aarch64) ARCH="arm64" ;;
+  *)
+    echo "Error: Unsupported architecture: $(uname -m)"
+    exit 1
+    ;;
+esac
+IMAGE_NAME="myproject:latest-${ARCH}"
 
 USER_NAME="$(id -un)"
 HOST_UID="$(id -u)"
