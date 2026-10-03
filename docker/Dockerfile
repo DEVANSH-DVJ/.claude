@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       sudo curl wget git ca-certificates build-essential pkg-config xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
+# git trusts the bind-mounted workspace
+RUN git config --system --add safe.directory /workspace
+
 # node from the official tarball; amd64 maps to x64
 ARG NODE_VERSION=22.14.0
 RUN curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${TARGETARCH/amd64/x64}.tar.xz" \
