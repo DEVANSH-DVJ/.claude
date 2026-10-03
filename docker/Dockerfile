@@ -19,8 +19,8 @@ ARG NODE_VERSION=22.14.0
 RUN curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${TARGETARCH/amd64/x64}.tar.xz" \
     | tar -xJ -C /usr/local --strip-components=1 --exclude='*/CHANGELOG.md' --exclude='*/README.md' --exclude='*/LICENSE'
 
-# miniconda pinned to py311, matching environment.yml
-ARG MINICONDA_VERSION=py311_26.7.1-1
+# miniconda pinned to py314, matching environment.yml
+ARG MINICONDA_VERSION=py314_26.7.1-1
 ENV CONDA_DIR=/opt/conda
 ENV PATH=$CONDA_DIR/bin:$PATH
 RUN curl -fsSL "https://repo.anaconda.com/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-$(uname -m).sh" -o /tmp/miniconda.sh \
