@@ -8,12 +8,13 @@ cd "$(dirname "$0")"
 ARCH=$(uname -m)
 
 if [ "$ARCH" = "x86_64" ]; then
-  DOCKERFILE="Dockerfile.amd64"
+  DOCKERFILE="Dockerfile"
   IMAGE_NAME="myproject:latest-amd64"
 else
   echo "Error: Unsupported architecture: $ARCH"
   exit 1
 fi
+BASE_OS="ubuntu:24.04"
 
 usage() {
   cat <<EOF
@@ -141,7 +142,7 @@ fi
 # Build
 echo
 echo "Building ${IMAGE_NAME}..."
-docker build -f "${DOCKERFILE}" -t "${IMAGE_NAME}" .
+docker build -f "${DOCKERFILE}" -t "${IMAGE_NAME}" --build-arg OS="${BASE_OS}" .
 
 # Prune dangling images
 echo "Pruning dangling images..."
