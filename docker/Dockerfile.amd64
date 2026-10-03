@@ -1,5 +1,5 @@
 # Template dev image. Edit the blocks below for the project's toolchain.
-# build.sh builds this with the docker/ directory as context; keep build artifacts (environment.yml, entrypoint.sh) here.
+# build.sh builds this with the docker/ directory as context; keep build artifacts (environment.yml, entrypoint.sh, fonts/) here.
 # Runtime code is bind-mounted at /workspace; exec.sh overrides the entrypoint with bash.
 FROM ubuntu:24.04
 
@@ -8,7 +8,7 @@ SHELL ["/bin/bash", "-lc"]
 
 # system packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      sudo curl wget git ca-certificates build-essential pkg-config xz-utils \
+      sudo curl wget git ca-certificates build-essential pkg-config xz-utils fontconfig \
     && rm -rf /var/lib/apt/lists/*
 
 # node from the official tarball
@@ -47,6 +47,10 @@ RUN curl -fsSL "https://github.com/jgraph/drawio-desktop/releases/download/v${DR
 # interactive entrypoint (exec.sh overrides this with bash)
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# licensed fonts (docker/fonts) last, so a font edit rebuilds only this layer
+COPY fonts/ /usr/share/fonts/truetype/local/
+RUN fc-cache -f
 
 WORKDIR /workspace
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

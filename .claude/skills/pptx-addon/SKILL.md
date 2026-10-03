@@ -91,6 +91,6 @@ A LibreOffice render is not proof of the PowerPoint look: PowerPoint differs in 
 
 The project image (`docker/Dockerfile.amd64`) must provide:
 
-- apt: `libreoffice-impress poppler-utils ttf-mscorefonts-installer fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation fonts-dejavu-core fontconfig`, with the mscorefonts EULA pre-accepted via `debconf-set-selections`, plus a fontconfig alias file for fonts with no free clone (Calibri Light, Segoe UI).
+- apt: `libreoffice-impress poppler-utils fontconfig`, plus the deck's font families copied from `docker/fonts` into the image and `fc-cache -f` (the Dockerfile's fonts block); a family the image lacks shows up as `font SUBSTITUTED` in the render output.
 - conda or pip: `python-pptx pdf2image pillow lxml markitdown[pptx]`.
 - Only for the plugin's html2pptx workflow: Node 20 or newer with `pptxgenjs playwright sharp react-icons react react-dom`, `npx playwright install --with-deps chromium`, and `NODE_PATH=/usr/local/lib/node_modules`.
