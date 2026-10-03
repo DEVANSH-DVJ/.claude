@@ -32,7 +32,7 @@ Project commands, layout, and toolchain specifics live in `project.md`.
 
 ## Build, format, environment
 
-- All build / lint / test / run commands go through the project's runner (e.g. a `docker/exec.sh` wrapper), never the host toolchain directly. The exact commands live in `project.md`.
+- All build / lint / test / run commands go through the project's runner (e.g. a `docker/exec.sh` wrapper), never the host toolchain directly. The exact commands live in `project.md`. LaTeX is the one exception: `make` for papers and talks runs on the host.
 - After editing, run the build or typecheck. Before finishing, run the linter and treat warnings as failures.
 - Format edited files before committing, using the project's formatter (`format/format.sh`). Per-language style lives in `format/`.
 
