@@ -55,7 +55,12 @@ Use this for every "change slides X..Y" request. Change only what was asked; eve
    ```
    Check for text overflowing its box or the slide edge, overlapping text or shapes, misaligned titles, columns, or icons, low contrast, wrong line wraps, and leftover placeholder text.
    If anything is off, go back to step 3. Stop only when every touched slide is clean.
-6. **Report** which slides changed, what changed on each, and anything noticed on out-of-scope slides but left alone (factual errors, typos, layout bugs).
+6. **Check PowerPoint parity** before hand-off; a clean render is not enough (see below):
+   ```bash
+   ./docker/exec.sh "python .claude/skills/pptx-addon/scripts/pptcheck.py deck_v7.pptx"
+   ```
+   Fix every hit (step 3) until it exits 0.
+7. **Report** which slides changed, what changed on each, and anything noticed on out-of-scope slides but left alone (factual errors, typos, layout bugs).
 
 ## Scripts
 
@@ -64,6 +69,7 @@ Use this for every "change slides X..Y" request. Change only what was asked; eve
 - `unpack.py deck.pptx work/<name>`: extracts the ZIP and pretty-prints every XML part.
 - `pack.py work/<name> out.pptx`: reverses the pretty print, zips, and checks the result.
 - `deckdiff.py old.pptx new.pptx`: lists added, removed, and changed parts, ignoring XML whitespace and attribute order.
+- `pptcheck.py deck.pptx [...]`: flags what PowerPoint lays out differently from LibreOffice (an `<a:endParaRPr>` before the paragraph's end, a stored `normAutofit` scale, a line or a line plus the word wrapped after it within 97-103% of its box's width); exits 1 on any hit.
 
 ## Editing the XML
 
@@ -72,6 +78,14 @@ Use this for every "change slides X..Y" request. Change only what was asked; eve
 - Shapes are `<p:sp>` with `<p:nvSpPr>` (id and name), `<p:spPr>` (position `<a:off>`, size `<a:ext>`, in EMU; 914400 per inch), and the text body. Pictures are `<p:pic>` and reference media through the slide's `.rels`.
 - A new image needs three things: the file under `ppt/media/`, a `Relationship` in `ppt/slides/_rels/slideN.xml.rels`, and a `Default` or `Override` entry in `[Content_Types].xml` for its extension.
 - Speaker notes are `ppt/notesSlides/notesSlideN.xml`; theme fonts and colors are `ppt/theme/theme1.xml`; layouts and masters are `ppt/slideLayouts/` and `ppt/slideMasters/`.
+
+## PowerPoint parity
+
+A LibreOffice render is not proof of the PowerPoint look: PowerPoint differs in three ways a render cannot show, so run `pptcheck.py` before every hand-off.
+
+- PowerPoint lays out text about 1% wider than LibreOffice, so a box sized exactly to its measured text wraps in PowerPoint though it fits in the render: give the box a few percent of slack, or `wrap="none"` for a one-line label.
+- PowerPoint ignores a stored `normAutofit` `fontScale` or `lnSpcReduction` and draws the text at full size, while LibreOffice applies the shrink: never rely on autofit, state the font size explicitly and use `<a:noAutofit/>`.
+- PowerPoint drops the runs after an `<a:endParaRPr>` that is not the last child of its `<a:p>`, while LibreOffice shows them: `<a:endParaRPr>` is always the paragraph's last child.
 
 ## Image requirements
 
