@@ -21,18 +21,6 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-# metric-compatible clones
-METRIC_CLONES = {
-    "Calibri": {"Carlito"},
-    "Calibri Light": {"Carlito"},
-    "Cambria": {"Caladea"},
-    "Arial": {"Liberation Sans", "Arimo"},
-    "Helvetica": {"Liberation Sans", "Arimo"},
-    "Times New Roman": {"Liberation Serif", "Tinos"},
-    "Courier New": {"Liberation Mono", "Cousine"},
-}
-
-
 def parse_slides(spec, n):
     """'1,3-5' -> sorted unique 1-based pages within 1..n."""
     if not spec:
@@ -83,13 +71,14 @@ def report_font_substitutions(pptx):
     if not fc:
         return
     for font in deck_fonts(pptx):
-        got = subprocess.run(
-            [fc, "-f", "%{family[0]}", font], check=True, capture_output=True, text=True
+        families = subprocess.run(
+            [fc, "-f", "%{family}", font], check=True, capture_output=True, text=True
         ).stdout.strip()
-        if got == font:
+        got = families.split(",")[0]
+        # a face's own full name also matches
+        if font.casefold() in families.casefold().split(","):
             continue
-        kind = "metric clone" if got in METRIC_CLONES.get(font, set()) else "SUBSTITUTED"
-        print(f"font {kind}: {font} -> {got}", file=sys.stderr)
+        print(f"font SUBSTITUTED: {font} -> {got}", file=sys.stderr)
 
 
 def to_pdf(pptx, tmp):
