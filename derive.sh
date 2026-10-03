@@ -236,7 +236,6 @@ filled() {
 # Rewrite the target's shared Dockerfile blocks, its project tail byte for byte
 sync_dockerfile() {
   local file=$1/docker/Dockerfile tail
-  grep -qxF "$PROJECT_MARKER" "$file" || die "no '$PROJECT_MARKER' line in $file"
   # trailing dot keeps the tail's final newlines
   tail=$(sed -n "/^$PROJECT_MARKER\$/,\$p" "$file" && echo .)
   { expected docker/Dockerfile | shared && printf '%s' "${tail%.}"; } >"$file"
@@ -335,6 +334,11 @@ sync_target() {
   select_paths
   template_clean
   target_clean "$target"
+  # the Dockerfile merge needs the project marker
+  if [ -e "$target/docker/Dockerfile" ]; then
+    grep -qxF "$PROJECT_MARKER" "$target/docker/Dockerfile" ||
+      die "no '$PROJECT_MARKER' line in $target/docker/Dockerfile; add it above the project's own lines first"
+  fi
 
   # keep owned paths, merge CLAUDE.md and Dockerfile, mirror the rest
   for p in "${PATHS[@]}"; do
@@ -409,7 +413,7 @@ fill_slug() {
   [[ $name =~ ^[a-z0-9][a-z0-9._-]*$ ]] || die "slug must be lowercase letters, digits, dots, dashes, underscores: $name"
   sed -i "s/myproject/$name/g" "$target"/docker/*.sh
   echo "set the slug $name in $target/docker/*.sh"
-  echo "commit 2, run from $target once .claude/project.md and the CLAUDE.md heading and description line are filled by hand:"
+  echo "commit 2, run from $target once .claude/project.md and the CLAUDE.md heading and description line are filled:"
   print_commit "$name: fill the template placeholders" 'docker/*.sh' .claude/project.md CLAUDE.md
 }
 
