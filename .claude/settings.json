@@ -9,5 +9,18 @@
   },
   "enabledPlugins": {
     "document-skills@anthropic-agent-skills": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect.py\""
+          }
+        ]
+      }
+    ]
   }
 }

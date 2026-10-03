@@ -11,15 +11,18 @@ CLAUDE.md                 thin loader: @-includes the three rule files
   session.md              how I work in any session (agnostic)
   engineering.md          code/diff/comment/docs conventions (agnostic)
   project.md              the ONE file you fill in per project
-  settings.json           registers the anthropic-agent-skills marketplace and enables its document-skills plugin
+  settings.json           registers the anthropic-agent-skills marketplace, enables its document-skills plugin, wires the protect hook
+  hooks/                  protect.py: blocks edits to template-owned files (see Enforcement)
   skills/                 review-diff, commit, delegate, format, comment-style, pptx-addon, pdf-addon, drawio
 format/                   one formatter dispatcher + per-language configs
 docker/                   build, run, cleanup, exec, chown, entrypoint scripts + Dockerfile.amd64 + environment.yml
 ```
 
-## Enforcement: rules and skills, not hooks
+## Enforcement: rules, skills, and one hook
 
-This template ships no hooks. Enforcement is the `.claude/*.md` rules the agent follows and the skills you invoke.
+Enforcement is the `.claude/*.md` rules the agent follows, the skills you invoke, and one PreToolUse hook.
+`.claude/hooks/protect.py` blocks any edit under `.claude/` other than `project.md` and `settings.local.json`, and any edit to a `.gitignore` or `LICENSE` file, so shared files change only in this repo and reach other repos by sync.
+A hand-made, gitignored `.claude/.unlock` file lifts the block; keep one in this repo only.
 Commit hygiene (pathspec commits, no identity override, no `Co-Authored-By`) lives in `session.md` and the `/commit` skill.
 Formatting is the `/format` skill; running the toolchain through the container wrapper is a preference in `engineering.md`.
 
