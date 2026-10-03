@@ -1,0 +1,54 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{CenturyGothic}
+    [2026/10/03 (autoinst)  Style file for CenturyGothic fonts.]
+
+\RequirePackage{xkeyval}
+\newcommand*{\CenturyGothic@scale}{1}
+\DeclareOptionX{scale}{\renewcommand*{\CenturyGothic@scale}{#1}}
+\DeclareOptionX{scaled}{\renewcommand*{\CenturyGothic@scale}{#1}}
+
+\DeclareOptionX{lining}{\edef\CenturyGothic@figurestyle{LF}}
+\DeclareOptionX{tabular}{\edef\CenturyGothic@figurealign{T}}
+\edef\CenturyGothic@figurestyle{LF}
+\edef\CenturyGothic@figurealign{T}
+
+\DeclareOptionX{mainfont}{
+    \renewcommand{\familydefault}{\rmdefault}
+}
+\DeclareOptionX{bold}{\edef\bfseries@rm{bold}}
+\DeclareOptionX{regular}{\edef\mdseries@rm{regular}}
+
+\ProcessOptionsX\relax
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage{textcomp}
+\RequirePackage{ifthen}
+\RequirePackage{mweights}
+
+\IfFileExists{fontaxes.sty}{
+    \RequirePackage{fontaxes}
+}{}
+
+%   Here we implement the scale=MatchLowercase option.
+%   If this is given, we must compute the correct value of
+%   the "\CenturyGothic@scale" parameter before loading the .fd files;
+%   but to determine that value we of course need the font's x-height.
+%   To avoid triggering the loading of .fd files,
+%   we use plain TeX's \font primitive to load the testfont.
+%   We then compute the ratio of the current x-height to our font's x-height;
+%   this is the "\CenturyGothic@scale" we will pass to the .fd files.
+\ifthenelse{\equal{\CenturyGothic@scale}{MatchLowercase}}
+    {   \newlength{\CenturyGothic@currentx}
+        \settoheight{\CenturyGothic@currentx}{x}
+        \newlength{\CenturyGothic@xheight}
+        \settoheight{\CenturyGothic@xheight}
+            {{\font\testfont=CenturyGothic-tlf-t1 at \f@size pt\testfont x}}
+        \renewcommand*{\CenturyGothic@scale}
+            {\strip@pt\dimexpr\number\numexpr\number\dimexpr\CenturyGothic@currentx\relax*65536/\number\dimexpr\CenturyGothic@xheight\relax\relax sp\relax}}
+    {}
+
+\renewcommand*
+    {\rmdefault}
+    {CenturyGothic-\CenturyGothic@figurealign\CenturyGothic@figurestyle}
+
+\endinput

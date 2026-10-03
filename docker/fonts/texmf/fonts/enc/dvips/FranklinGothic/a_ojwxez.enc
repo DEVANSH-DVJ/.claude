@@ -1,0 +1,63 @@
+% THIS FILE WAS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
+%%AutoEnc_ojwxezkf6xl76apysauwgtqt2d
+% Encoding created by otftotfm on Sat Oct  3 19:28:28 2026
+% Command line follows encoding
+/AutoEnc_ojwxezkf6xl76apysauwgtqt2d [
+%00
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+  /.notdef /.notdef /.notdef /cedilla /ogonek /quotesinglbase /exclam /asterisk
+%10
+  /question /C /quotedblbase /bar /questiondown /.notdef /.notdef /.notdef
+  /arrowleft /arrowright /.notdef /.notdef /.notdef /.notdef /exclamdown /.notdef
+%20
+  /.notdef /endash /.notdef /.notdef /dollar /.notdef /.notdef /quotesingle
+  /.notdef /.notdef /.notdef /.notdef /comma /.notdef /period /uni2044
+%30
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+  /.notdef /.notdef /.notdef /.notdef /.notdef /minus /.notdef /.notdef
+%40
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+%50
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /uni2126
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /arrowup /arrowdown
+%60
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /musicalnote /.notdef
+%70
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+%80
+  /.notdef /.notdef /.notdef /.notdef /dagger /daggerdbl /.notdef /perthousand
+  /bullet /.notdef /.notdef /.notdef /florin /.notdef /.notdef /.notdef
+%90
+  /.notdef /.notdef /lira /.notdef /.notdef /.notdef /.notdef /trademark
+  /.notdef /.notdef /.notdef /afii61352 /.notdef /estimated /openbullet /.notdef
+%A0
+  /.notdef /.notdef /cent /sterling /currency /yen /brokenbar /section
+  /.notdef /copyright /ordfeminine /.notdef /logicalnot /.notdef /registered /.notdef
+%B0
+  /degree /plusminus /twosuperior /threesuperior /.notdef /uni00B5 /paragraph /uni00B7
+  /.notdef /onesuperior /ordmasculine /radical /onequarter /onehalf /threequarters /Euro
+%C0
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+%D0
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /multiply /.notdef
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+%E0
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+%F0
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /divide /.notdef
+  /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+] def
+% Command line: 'otftotfm --automatic --encoding=fontools_ts1
+% --tfm-directory=/fonts/texmf/fonts/tfm/ms/FranklinGothic
+% --vf-directory=/fonts/texmf/fonts/vf/ms/FranklinGothic
+% --truetype-directory=/fonts/texmf/fonts/truetype/ms/FranklinGothic
+% --encoding-directory=/fonts/texmf/fonts/enc/dvips/FranklinGothic
+% --map-file=/fonts/texmf/fonts/map/dvips/FranklinGothic/FranklinGothic.map
+% --no-updmap --force --coding-scheme=TEX TEXT COMPANION SYMBOLS 1---TS1
+% /fonts/FRABK.TTF FranklinGothic-Book-tlf-ts1'

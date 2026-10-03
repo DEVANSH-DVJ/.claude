@@ -1,0 +1,66 @@
+% THIS FILE WAS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
+%%AutoEnc_5ec65q6vovhd2osvs6caggfryg
+% Encoding created by otftotfm on Sat Oct  3 19:28:19 2026
+% Command line follows encoding
+/AutoEnc_5ec65q6vovhd2osvs6caggfryg [
+%00
+  /uni0060 /uni00B4 /uni02C6 /uni02DC /uni00A8 /uni02DD /uni02DA /uni02C7
+  /uni02D8 /uni00AF /uni02D9 /uni00B8 /uni02DB /uni201A /uni2039 /uni203A
+%10
+  /uni201C /uni201D /uni201E /uni00AB /uni00BB /uni2013 /uni2014 /.notdef
+  /.notdef /index722 /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+%20
+  /.notdef /uni0021 /uni0022 /uni0023 /uni0024 /uni0025 /index1019 /uni2019
+  /uni0028 /uni0029 /uni002A /uni002B /uni002C /uni002D /uni002E /uni002F
+%30
+  /index684 /index685 /index686 /index687 /index688 /index689 /index690 /index691
+  /index692 /index693 /uni003A /uni003B /uni003C /uni003D /uni003E /uni003F
+%40
+  /uni0040 /uni0041 /uni0042 /uni0043 /uni0044 /uni0045 /uni0046 /uni0047
+  /uni0048 /uni0049 /uni004A /uni004B /uni004C /uni004D /uni004E /uni004F
+%50
+  /uni0050 /uni0051 /uni0052 /uni0053 /uni0054 /uni0055 /uni0056 /uni0057
+  /uni0058 /uni0059 /uni005A /uni005B /uni005C /uni005D /uni005E /uni005F
+%60
+  /uni2018 /index714 /index715 /index716 /index717 /index718 /index719 /index720
+  /index721 /index722 /index723 /index724 /index725 /index726 /index727 /index728
+%70
+  /index729 /index730 /index731 /index732 /index733 /index734 /index735 /index736
+  /index737 /index738 /index739 /uni007B /uni007C /uni007D /uni007E /uni002D
+%80
+  /uni0102 /uni0104 /uni0106 /uni010C /uni010E /uni011A /uni0118 /uni011E
+  /uni0139 /uni013D /uni0141 /uni0143 /uni0147 /uni014A /uni0150 /uni0154
+%90
+  /uni0158 /uni015A /uni0160 /uni015E /uni0164 /uni0162 /uni0170 /uni016E
+  /uni0178 /uni0179 /uni017D /uni017B /uni0132 /uni0130 /index780 /uni00A7
+%A0
+  /index774 /index775 /index776 /index777 /index779 /index785 /index784 /index786
+  /index799 /index801 /index742 /index803 /index805 /index806 /index809 /index810
+%B0
+  /index812 /index813 /index816 /index815 /index819 /index817 /index825 /index824
+  /index832 /index834 /index836 /index835 /index796 /uni00A1 /uni00BF /uni00A3
+%C0
+  /uni00C0 /uni00C1 /uni00C2 /uni00C3 /uni00C4 /uni00C5 /uni00C6 /uni00C7
+  /uni00C8 /uni00C9 /uni00CA /uni00CB /uni00CC /uni00CD /uni00CE /uni00CF
+%D0
+  /uni00D0 /uni00D1 /uni00D2 /uni00D3 /uni00D4 /uni00D5 /uni00D6 /uni0152
+  /uni00D8 /uni00D9 /uni00DA /uni00DB /uni00DC /uni00DD /uni00DE /.notdef
+%E0
+  /index747 /index748 /index749 /index750 /index751 /index752 /index740 /index753
+  /index754 /index755 /index756 /index757 /index758 /index759 /index760 /index761
+%F0
+  /index745 /index762 /index763 /index764 /index765 /index766 /index767 /index741
+  /index743 /index768 /index769 /index770 /index771 /index772 /index744 /.notdef
+] def
+% Command line: 'otftotfm --automatic --encoding=fontools_t1
+% --tfm-directory=/fonts/texmf/fonts/tfm/ms/Arial
+% --vf-directory=/fonts/texmf/fonts/vf/ms/Arial
+% --truetype-directory=/fonts/texmf/fonts/truetype/ms/Arial
+% --encoding-directory=/fonts/texmf/fonts/enc/dvips/Arial
+% --map-file=/fonts/texmf/fonts/map/dvips/Arial/Arial.map --no-updmap
+% --force --coding-scheme=EXTENDED TEX FONT ENCODING - LATIN --feature=kern
+% --feature=lnum --feature=pnum --feature=smcp --unicoding=germandbls =:
+% SSsmall --unicoding=ff =: FFsmall --unicoding=fi =: FIsmall
+% --unicoding=ffi =: FFIsmall --unicoding=fl =: FLsmall --unicoding=ffl =:
+% FFLsmall /fonts/ariblk.ttf Arial-Black-lf-sc-t1'

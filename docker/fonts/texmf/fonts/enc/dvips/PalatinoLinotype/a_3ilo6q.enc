@@ -1,0 +1,68 @@
+% THIS FILE WAS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
+%%AutoEnc_3ilo6qlpda5ni4bwmt5adztlfh
+% Encoding created by otftotfm on Sat Oct  3 19:28:27 2026
+% Command line follows encoding
+/AutoEnc_3ilo6qlpda5ni4bwmt5adztlfh [
+%00
+  /uni0060 /uni00B4 /uni02C6 /uni02DC /uni00A8 /uni02DD /uni02DA /uni02C7
+  /uni02D8 /uni00AF /uni02D9 /uni00B8 /uni02DB /uni201A /uni2039 /uni203A
+%10
+  /uni201C /uni201D /uni201E /uni00AB /uni00BB /uni2013 /uni2014 /.notdef
+  /uni2080 /index1110 /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+%20
+  /.notdef /index1236 /uni0022 /uni0023 /index480 /uni0025 /index1237 /uni2019
+  /uni208D /uni208E /uni002A /uni208A /uni002C /uni002D /uni002E /uni002F
+%30
+  /uni2080 /uni2081 /uni2082 /uni2083 /uni2084 /uni2085 /uni2086 /uni2087
+  /uni2088 /uni2089 /uni003A /uni003B /uni003C /uni208C /uni003E /index1235
+%40
+  /uni0040 /uni0041 /uni0042 /uni0043 /uni0044 /uni0045 /uni0046 /uni0047
+  /uni0048 /uni0049 /uni004A /uni004B /uni004C /uni004D /uni004E /uni004F
+%50
+  /uni0050 /uni0051 /uni0052 /uni0053 /uni0054 /uni0055 /uni0056 /uni0057
+  /uni0058 /uni0059 /uni005A /uni005B /uni005C /uni005D /uni005E /uni005F
+%60
+  /uni2018 /index1102 /index1103 /index1104 /index1105 /index1106 /index1107 /index1108
+  /index1109 /index1110 /index1111 /index1112 /index1113 /index1114 /index1115 /index1116
+%70
+  /index1117 /index1118 /index1119 /index1120 /index1121 /index1122 /index1123 /index1124
+  /index1125 /index1126 /index1127 /uni007B /uni007C /uni007D /uni007E /uni002D
+%80
+  /uni0102 /uni0104 /uni0106 /uni010C /uni010E /uni011A /uni0118 /uni011E
+  /uni0139 /uni013D /uni0141 /uni0143 /uni0147 /uni014A /uni0150 /uni0154
+%90
+  /uni0158 /uni015A /uni0160 /uni015E /uni0164 /uni0162 /uni0170 /uni016E
+  /uni0178 /uni0179 /uni017D /uni017B /uni0132 /uni0130 /index1146 /uni00A7
+%A0
+  /index1133 /index1137 /index1140 /index1142 /index1145 /index1152 /index1156 /index1159
+  /index1176 /index1178 /index1181 /index1182 /index1184 /uni014B /index1193 /index1198
+%B0
+  /index1199 /index1202 /index1204 /index1206 /index1208 /index1210 /index1219 /index1218
+  /index1229 /index1230 /index1231 /index1232 /index1234 /uni00A1 /uni00BF /uni00A3
+%C0
+  /uni00C0 /uni00C1 /uni00C2 /uni00C3 /uni00C4 /uni00C5 /uni00C6 /uni00C7
+  /uni00C8 /uni00C9 /uni00CA /uni00CB /uni00CC /uni00CD /uni00CE /uni00CF
+%D0
+  /uni00D0 /uni00D1 /uni00D2 /uni00D3 /uni00D4 /uni00D5 /uni00D6 /uni0152
+  /uni00D8 /uni00D9 /uni00DA /uni00DB /uni00DC /uni00DD /uni00DE /.notdef
+%E0
+  /index1129 /index1128 /index1130 /index1132 /index1131 /index1134 /index1138 /index1143
+  /index1149 /index1148 /index1150 /index1151 /index1165 /index1164 /index1166 /index1167
+%F0
+  /uni00F0 /index1183 /index1188 /index1187 /index1189 /index1191 /index1190 /index1197
+  /index1195 /index1213 /index1212 /index1214 /index1215 /index1226 /index1233 /.notdef
+] def
+% Command line: 'otftotfm --automatic --encoding=fontools_t1
+% --tfm-directory=/fonts/texmf/fonts/tfm/ms/PalatinoLinotype
+% --vf-directory=/fonts/texmf/fonts/vf/ms/PalatinoLinotype
+% --truetype-directory=/fonts/texmf/fonts/truetype/ms/PalatinoLinotype
+% --encoding-directory=/fonts/texmf/fonts/enc/dvips/PalatinoLinotype
+% --map-file=/fonts/texmf/fonts/map/dvips/PalatinoLinotype/PalatinoLinotype.map
+% --no-updmap --force --coding-scheme=EXTENDED TEX FONT ENCODING - LATIN
+% --feature=kern --feature=liga --feature=onum --feature=pnum --feature=smcp
+% --ligkern=f i =: fi --ligkern=f l =: fl --ligkern=f f =: ff --ligkern=ff i
+% =: ffi --ligkern=ff l =: ffl --unicoding=germandbls =: SSsmall
+% --unicoding=ff =: FFsmall --unicoding=fi =: FIsmall --unicoding=ffi =:
+% FFIsmall --unicoding=fl =: FLsmall --unicoding=ffl =: FFLsmall
+% /fonts/pala.ttf PalatinoLinotype-Roman-osf-sc-t1'

@@ -1,0 +1,56 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{FranklinGothic}
+    [2026/10/03 (autoinst)  Style file for FranklinGothic fonts.]
+
+\RequirePackage{xkeyval}
+\newcommand*{\FranklinGothic@scale}{1}
+\DeclareOptionX{scale}{\renewcommand*{\FranklinGothic@scale}{#1}}
+\DeclareOptionX{scaled}{\renewcommand*{\FranklinGothic@scale}{#1}}
+
+\DeclareOptionX{lining}{\edef\FranklinGothic@figurestyle{LF}}
+\DeclareOptionX{tabular}{\edef\FranklinGothic@figurealign{T}}
+\edef\FranklinGothic@figurestyle{LF}
+\edef\FranklinGothic@figurealign{T}
+
+\DeclareOptionX{mainfont}{
+    \renewcommand{\familydefault}{\rmdefault}
+}
+\DeclareOptionX{heavy}{\edef\bfseries@rm{heavy}}
+\DeclareOptionX{demibold}{\edef\bfseries@rm{demibold}}
+\DeclareOptionX{medium}{\edef\mdseries@rm{medium}}
+\DeclareOptionX{book}{\edef\mdseries@rm{book}}
+
+\ProcessOptionsX\relax
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage{textcomp}
+\RequirePackage{ifthen}
+\RequirePackage{mweights}
+
+\IfFileExists{fontaxes.sty}{
+    \RequirePackage{fontaxes}
+}{}
+
+%   Here we implement the scale=MatchLowercase option.
+%   If this is given, we must compute the correct value of
+%   the "\FranklinGothic@scale" parameter before loading the .fd files;
+%   but to determine that value we of course need the font's x-height.
+%   To avoid triggering the loading of .fd files,
+%   we use plain TeX's \font primitive to load the testfont.
+%   We then compute the ratio of the current x-height to our font's x-height;
+%   this is the "\FranklinGothic@scale" we will pass to the .fd files.
+\ifthenelse{\equal{\FranklinGothic@scale}{MatchLowercase}}
+    {   \newlength{\FranklinGothic@currentx}
+        \settoheight{\FranklinGothic@currentx}{x}
+        \newlength{\FranklinGothic@xheight}
+        \settoheight{\FranklinGothic@xheight}
+            {{\font\testfont=FranklinGothic-Book-tlf-t1 at \f@size pt\testfont x}}
+        \renewcommand*{\FranklinGothic@scale}
+            {\strip@pt\dimexpr\number\numexpr\number\dimexpr\FranklinGothic@currentx\relax*65536/\number\dimexpr\FranklinGothic@xheight\relax\relax sp\relax}}
+    {}
+
+\renewcommand*
+    {\rmdefault}
+    {FranklinGothic-\FranklinGothic@figurealign\FranklinGothic@figurestyle}
+
+\endinput

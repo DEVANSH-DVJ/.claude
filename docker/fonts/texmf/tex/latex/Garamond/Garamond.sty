@@ -1,0 +1,54 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{Garamond}
+    [2026/10/03 (autoinst)  Style file for Garamond fonts.]
+
+\RequirePackage{xkeyval}
+\newcommand*{\Garamond@scale}{1}
+\DeclareOptionX{scale}{\renewcommand*{\Garamond@scale}{#1}}
+\DeclareOptionX{scaled}{\renewcommand*{\Garamond@scale}{#1}}
+
+\DeclareOptionX{lining}{\edef\Garamond@figurestyle{LF}}
+\DeclareOptionX{tabular}{\edef\Garamond@figurealign{T}}
+\edef\Garamond@figurestyle{LF}
+\edef\Garamond@figurealign{T}
+
+\DeclareOptionX{mainfont}{
+    \renewcommand{\familydefault}{\rmdefault}
+}
+\DeclareOptionX{bold}{\edef\bfseries@rm{bold}}
+\DeclareOptionX{regular}{\edef\mdseries@rm{regular}}
+
+\ProcessOptionsX\relax
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage{textcomp}
+\RequirePackage{ifthen}
+\RequirePackage{mweights}
+
+\IfFileExists{fontaxes.sty}{
+    \RequirePackage{fontaxes}
+}{}
+
+%   Here we implement the scale=MatchLowercase option.
+%   If this is given, we must compute the correct value of
+%   the "\Garamond@scale" parameter before loading the .fd files;
+%   but to determine that value we of course need the font's x-height.
+%   To avoid triggering the loading of .fd files,
+%   we use plain TeX's \font primitive to load the testfont.
+%   We then compute the ratio of the current x-height to our font's x-height;
+%   this is the "\Garamond@scale" we will pass to the .fd files.
+\ifthenelse{\equal{\Garamond@scale}{MatchLowercase}}
+    {   \newlength{\Garamond@currentx}
+        \settoheight{\Garamond@currentx}{x}
+        \newlength{\Garamond@xheight}
+        \settoheight{\Garamond@xheight}
+            {{\font\testfont=Garamond-tlf-t1 at \f@size pt\testfont x}}
+        \renewcommand*{\Garamond@scale}
+            {\strip@pt\dimexpr\number\numexpr\number\dimexpr\Garamond@currentx\relax*65536/\number\dimexpr\Garamond@xheight\relax\relax sp\relax}}
+    {}
+
+\renewcommand*
+    {\rmdefault}
+    {Garamond-\Garamond@figurealign\Garamond@figurestyle}
+
+\endinput

@@ -1,0 +1,63 @@
+% THIS FILE WAS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
+%%AutoEnc_wibzwq2azwizh627etkuww2bdd
+% Encoding created by otftotfm on Sat Oct  3 19:28:15 2026
+% Command line follows encoding
+/AutoEnc_wibzwq2azwizh627etkuww2bdd [
+%00
+  /uni0060 /uni00B4 /uni02C6 /uni02DC /uni00A8 /uni02DD /uni02DA /uni02C7
+  /uni02D8 /uni00AF /uni02D9 /uni00B8 /uni02DB /uni201A /uni2039 /uni203A
+%10
+  /uni201C /uni201D /uni201E /uni00AB /uni00BB /uni2013 /uni2014 /uni200C
+  /uni2080 /uni0131 /uni0237 /.notdef /.notdef /.notdef /.notdef /.notdef
+%20
+  /uni02FD /uni0021 /uni0022 /uni0023 /uni0024 /uni0025 /uni0026 /uni2019
+  /uni207D /uni207E /uni002A /uni207A /uni002C /uni002D /uni002E /uni002F
+%30
+  /uni2070 /uni00B9 /uni00B2 /uni00B3 /uni2074 /uni2075 /uni2076 /uni2077
+  /uni2078 /uni2079 /uni003A /uni003B /uni003C /uni207C /uni003E /uni003F
+%40
+  /uni0040 /index977 /index978 /index979 /index980 /index981 /index982 /index983
+  /index984 /index985 /index986 /index987 /index988 /index989 /index990 /index991
+%50
+  /index992 /index993 /index994 /index995 /index996 /index997 /index998 /index999
+  /index1000 /index1001 /index1002 /uni005B /uni005C /uni005D /uni005E /uni005F
+%60
+  /uni2018 /index389 /index390 /index391 /index392 /index393 /index394 /index395
+  /index396 /uni2071 /index398 /index399 /index400 /index401 /uni207F /index403
+%70
+  /index404 /index405 /index406 /index407 /index408 /index409 /index410 /index411
+  /index412 /index413 /index414 /uni007B /uni007C /uni007D /uni007E /uni002D
+%80
+  /uni0102 /uni0104 /uni0106 /uni010C /uni010E /uni011A /uni0118 /uni011E
+  /uni0139 /uni013D /uni0141 /uni0143 /uni0147 /uni014A /uni0150 /uni0154
+%90
+  /uni0158 /uni015A /uni0160 /uni015E /uni0164 /uni0162 /uni0170 /uni016E
+  /uni0178 /uni0179 /uni017D /uni017B /uni0132 /uni0130 /uni0111 /uni00A7
+%A0
+  /uni0103 /uni0105 /uni0107 /uni010D /uni010F /uni011B /uni0119 /uni011F
+  /uni013A /uni013E /uni0142 /uni0144 /uni0148 /uni014B /uni0151 /uni0155
+%B0
+  /uni0159 /uni015B /uni0161 /uni015F /uni0165 /uni0163 /uni0171 /uni016F
+  /uni00FF /uni017A /uni017E /uni017C /uni0133 /uni00A1 /uni00BF /uni00A3
+%C0
+  /uni00C0 /uni00C1 /uni00C2 /uni00C3 /uni00C4 /uni00C5 /uni00C6 /uni00C7
+  /uni00C8 /uni00C9 /uni00CA /uni00CB /uni00CC /uni00CD /uni00CE /uni00CF
+%D0
+  /uni00D0 /uni00D1 /uni00D2 /uni00D3 /uni00D4 /uni00D5 /uni00D6 /uni0152
+  /uni00D8 /uni00D9 /uni00DA /uni00DB /uni00DC /uni00DD /uni00DE /uni1E9E
+%E0
+  /uni00E0 /uni00E1 /uni00E2 /uni00E3 /uni00E4 /uni00E5 /uni00E6 /uni00E7
+  /uni00E8 /uni00E9 /uni00EA /uni00EB /uni00EC /uni00ED /uni00EE /uni00EF
+%F0
+  /uni00F0 /uni00F1 /uni00F2 /uni00F3 /uni00F4 /uni00F5 /uni00F6 /uni0153
+  /uni00F8 /uni00F9 /uni00FA /uni00FB /uni00FC /uni00FD /uni00FE /uni00DF
+] def
+% Command line: 'otftotfm --automatic --encoding=fontools_t1
+% --tfm-directory=/fonts/texmf/fonts/tfm/ms/Cambria
+% --vf-directory=/fonts/texmf/fonts/vf/ms/Cambria
+% --truetype-directory=/fonts/texmf/fonts/truetype/ms/Cambria
+% --encoding-directory=/fonts/texmf/fonts/enc/dvips/Cambria
+% --map-file=/fonts/texmf/fonts/map/dvips/Cambria/Cambria.map --no-updmap
+% --force --coding-scheme=EXTENDED TEX FONT ENCODING - LATIN --feature=sups
+% --ligkern=* {KL} * /work/gen/cambria/cambria.ttf Cambria-sup-t1'

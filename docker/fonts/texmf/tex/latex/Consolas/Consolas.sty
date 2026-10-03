@@ -1,0 +1,71 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{Consolas}
+    [2026/10/03 (autoinst)  Style file for Consolas fonts.]
+
+\RequirePackage{xkeyval}
+\newcommand*{\Consolas@scale}{1}
+\DeclareOptionX{scale}{\renewcommand*{\Consolas@scale}{#1}}
+\DeclareOptionX{scaled}{\renewcommand*{\Consolas@scale}{#1}}
+
+\DeclareOptionX{lining}{\edef\Consolas@figurestyle{LF}}
+\DeclareOptionX{oldstyle}{\edef\Consolas@figurestyle{OsF}}
+\DeclareOptionX{tabular}{\edef\Consolas@figurealign{T}}
+\edef\Consolas@figurestyle{OsF}
+\edef\Consolas@figurealign{T}
+
+\DeclareOptionX{mainfont}{
+    \renewcommand{\familydefault}{\ttdefault}
+}
+\DeclareOptionX{bold}{\edef\bfseries@tt{bold}}
+\DeclareOptionX{regular}{\edef\mdseries@tt{regular}}
+
+\ProcessOptionsX\relax
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage{textcomp}
+\RequirePackage{ifthen}
+\RequirePackage{mweights}
+
+\IfFileExists{fontaxes.sty}{
+    \RequirePackage{fontaxes}
+    \fa@naming@exception{figures}{{superior}{proportional}}{Sup}
+    \fa@naming@exception{figures}{{superior}{tabular}}{Sup}
+    \def\supfigures{\@nomath\supfigures
+        \fontfigurestyle{superior}\selectfont}
+    \let\sufigures\supfigures
+    \DeclareTextFontCommand{\textsup}{\supfigures}
+    \let\textsu\textsup
+    \let\textsuperior\textsup
+    \let\@oldtextsuperscript\textsuperscript
+    \def\textsuperscript{\@ifstar\@oldtextsuperscript\textsup}
+    \def\@makefnmark{%
+        \mbox{\footnotemarkfont\textsuperscript{\@thefnmark}}}
+    \@ifundefined{ftntm@font}%
+        {\let\footnotemarkfont\normalfont}%
+        {\let\footnotemarkfont\ftntm@font}
+
+}{}
+
+%   Here we implement the scale=MatchLowercase option.
+%   If this is given, we must compute the correct value of
+%   the "\Consolas@scale" parameter before loading the .fd files;
+%   but to determine that value we of course need the font's x-height.
+%   To avoid triggering the loading of .fd files,
+%   we use plain TeX's \font primitive to load the testfont.
+%   We then compute the ratio of the current x-height to our font's x-height;
+%   this is the "\Consolas@scale" we will pass to the .fd files.
+\ifthenelse{\equal{\Consolas@scale}{MatchLowercase}}
+    {   \newlength{\Consolas@currentx}
+        \settoheight{\Consolas@currentx}{x}
+        \newlength{\Consolas@xheight}
+        \settoheight{\Consolas@xheight}
+            {{\font\testfont=Consolas-tosf-t1 at \f@size pt\testfont x}}
+        \renewcommand*{\Consolas@scale}
+            {\strip@pt\dimexpr\number\numexpr\number\dimexpr\Consolas@currentx\relax*65536/\number\dimexpr\Consolas@xheight\relax\relax sp\relax}}
+    {}
+
+\renewcommand*
+    {\ttdefault}
+    {Consolas-\Consolas@figurealign\Consolas@figurestyle}
+
+\endinput

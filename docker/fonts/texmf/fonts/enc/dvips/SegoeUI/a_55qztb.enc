@@ -1,0 +1,66 @@
+% THIS FILE WAS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
+%%AutoEnc_55qztb3ixvm5oil75wxc3cygpd
+% Encoding created by otftotfm on Sat Oct  3 19:28:18 2026
+% Command line follows encoding
+/AutoEnc_55qztb3ixvm5oil75wxc3cygpd [
+%00
+  /uni0060 /uni00B4 /uni02C6 /uni02DC /uni00A8 /uni02DD /uni02DA /uni02C7
+  /uni02D8 /uni00AF /uni02D9 /uni00B8 /uni02DB /uni201A /uni2039 /uni203A
+%10
+  /uni201C /uni201D /uni201E /uni00AB /uni00BB /uni2013 /uni2014 /.notdef
+  /uni2080 /index2866 /uni0237 /.notdef /.notdef /.notdef /.notdef /.notdef
+%20
+  /uni02FD /uni0021 /uni0022 /uni0023 /uni0024 /uni0025 /index3064 /uni2019
+  /uni0028 /uni0029 /uni002A /uni002B /uni002C /uni002D /uni002E /uni002F
+%30
+  /index2838 /index2839 /index2840 /index2841 /index2842 /index2843 /index2844 /index2845
+  /index2846 /index2847 /uni003A /uni003B /uni003C /uni003D /uni003E /uni003F
+%40
+  /uni0040 /uni0041 /uni0042 /uni0043 /uni0044 /uni0045 /uni0046 /uni0047
+  /uni0048 /uni0049 /uni004A /uni004B /uni004C /uni004D /uni004E /uni004F
+%50
+  /uni0050 /uni0051 /uni0052 /uni0053 /uni0054 /uni0055 /uni0056 /uni0057
+  /uni0058 /uni0059 /uni005A /uni005B /uni005C /uni005D /uni005E /uni005F
+%60
+  /uni2018 /index2858 /index2859 /index2860 /index2861 /index2862 /index2863 /index2864
+  /index2865 /index2866 /index2867 /index2868 /index2869 /index2870 /index2871 /index2872
+%70
+  /index2873 /index2874 /index2875 /index2876 /index2877 /index2878 /index2879 /index2880
+  /index2881 /index2882 /index2883 /uni007B /uni007C /uni007D /uni007E /uni002D
+%80
+  /uni0102 /uni0104 /uni0106 /uni010C /uni010E /uni011A /uni0118 /uni011E
+  /uni0139 /uni013D /uni0141 /uni0143 /uni0147 /uni014A /uni0150 /uni0154
+%90
+  /uni0158 /uni015A /uni0160 /uni015E /uni0164 /uni0162 /uni0170 /uni016E
+  /uni0178 /uni0179 /uni017D /uni017B /uni0132 /uni0130 /index2924 /uni00A7
+%A0
+  /index2918 /index2919 /index2920 /index2921 /index2923 /index2929 /index2928 /index2930
+  /index2943 /index2945 /index2886 /index2947 /index2949 /index2950 /index2953 /index2954
+%B0
+  /index2956 /index2957 /index2960 /index2959 /index2963 /index2961 /index2969 /index2968
+  /index2976 /index2978 /index2980 /index2979 /index2940 /uni00A1 /uni00BF /uni00A3
+%C0
+  /uni00C0 /uni00C1 /uni00C2 /uni00C3 /uni00C4 /uni00C5 /uni00C6 /uni00C7
+  /uni00C8 /uni00C9 /uni00CA /uni00CB /uni00CC /uni00CD /uni00CE /uni00CF
+%D0
+  /uni00D0 /uni00D1 /uni00D2 /uni00D3 /uni00D4 /uni00D5 /uni00D6 /uni0152
+  /uni00D8 /uni00D9 /uni00DA /uni00DB /uni00DC /uni00DD /uni00DE /uni1E9E
+%E0
+  /index2891 /index2892 /index2893 /index2894 /index2895 /index2896 /index2884 /index2897
+  /index2898 /index2899 /index2900 /index2901 /index2902 /index2903 /index2904 /index2905
+%F0
+  /index2889 /index2906 /index2907 /index2908 /index2909 /index2910 /index2911 /index2885
+  /index2887 /index2912 /index2913 /index2914 /index2915 /index2916 /index2888 /.notdef
+] def
+% Command line: 'otftotfm --automatic --encoding=fontools_t1
+% --tfm-directory=/fonts/texmf/fonts/tfm/ms/SegoeUI
+% --vf-directory=/fonts/texmf/fonts/vf/ms/SegoeUI
+% --truetype-directory=/fonts/texmf/fonts/truetype/ms/SegoeUI
+% --encoding-directory=/fonts/texmf/fonts/enc/dvips/SegoeUI
+% --map-file=/fonts/texmf/fonts/map/dvips/SegoeUI/SegoeUI.map --no-updmap
+% --force --coding-scheme=EXTENDED TEX FONT ENCODING - LATIN --feature=kern
+% --feature=onum --feature=pnum --feature=smcp --unicoding=germandbls =:
+% SSsmall --unicoding=ff =: FFsmall --unicoding=fi =: FIsmall
+% --unicoding=ffi =: FFIsmall --unicoding=fl =: FLsmall --unicoding=ffl =:
+% FFLsmall /fonts/seguisbi.ttf SegoeUI-SemiboldItalic-osf-sc-t1'

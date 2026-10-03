@@ -1,0 +1,54 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{CourierNew}
+    [2026/10/03 (autoinst)  Style file for CourierNew fonts.]
+
+\RequirePackage{xkeyval}
+\newcommand*{\CourierNew@scale}{1}
+\DeclareOptionX{scale}{\renewcommand*{\CourierNew@scale}{#1}}
+\DeclareOptionX{scaled}{\renewcommand*{\CourierNew@scale}{#1}}
+
+\DeclareOptionX{lining}{\edef\CourierNew@figurestyle{LF}}
+\DeclareOptionX{tabular}{\edef\CourierNew@figurealign{T}}
+\edef\CourierNew@figurestyle{LF}
+\edef\CourierNew@figurealign{T}
+
+\DeclareOptionX{mainfont}{
+    \renewcommand{\familydefault}{\ttdefault}
+}
+\DeclareOptionX{bold}{\edef\bfseries@tt{bold}}
+\DeclareOptionX{regular}{\edef\mdseries@tt{regular}}
+
+\ProcessOptionsX\relax
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage{textcomp}
+\RequirePackage{ifthen}
+\RequirePackage{mweights}
+
+\IfFileExists{fontaxes.sty}{
+    \RequirePackage{fontaxes}
+}{}
+
+%   Here we implement the scale=MatchLowercase option.
+%   If this is given, we must compute the correct value of
+%   the "\CourierNew@scale" parameter before loading the .fd files;
+%   but to determine that value we of course need the font's x-height.
+%   To avoid triggering the loading of .fd files,
+%   we use plain TeX's \font primitive to load the testfont.
+%   We then compute the ratio of the current x-height to our font's x-height;
+%   this is the "\CourierNew@scale" we will pass to the .fd files.
+\ifthenelse{\equal{\CourierNew@scale}{MatchLowercase}}
+    {   \newlength{\CourierNew@currentx}
+        \settoheight{\CourierNew@currentx}{x}
+        \newlength{\CourierNew@xheight}
+        \settoheight{\CourierNew@xheight}
+            {{\font\testfont=CourierNewPSMT-tlf-t1 at \f@size pt\testfont x}}
+        \renewcommand*{\CourierNew@scale}
+            {\strip@pt\dimexpr\number\numexpr\number\dimexpr\CourierNew@currentx\relax*65536/\number\dimexpr\CourierNew@xheight\relax\relax sp\relax}}
+    {}
+
+\renewcommand*
+    {\ttdefault}
+    {CourierNew-\CourierNew@figurealign\CourierNew@figurestyle}
+
+\endinput

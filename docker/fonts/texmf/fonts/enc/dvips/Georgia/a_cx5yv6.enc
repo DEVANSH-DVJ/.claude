@@ -1,0 +1,66 @@
+% THIS FILE WAS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
+%%AutoEnc_cx5yv6nek3cfdf7hpke46kmchg
+% Encoding created by otftotfm on Sat Oct  3 19:28:21 2026
+% Command line follows encoding
+/AutoEnc_cx5yv6nek3cfdf7hpke46kmchg [
+%00
+  /uni0060 /uni00B4 /uni02C6 /uni02DC /uni00A8 /uni02DD /uni02DA /uni02C7
+  /uni02D8 /uni00AF /uni02D9 /uni00B8 /uni02DB /uni201A /uni2039 /uni203A
+%10
+  /uni201C /uni201D /uni201E /uni00AB /uni00BB /uni2013 /uni2014 /.notdef
+  /uni2080 /index651 /uni0237 /.notdef /.notdef /.notdef /.notdef /.notdef
+%20
+  /.notdef /uni0021 /uni0022 /uni0023 /uni0024 /uni0025 /uni0026 /uni2019
+  /uni0028 /uni0029 /uni002A /uni002B /uni002C /uni002D /uni002E /uni002F
+%30
+  /uni0030 /uni0031 /uni0032 /uni0033 /uni0034 /uni0035 /uni0036 /uni0037
+  /uni0038 /uni0039 /uni003A /uni003B /uni003C /uni003D /uni003E /uni003F
+%40
+  /uni0040 /uni0041 /uni0042 /uni0043 /uni0044 /uni0045 /uni0046 /uni0047
+  /uni0048 /uni0049 /uni004A /uni004B /uni004C /uni004D /uni004E /uni004F
+%50
+  /uni0050 /uni0051 /uni0052 /uni0053 /uni0054 /uni0055 /uni0056 /uni0057
+  /uni0058 /uni0059 /uni005A /uni005B /uni005C /uni005D /uni005E /uni005F
+%60
+  /uni2018 /index643 /index644 /index645 /index646 /index647 /index648 /index649
+  /index650 /index651 /index652 /index653 /index654 /index655 /index656 /index657
+%70
+  /index658 /index659 /index660 /index661 /index662 /index663 /index664 /index665
+  /index666 /index667 /index668 /uni007B /uni007C /uni007D /uni007E /uni002D
+%80
+  /uni0102 /uni0104 /uni0106 /uni010C /uni010E /uni011A /uni0118 /uni011E
+  /uni0139 /uni013D /uni0141 /uni0143 /uni0147 /uni014A /uni0150 /uni0154
+%90
+  /uni0158 /uni015A /uni0160 /uni015E /uni0164 /uni0162 /uni0170 /uni016E
+  /uni0178 /uni0179 /uni017D /uni017B /uni0132 /uni0130 /index687 /uni00A7
+%A0
+  /index670 /index675 /index681 /index682 /index686 /index690 /index697 /index699
+  /index717 /index718 /index721 /index722 /index723 /index696 /index731 /index738
+%B0
+  /index739 /index741 /index742 /index743 /index747 /index748 /index755 /index758
+  /index766 /index768 /index769 /uni017B /index711 /uni00A1 /uni00BF /uni00A3
+%C0
+  /uni00C0 /uni00C1 /uni00C2 /uni00C3 /uni00C4 /uni00C5 /uni00C6 /uni00C7
+  /uni00C8 /uni00C9 /uni00CA /uni00CB /uni00CC /uni00CD /uni00CE /uni00CF
+%D0
+  /uni00D0 /uni00D1 /uni00D2 /uni00D3 /uni00D4 /uni00D5 /uni00D6 /uni0152
+  /uni00D8 /uni00D9 /uni00DA /uni00DB /uni00DC /uni00DD /uni00DE /uni1E9E
+%E0
+  /index673 /index669 /index671 /index678 /index672 /index676 /index679 /index683
+  /index694 /index688 /index691 /index692 /index710 /index705 /index707 /index708
+%F0
+  /index698 /index725 /index730 /index726 /index728 /index735 /index729 /index736
+  /index733 /index754 /index750 /index752 /index753 /index764 /index737 /.notdef
+] def
+% Command line: 'otftotfm --automatic --encoding=fontools_t1
+% --tfm-directory=/fonts/texmf/fonts/tfm/ms/Georgia
+% --vf-directory=/fonts/texmf/fonts/vf/ms/Georgia
+% --truetype-directory=/fonts/texmf/fonts/truetype/ms/Georgia
+% --encoding-directory=/fonts/texmf/fonts/enc/dvips/Georgia
+% --map-file=/fonts/texmf/fonts/map/dvips/Georgia/Georgia.map --no-updmap
+% --force --coding-scheme=EXTENDED TEX FONT ENCODING - LATIN --feature=kern
+% --feature=onum --feature=pnum --feature=smcp --unicoding=germandbls =:
+% SSsmall --unicoding=ff =: FFsmall --unicoding=fi =: FIsmall
+% --unicoding=ffi =: FFIsmall --unicoding=fl =: FLsmall --unicoding=ffl =:
+% FFLsmall /fonts/georgia.ttf Georgia-osf-sc-t1'

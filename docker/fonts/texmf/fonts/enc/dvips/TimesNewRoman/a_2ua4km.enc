@@ -1,0 +1,66 @@
+% THIS FILE WAS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
+%%AutoEnc_2ua4kmzvj5lw4imtgrd3pw4aqc
+% Encoding created by otftotfm on Sat Oct  3 19:28:20 2026
+% Command line follows encoding
+/AutoEnc_2ua4kmzvj5lw4imtgrd3pw4aqc [
+%00
+  /uni0060 /uni00B4 /uni02C6 /uni02DC /uni00A8 /uni02DD /uni02DA /uni02C7
+  /uni02D8 /uni00AF /uni02D9 /uni00B8 /uni02DB /uni201A /uni2039 /uni203A
+%10
+  /uni201C /uni201D /uni201E /uni00AB /uni00BB /uni2013 /uni2014 /uni200C
+  /uni2080 /index3458 /uni0237 /.notdef /.notdef /.notdef /.notdef /.notdef
+%20
+  /uni02FD /uni0021 /uni0022 /uni0023 /uni0024 /uni0025 /index3679 /uni2019
+  /uni0028 /uni0029 /uni002A /uni002B /uni002C /uni002D /uni002E /uni002F
+%30
+  /index3434 /index3435 /index3436 /index3437 /index3438 /index3439 /index3440 /index3441
+  /index3442 /index3443 /uni003A /uni003B /uni003C /uni003D /uni003E /uni003F
+%40
+  /uni0040 /uni0041 /uni0042 /uni0043 /uni0044 /uni0045 /uni0046 /uni0047
+  /uni0048 /uni0049 /uni004A /uni004B /uni004C /uni004D /uni004E /uni004F
+%50
+  /uni0050 /uni0051 /uni0052 /uni0053 /uni0054 /uni0055 /uni0056 /uni0057
+  /uni0058 /uni0059 /uni005A /uni005B /uni005C /uni005D /uni005E /uni005F
+%60
+  /uni2018 /index3450 /index3451 /index3452 /index3453 /index3454 /index3455 /index3456
+  /index3457 /index3458 /index3459 /index3460 /index3461 /index3462 /index3463 /index3464
+%70
+  /index3465 /index3466 /index3467 /index3468 /index3469 /index3470 /index3471 /index3472
+  /index3473 /index3474 /index3475 /uni007B /uni007C /uni007D /uni007E /uni002D
+%80
+  /uni0102 /uni0104 /uni0106 /uni010C /uni010E /uni011A /uni0118 /uni011E
+  /uni0139 /uni013D /uni0141 /uni0143 /uni0147 /uni014A /uni0150 /uni0154
+%90
+  /uni0158 /uni015A /uni0160 /uni015E /uni0164 /uni0162 /uni0170 /uni016E
+  /uni0178 /uni0179 /uni017D /uni017B /uni0132 /uni0130 /index3517 /uni00A7
+%A0
+  /index3510 /index3511 /index3512 /index3513 /index3516 /index3522 /index3521 /index3523
+  /index3537 /index3539 /index3478 /index3541 /index3543 /index3544 /index3547 /index3548
+%B0
+  /index3550 /index3551 /index3554 /index3553 /index3558 /index3556 /index3564 /index3563
+  /index3571 /index3573 /index3575 /index3574 /index3534 /uni00A1 /uni00BF /uni00A3
+%C0
+  /uni00C0 /uni00C1 /uni00C2 /uni00C3 /uni00C4 /uni00C5 /uni00C6 /uni00C7
+  /uni00C8 /uni00C9 /uni00CA /uni00CB /uni00CC /uni00CD /uni00CE /uni00CF
+%D0
+  /uni00D0 /uni00D1 /uni00D2 /uni00D3 /uni00D4 /uni00D5 /uni00D6 /uni0152
+  /uni00D8 /uni00D9 /uni00DA /uni00DB /uni00DC /uni00DD /uni00DE /uni1E9E
+%E0
+  /index3483 /index3484 /index3485 /index3486 /index3487 /index3488 /index3476 /index3489
+  /index3490 /index3491 /index3492 /index3493 /index3494 /index3495 /index3496 /index3497
+%F0
+  /index3481 /index3498 /index3499 /index3500 /index3501 /index3502 /index3503 /index3477
+  /index3479 /index3504 /index3505 /index3506 /index3507 /index3508 /index3480 /.notdef
+] def
+% Command line: 'otftotfm --automatic --encoding=fontools_t1
+% --tfm-directory=/fonts/texmf/fonts/tfm/ms/TimesNewRoman
+% --vf-directory=/fonts/texmf/fonts/vf/ms/TimesNewRoman
+% --truetype-directory=/fonts/texmf/fonts/truetype/ms/TimesNewRoman
+% --encoding-directory=/fonts/texmf/fonts/enc/dvips/TimesNewRoman
+% --map-file=/fonts/texmf/fonts/map/dvips/TimesNewRoman/TimesNewRoman.map
+% --no-updmap --force --coding-scheme=EXTENDED TEX FONT ENCODING - LATIN
+% --feature=kern --feature=lnum --feature=pnum --feature=smcp
+% --unicoding=germandbls =: SSsmall --unicoding=ff =: FFsmall --unicoding=fi
+% =: FIsmall --unicoding=ffi =: FFIsmall --unicoding=fl =: FLsmall
+% --unicoding=ffl =: FFLsmall /fonts/times.ttf TimesNewRomanPSMT-lf-sc-t1'

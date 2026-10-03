@@ -1,0 +1,54 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{Tahoma}
+    [2026/10/03 (autoinst)  Style file for Tahoma fonts.]
+
+\RequirePackage{xkeyval}
+\newcommand*{\Tahoma@scale}{1}
+\DeclareOptionX{scale}{\renewcommand*{\Tahoma@scale}{#1}}
+\DeclareOptionX{scaled}{\renewcommand*{\Tahoma@scale}{#1}}
+
+\DeclareOptionX{lining}{\edef\Tahoma@figurestyle{LF}}
+\DeclareOptionX{tabular}{\edef\Tahoma@figurealign{T}}
+\edef\Tahoma@figurestyle{LF}
+\edef\Tahoma@figurealign{T}
+
+\DeclareOptionX{mainfont}{
+    \renewcommand{\familydefault}{\rmdefault}
+}
+\DeclareOptionX{bold}{\edef\bfseries@rm{bold}}
+\DeclareOptionX{regular}{\edef\mdseries@rm{regular}}
+
+\ProcessOptionsX\relax
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage{textcomp}
+\RequirePackage{ifthen}
+\RequirePackage{mweights}
+
+\IfFileExists{fontaxes.sty}{
+    \RequirePackage{fontaxes}
+}{}
+
+%   Here we implement the scale=MatchLowercase option.
+%   If this is given, we must compute the correct value of
+%   the "\Tahoma@scale" parameter before loading the .fd files;
+%   but to determine that value we of course need the font's x-height.
+%   To avoid triggering the loading of .fd files,
+%   we use plain TeX's \font primitive to load the testfont.
+%   We then compute the ratio of the current x-height to our font's x-height;
+%   this is the "\Tahoma@scale" we will pass to the .fd files.
+\ifthenelse{\equal{\Tahoma@scale}{MatchLowercase}}
+    {   \newlength{\Tahoma@currentx}
+        \settoheight{\Tahoma@currentx}{x}
+        \newlength{\Tahoma@xheight}
+        \settoheight{\Tahoma@xheight}
+            {{\font\testfont=Tahoma-tlf-t1 at \f@size pt\testfont x}}
+        \renewcommand*{\Tahoma@scale}
+            {\strip@pt\dimexpr\number\numexpr\number\dimexpr\Tahoma@currentx\relax*65536/\number\dimexpr\Tahoma@xheight\relax\relax sp\relax}}
+    {}
+
+\renewcommand*
+    {\rmdefault}
+    {Tahoma-\Tahoma@figurealign\Tahoma@figurestyle}
+
+\endinput

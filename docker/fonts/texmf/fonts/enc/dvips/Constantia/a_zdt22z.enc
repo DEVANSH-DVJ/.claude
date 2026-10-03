@@ -1,0 +1,68 @@
+% THIS FILE WAS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
+%%AutoEnc_zdt22zvcxejsp6ritpq4qpywag
+% Encoding created by otftotfm on Sat Oct  3 19:28:25 2026
+% Command line follows encoding
+/AutoEnc_zdt22zvcxejsp6ritpq4qpywag [
+%00
+  /uni0060 /uni00B4 /uni02C6 /uni02DC /uni00A8 /uni02DD /uni02DA /uni02C7
+  /uni02D8 /uni00AF /uni02D9 /uni00B8 /uni02DB /uni201A /uni2039 /uni203A
+%10
+  /uni201C /uni201D /uni201E /uni00AB /uni00BB /uni2013 /uni2014 /.notdef
+  /uni2080 /index270 /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+%20
+  /.notdef /uni0021 /uni0022 /uni0023 /index847 /uni0025 /index429 /uni2019
+  /uni0028 /uni0029 /uni002A /uni002B /uni002C /uni002D /uni002E /uni002F
+%30
+  /index894 /index895 /index896 /index897 /index898 /index899 /index900 /index901
+  /index902 /index903 /uni003A /uni003B /uni003C /uni003D /uni003E /uni003F
+%40
+  /uni0040 /uni0041 /uni0042 /uni0043 /uni0044 /uni0045 /uni0046 /uni0047
+  /uni0048 /uni0049 /uni004A /uni004B /uni004C /uni004D /uni004E /uni004F
+%50
+  /uni0050 /uni0051 /uni0052 /uni0053 /uni0054 /uni0055 /uni0056 /uni0057
+  /uni0058 /uni0059 /uni005A /uni005B /uni005C /uni005D /uni005E /uni005F
+%60
+  /uni2018 /index262 /index263 /index264 /index265 /index266 /index267 /index268
+  /index269 /index270 /index271 /index272 /index273 /index274 /index275 /index276
+%70
+  /index277 /index278 /index279 /index280 /index281 /index282 /index283 /index284
+  /index285 /index286 /index287 /uni007B /uni007C /uni007D /uni007E /uni002D
+%80
+  /uni0102 /uni0104 /uni0106 /uni010C /uni010E /uni011A /uni0118 /uni011E
+  /uni0139 /uni013D /uni0141 /uni0143 /uni0147 /uni014A /uni0150 /uni0154
+%90
+  /uni0158 /uni015A /uni0160 /uni015E /uni0164 /uni0162 /uni0170 /uni016E
+  /uni0178 /uni0179 /uni017D /uni017B /uni0132 /uni0130 /index306 /uni00A7
+%A0
+  /index294 /index297 /index300 /index302 /index305 /index310 /index315 /index317
+  /index334 /index335 /index337 /index339 /index340 /index386 /index350 /index354
+%B0
+  /index355 /index357 /index359 /index360 /index362 /index1161 /index373 /index372
+  /index382 /index383 /index384 /index385 /index331 /uni00A1 /uni00BF /index852
+%C0
+  /uni00C0 /uni00C1 /uni00C2 /uni00C3 /uni00C4 /uni00C5 /uni00C6 /uni00C7
+  /uni00C8 /uni00C9 /uni00CA /uni00CB /uni00CC /uni00CD /uni00CE /uni00CF
+%D0
+  /uni00D0 /uni00D1 /uni00D2 /uni00D3 /uni00D4 /uni00D5 /uni00D6 /uni0152
+  /uni00D8 /uni00D9 /uni00DA /uni00DB /uni00DC /uni00DD /uni00DE /.notdef
+%E0
+  /index288 /index289 /index290 /index291 /index292 /index295 /index298 /index304
+  /index307 /index308 /index309 /index311 /index322 /index323 /index324 /index326
+%F0
+  /index387 /index341 /index343 /index344 /index345 /index346 /index347 /index353
+  /index351 /index365 /index366 /index367 /index369 /index380 /index388 /.notdef
+] def
+% Command line: 'otftotfm --automatic --encoding=fontools_t1
+% --tfm-directory=/fonts/texmf/fonts/tfm/ms/Constantia
+% --vf-directory=/fonts/texmf/fonts/vf/ms/Constantia
+% --truetype-directory=/fonts/texmf/fonts/truetype/ms/Constantia
+% --encoding-directory=/fonts/texmf/fonts/enc/dvips/Constantia
+% --map-file=/fonts/texmf/fonts/map/dvips/Constantia/Constantia.map
+% --no-updmap --force --coding-scheme=EXTENDED TEX FONT ENCODING - LATIN
+% --feature=kern --feature=liga --feature=lnum --feature=smcp --feature=tnum
+% --ligkern=f i =: fi --ligkern=f l =: fl --ligkern=f f =: ff --ligkern=ff i
+% =: ffi --ligkern=ff l =: ffl --unicoding=germandbls =: SSsmall
+% --unicoding=ff =: FFsmall --unicoding=fi =: FIsmall --unicoding=ffi =:
+% FFIsmall --unicoding=fl =: FLsmall --unicoding=ffl =: FFLsmall
+% /fonts/constani.ttf Constantia-Italic-tlf-sc-t1'

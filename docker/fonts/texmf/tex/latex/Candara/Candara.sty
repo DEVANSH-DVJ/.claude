@@ -1,0 +1,72 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{Candara}
+    [2026/10/03 (autoinst)  Style file for Candara fonts.]
+
+\RequirePackage{xkeyval}
+\newcommand*{\Candara@scale}{1}
+\DeclareOptionX{scale}{\renewcommand*{\Candara@scale}{#1}}
+\DeclareOptionX{scaled}{\renewcommand*{\Candara@scale}{#1}}
+
+\DeclareOptionX{lining}{\edef\Candara@figurestyle{LF}}
+\DeclareOptionX{oldstyle}{\edef\Candara@figurestyle{OsF}}
+\DeclareOptionX{tabular}{\edef\Candara@figurealign{T}}
+\DeclareOptionX{proportional}{\edef\Candara@figurealign{}}
+\edef\Candara@figurestyle{OsF}
+\edef\Candara@figurealign{}
+
+\DeclareOptionX{mainfont}{
+    \renewcommand{\familydefault}{\rmdefault}
+}
+\DeclareOptionX{bold}{\edef\bfseries@rm{bold}}
+\DeclareOptionX{regular}{\edef\mdseries@rm{regular}}
+
+\ProcessOptionsX\relax
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage{textcomp}
+\RequirePackage{ifthen}
+\RequirePackage{mweights}
+
+\IfFileExists{fontaxes.sty}{
+    \RequirePackage{fontaxes}
+    \fa@naming@exception{figures}{{superior}{proportional}}{Sup}
+    \fa@naming@exception{figures}{{superior}{tabular}}{Sup}
+    \def\supfigures{\@nomath\supfigures
+        \fontfigurestyle{superior}\selectfont}
+    \let\sufigures\supfigures
+    \DeclareTextFontCommand{\textsup}{\supfigures}
+    \let\textsu\textsup
+    \let\textsuperior\textsup
+    \let\@oldtextsuperscript\textsuperscript
+    \def\textsuperscript{\@ifstar\@oldtextsuperscript\textsup}
+    \def\@makefnmark{%
+        \mbox{\footnotemarkfont\textsuperscript{\@thefnmark}}}
+    \@ifundefined{ftntm@font}%
+        {\let\footnotemarkfont\normalfont}%
+        {\let\footnotemarkfont\ftntm@font}
+
+}{}
+
+%   Here we implement the scale=MatchLowercase option.
+%   If this is given, we must compute the correct value of
+%   the "\Candara@scale" parameter before loading the .fd files;
+%   but to determine that value we of course need the font's x-height.
+%   To avoid triggering the loading of .fd files,
+%   we use plain TeX's \font primitive to load the testfont.
+%   We then compute the ratio of the current x-height to our font's x-height;
+%   this is the "\Candara@scale" we will pass to the .fd files.
+\ifthenelse{\equal{\Candara@scale}{MatchLowercase}}
+    {   \newlength{\Candara@currentx}
+        \settoheight{\Candara@currentx}{x}
+        \newlength{\Candara@xheight}
+        \settoheight{\Candara@xheight}
+            {{\font\testfont=Candara-osf-t1 at \f@size pt\testfont x}}
+        \renewcommand*{\Candara@scale}
+            {\strip@pt\dimexpr\number\numexpr\number\dimexpr\Candara@currentx\relax*65536/\number\dimexpr\Candara@xheight\relax\relax sp\relax}}
+    {}
+
+\renewcommand*
+    {\rmdefault}
+    {Candara-\Candara@figurealign\Candara@figurestyle}
+
+\endinput

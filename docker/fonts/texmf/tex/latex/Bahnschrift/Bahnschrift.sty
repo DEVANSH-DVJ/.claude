@@ -1,0 +1,70 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{Bahnschrift}
+    [2026/10/03 (autoinst)  Style file for Bahnschrift fonts.]
+
+\RequirePackage{xkeyval}
+\newcommand*{\Bahnschrift@scale}{1}
+\DeclareOptionX{scale}{\renewcommand*{\Bahnschrift@scale}{#1}}
+\DeclareOptionX{scaled}{\renewcommand*{\Bahnschrift@scale}{#1}}
+
+\DeclareOptionX{lining}{\edef\Bahnschrift@figurestyle{LF}}
+\DeclareOptionX{tabular}{\edef\Bahnschrift@figurealign{T}}
+\DeclareOptionX{proportional}{\edef\Bahnschrift@figurealign{}}
+\edef\Bahnschrift@figurestyle{LF}
+\edef\Bahnschrift@figurealign{}
+
+\DeclareOptionX{mainfont}{
+    \renewcommand{\familydefault}{\rmdefault}
+}
+\DeclareOptionX{regular}{\edef\mdseries@rm{regular}}
+
+\ProcessOptionsX\relax
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage{textcomp}
+\RequirePackage{ifthen}
+\RequirePackage{mweights}
+
+\IfFileExists{fontaxes.sty}{
+    \RequirePackage{fontaxes}
+    \fa@naming@exception{figures}{{superior}{proportional}}{Sup}
+    \fa@naming@exception{figures}{{superior}{tabular}}{Sup}
+    \def\supfigures{\@nomath\supfigures
+        \fontfigurestyle{superior}\selectfont}
+    \let\sufigures\supfigures
+    \DeclareTextFontCommand{\textsup}{\supfigures}
+    \let\textsu\textsup
+    \let\textsuperior\textsup
+    \let\@oldtextsuperscript\textsuperscript
+    \def\textsuperscript{\@ifstar\@oldtextsuperscript\textsup}
+    \def\@makefnmark{%
+        \mbox{\footnotemarkfont\textsuperscript{\@thefnmark}}}
+    \@ifundefined{ftntm@font}%
+        {\let\footnotemarkfont\normalfont}%
+        {\let\footnotemarkfont\ftntm@font}
+
+}{}
+
+%   Here we implement the scale=MatchLowercase option.
+%   If this is given, we must compute the correct value of
+%   the "\Bahnschrift@scale" parameter before loading the .fd files;
+%   but to determine that value we of course need the font's x-height.
+%   To avoid triggering the loading of .fd files,
+%   we use plain TeX's \font primitive to load the testfont.
+%   We then compute the ratio of the current x-height to our font's x-height;
+%   this is the "\Bahnschrift@scale" we will pass to the .fd files.
+\ifthenelse{\equal{\Bahnschrift@scale}{MatchLowercase}}
+    {   \newlength{\Bahnschrift@currentx}
+        \settoheight{\Bahnschrift@currentx}{x}
+        \newlength{\Bahnschrift@xheight}
+        \settoheight{\Bahnschrift@xheight}
+            {{\font\testfont=Bahnschrift-lf-t1 at \f@size pt\testfont x}}
+        \renewcommand*{\Bahnschrift@scale}
+            {\strip@pt\dimexpr\number\numexpr\number\dimexpr\Bahnschrift@currentx\relax*65536/\number\dimexpr\Bahnschrift@xheight\relax\relax sp\relax}}
+    {}
+
+\renewcommand*
+    {\rmdefault}
+    {Bahnschrift-\Bahnschrift@figurealign\Bahnschrift@figurestyle}
+
+\endinput
