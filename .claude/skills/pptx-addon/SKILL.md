@@ -89,7 +89,7 @@ A LibreOffice render is not proof of the PowerPoint look: PowerPoint differs in 
 
 ## Image requirements
 
-The project image (`docker/Dockerfile`) must provide:
+The project image (the template's drawio and slides blocks) must provide:
 
 - apt: `libreoffice-impress poppler-utils fontconfig`, plus the deck's font families copied from `docker/fonts` into the image and `fc-cache -f` (the Dockerfile's fonts block); a family the image lacks shows up as `font SUBSTITUTED` in the render output.
 - conda or pip: `python-pptx pdf2image pillow lxml markitdown[pptx]`.

@@ -44,7 +44,7 @@ COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # ==== drawio ====
-# draw.io desktop, Xvfb, and licensed fonts.
+# draw.io desktop, Xvfb, poppler, pdf python tools, and licensed fonts.
 
 # draw.io desktop; export runs through .claude/skills/drawio/scripts/export.sh
 ARG DRAWIO_VERSION=31.3.2
@@ -53,11 +53,28 @@ RUN curl -fsSL "https://github.com/jgraph/drawio-desktop/releases/download/v${DR
       libasound2t64 libgbm1 libnss3 libgtk-3-0t64 libxss1 libxtst6 libsecret-1-0 libnotify4 \
     && rm -rf /var/lib/apt/lists/* /tmp/drawio.deb
 
+# poppler for pdf rendering
+RUN apt-get update && apt-get install -y --no-install-recommends poppler-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# pdf python tools for the pdf addon
+RUN pip install --no-cache-dir pdf2image pillow
+
 # fontconfig and licensed fonts, last so font edits rebuild little
 RUN apt-get update && apt-get install -y --no-install-recommends fontconfig \
     && rm -rf /var/lib/apt/lists/*
 COPY fonts/ /usr/share/fonts/truetype/local/
 RUN fc-cache -f
+
+# ==== slides ====
+# LibreOffice Impress and deck python tools for the pptx addon.
+
+# LibreOffice Impress for deck rendering
+RUN apt-get update && apt-get install -y --no-install-recommends libreoffice-impress \
+    && rm -rf /var/lib/apt/lists/*
+
+# deck python tools for the pptx addon
+RUN pip install --no-cache-dir python-pptx lxml "markitdown[pptx]"
 
 # ==== project ====
 # Project-owned from this marker on; derive.sh --sync keeps it.
