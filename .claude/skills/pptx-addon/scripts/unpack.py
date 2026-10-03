@@ -13,7 +13,7 @@ from pathlib import Path
 from xml.dom import minidom
 
 
-def main():
+if __name__ == "__main__":
     assert len(sys.argv) == 3, "Usage: python unpack.py deck.pptx <out_dir>"
     src, out = Path(sys.argv[1]), Path(sys.argv[2])
     out.mkdir(parents=True, exist_ok=True)
@@ -24,7 +24,3 @@ def main():
         dom = minidom.parse(str(part))
         part.write_bytes(dom.toprettyxml(indent="  ", encoding="UTF-8"))
     print(f"unpacked {src} -> {out}/ ({len(parts)} XML parts)")
-
-
-if __name__ == "__main__":
-    main()

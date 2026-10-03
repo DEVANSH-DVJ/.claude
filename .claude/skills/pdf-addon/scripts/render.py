@@ -107,7 +107,7 @@ def default_out(pdf):
     return Path("render") / pdf.stem
 
 
-def main():
+if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Render PDF pages to PNG")
     ap.add_argument("pdf")
     ap.add_argument("--pages", help="1-based list/ranges, e.g. 1,3-5 (default: all)")
@@ -132,7 +132,3 @@ def main():
         print(f"  {p}")
     if args.grid:
         print(f"  {make_grid(pngs, out, args.cols)}")
-
-
-if __name__ == "__main__":
-    main()

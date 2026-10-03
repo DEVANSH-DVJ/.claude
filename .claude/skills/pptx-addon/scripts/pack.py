@@ -45,7 +45,7 @@ def check(pptx):
     return "XML well-formed, opens in python-pptx"
 
 
-def main():
+if __name__ == "__main__":
     assert len(sys.argv) == 3, "Usage: python pack.py <unpacked_dir> out.pptx"
     src, out = Path(sys.argv[1]), Path(sys.argv[2])
     files = sorted(p for p in src.rglob("*") if p.is_file())
@@ -65,7 +65,3 @@ def main():
         raise
     os.replace(tmp, out)
     print(f"packed {src}/ -> {out}: {report}")
-
-
-if __name__ == "__main__":
-    main()

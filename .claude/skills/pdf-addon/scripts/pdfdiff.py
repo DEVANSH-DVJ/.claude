@@ -50,7 +50,7 @@ def pixel_change(a, b):
     return mask.histogram()[255] / (ia.size[0] * ia.size[1])
 
 
-def main():
+if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Page-by-page PDF comparison")
     ap.add_argument("old")
     ap.add_argument("new")
@@ -83,7 +83,3 @@ def main():
                     print("\n".join("    " + d for d in delta[2:]))
     same = min(n_old, n_new) - changed
     print(f"{changed} pages changed, {same} unchanged")
-
-
-if __name__ == "__main__":
-    main()

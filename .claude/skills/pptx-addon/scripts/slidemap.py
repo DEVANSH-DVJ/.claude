@@ -27,7 +27,7 @@ def title_of(slide_xml):
     return (first.text or "") if first is not None else ""
 
 
-def main():
+if __name__ == "__main__":
     assert len(sys.argv) == 2, "Usage: python slidemap.py deck.pptx"
     z = zipfile.ZipFile(sys.argv[1])
     rels = ET.fromstring(z.read("ppt/_rels/presentation.xml.rels"))
@@ -36,7 +36,3 @@ def main():
     for i, sld in enumerate(pres.iter(P + "sldId"), 1):
         part = "ppt/" + target[sld.get(R + "id")]
         print(f"slide {i:2d} -> {part:24s} {title_of(z.read(part))[:60]}")
-
-
-if __name__ == "__main__":
-    main()

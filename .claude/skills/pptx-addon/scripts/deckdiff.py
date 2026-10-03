@@ -22,7 +22,7 @@ def normalized(name, data):
     return data
 
 
-def main():
+if __name__ == "__main__":
     assert len(sys.argv) == 3, "Usage: python deckdiff.py old.pptx new.pptx"
     old, new = (zipfile.ZipFile(p) for p in sys.argv[1:3])
     old_names, new_names = set(old.namelist()), set(new.namelist())
@@ -38,7 +38,3 @@ def main():
             print(f"{label}: {n}")
     same = len(old_names & new_names) - len(changed)
     print(f"identical: {same} parts")
-
-
-if __name__ == "__main__":
-    main()

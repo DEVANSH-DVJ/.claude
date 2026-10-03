@@ -21,6 +21,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+
 def parse_slides(spec, n):
     """'1,3-5' -> sorted unique 1-based pages within 1..n."""
     if not spec:
@@ -177,7 +178,7 @@ def default_out(pptx):
     return Path("render") / pptx.stem
 
 
-def main():
+if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Render pptx slides to PNG")
     ap.add_argument("pptx")
     ap.add_argument("--slides", help="1-based list/ranges, e.g. 1,3-5 (default: all)")
@@ -206,7 +207,3 @@ def main():
         print(f"  {p}")
     if args.grid:
         print(f"  {make_grid(pngs, out, args.cols)}")
-
-
-if __name__ == "__main__":
-    main()
