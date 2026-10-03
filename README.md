@@ -57,7 +57,7 @@ Repos with identical leading blocks share layers through the build cache; no ima
 ## Enforcement: rules, skills, and one hook
 
 Enforcement is the `.claude/*.md` rules the agent follows, the skills you invoke, and one PreToolUse hook.
-`.claude/hooks/protect.py` blocks any edit under `.claude/` other than `project.md` and `settings.local.json`, and any edit to a `.gitignore` or `LICENSE` file, so shared files change only in this repo and reach other repos by sync.
+`.claude/hooks/protect.py` blocks any edit under `.claude/`, `docker/`, or `format/` and to any `.gitignore` or `LICENSE`, except `.claude/project.md`, `.claude/settings.local.json`, `docker/Dockerfile`, and `docker/environment.yml`, so the copied files change only in this repo and reach other repos by sync.
 A hand-made, gitignored `.claude/.unlock` file lifts the block; keep one in this repo only.
 `derive.sh --check <repo>` infers a repo's categories from its skills, prints one status line per template path, and exits 1 on `differs` or `missing`:
 
@@ -83,7 +83,7 @@ Formatting is the `/format` skill; running the toolchain through the container w
 | `pdf-addon`     | drawio   | PDF review: render pages with a contact sheet, diff two versions page by page by text and pixels                                                                         |
 | `/writing`      | writing  | prose deliverables (paper, slides, poster, notes, docs) one unit at a time: plan, draft, two-reader voice review, fidelity check, adjudication, second round, final read |
 | `pptx-addon`    | slides   | slide decks: render, edit only the requested slides, prove the rest unchanged; image requirements in its SKILL.md                                                        |
-| `/latex`        | latex    | LaTeX papers and beamer talks: host `latexmk` builds, log and font checks, page renders with a page-count gate, `latexdiff` against the submission, draw.io figures      |
+| `/latex`        | latex    | LaTeX papers and beamer talks: host `make` builds, log and font checks, page renders with a page-count gate, `latexdiff` against the submission, draw.io figures         |
 
 Day to day: `/format` before commits, `/review-diff` before finishing, `/commit` to commit.
 Claude Code loads a personal `~/.claude/skills/<name>` over a project skill of the same name, so keep no personal copies of these.
@@ -91,37 +91,41 @@ Anthropic's document skills (`/document-skills:pptx` and friends) are source-ava
 
 ## Adopting this template
 
-A new repo is derived in two commits, and its shared files are never edited afterwards; template changes reach it by `--sync`.
+A repo takes the template in two commits; afterwards it edits only its project-owned parts, and template changes arrive through `--sync`.
 
-1. Commit 1 is a copy of the category files, verbatim except that `docker/Dockerfile` and `settings.json` are trimmed to the categories, with the message `template: import <categories> from devansh-dvj/.claude@<short sha>`.
-2. Commit 2 fills the placeholders only: the slug in `docker/*.sh`, `.claude/project.md`, and the `<PROJECT>` and one-line placeholders at the top of `CLAUDE.md`.
+1. Commit 1 adds the chosen categories' files verbatim, except that `docker/Dockerfile` drops the blocks of categories not chosen and, without slides, `.claude/settings.json` drops the plugin keys.
+   Its message is `template: import <categories> from devansh-dvj/.claude@<short sha>`.
+2. Commit 2 fills the placeholders: the slug in `docker/*.sh`, `.claude/project.md`, and the heading and description line of `CLAUDE.md`.
 
-`<template>/derive.sh [--force] <repo> <category>...` makes commit 1 mechanical.
-It copies the tracked files of the given categories and the ones they imply, refuses to overwrite a file that differs unless `--force`, and prints the `git add` and `git commit` commands for commit 1 without running them.
-An existing repo adopting the template uses `--replace`: with nothing uncommitted under `CLAUDE.md`, `.claude`, `docker`, and `format`, it `git rm`s the tracked files there, keeping untracked and ignored ones such as `.claude/settings.local.json`, copies the categories, and prints a commit 1 that stages those roots whole, removals included.
-`<template>/derive.sh --slug <slug> <repo>` sets the slug in the repo's `docker/*.sh` and prints the commit 2 commands, to run once `.claude/project.md` and the top of `CLAUDE.md` are filled by hand.
-`<template>/derive.sh --sync <repo>` mirrors the template's HEAD into a derived repo: with nothing uncommitted under its roots, it re-copies every template-owned path of its categories, removes the files the template dropped and the paths of categories the repo did not take, keeps `.claude/project.md`, `docker/environment.yml`, the top of `CLAUDE.md`, the slug, and the project tail of `docker/Dockerfile`, and prints each change and a commit `template: sync from devansh-dvj/.claude@<short sha>` that stages the roots whole, removals included.
+`derive.sh` does the mechanical part and prints the `git add` and `git commit` commands rather than running them:
 
-Both flows run from a pasted prompt in a Claude Code session in the repo: the derivation prompt for a new repo, the sync prompt for a derived repo picking up template changes or an existing repo adopting the template.
-Set `<template>` in either to a local checkout of this repo.
+- `derive.sh <repo> <category>...` copies the files for commit 1, and refuses if a file already there differs from the template.
+- `derive.sh --replace <repo> <category>...` does the same for an existing repo: it removes the tracked files under `CLAUDE.md`, `.claude/`, `docker/`, and `format/` first, so commit 1 replaces them.
+- `derive.sh --slug <slug> <repo>` writes the slug into `docker/*.sh` and prints the commit 2 commands; `.claude/project.md` and the heading and description line of `CLAUDE.md` are filled before that commit, outside the script.
+- `derive.sh --check <repo>` prints one status per template path (the statuses are listed under Enforcement).
+- `derive.sh --sync <repo>` brings a derived repo up to the template's current commit: it recopies the template paths, removes what the template dropped, keeps the project-owned parts (`.claude/project.md`, `docker/environment.yml`, the slug, the heading and description line of `CLAUDE.md`, the project tail of `docker/Dockerfile`), and prints a commit `template: sync from devansh-dvj/.claude@<short sha>`.
+
+Both `--replace` and `--sync` refuse a repo with uncommitted or untracked files under `CLAUDE.md`, `.claude/`, `docker/`, or `format/`.
+The two prompts below drive all of this from a Claude Code session in the repo; each clones this template into `work/template`, kept out of git through `.git/info/exclude`, and runs `derive.sh` from there.
 
 ## Derivation prompt (new repo)
 
-> Set up this repo from the Claude Code template checked out at `<template>` (github.com/devansh-dvj/.claude), in two commits, and stop once the image builds.
-> First ask me, in one question, what this project's goal is.
-> Then propose its categories from core (always), drawio, writing, slides, and latex (slides and latex bring drawio and writing), with a line on why each fits, plus a short lowercase slug, and wait for me to confirm them.
-> Run `<template>/derive.sh . <categories>` from this repo's root; if it refuses because a file differs, stop and show me.
-> Make commit 1 by running exactly the `git add` and `git commit` commands it prints, adding nothing to the message.
-> For commit 2, change only the placeholders: run `<template>/derive.sh --slug <slug> .`, fill `.claude/project.md` from my answer and the repo (for latex, record under Overrides that LaTeX builds run on the host), and replace the `<PROJECT>` and one-line placeholders at the top of `CLAUDE.md`.
-> Make commit 2 by running exactly the `git add` and `git commit` commands `--slug` printed, and never edit any other file derive.sh copied.
-> Then run `./docker/build.sh`, tell me whether it built, and stop.
+> Set up the Claude Code workflow from `github.com/devansh-dvj/.claude` in this repo, in two commits, ending with a built image.
+> Clone the template first: `git clone --depth 1 git@github.com:devansh-dvj/.claude.git work/template`, and add `work/` to `.git/info/exclude` if it is not ignored yet.
+> Ask me, in one question, what this project's goal is.
+> Propose its categories, one line each on why it fits (core always; drawio, writing, slides, latex as needed; slides and latex bring drawio and writing), and a short lowercase slug, then wait for my confirmation.
+> Run `work/template/derive.sh . <categories>` from this repo's root; if it refuses, show me its output and wait.
+> Make commit 1 with exactly the commands it prints.
+> Run `work/template/derive.sh --slug <slug> .`, fill `.claude/project.md` from my answer and the repo, deleting any section with nothing true to state, and in `CLAUDE.md` put the project name in place of `<PROJECT>` and one line in place of the description placeholder.
+> Make commit 2 with exactly the commands `--slug` printed, touching no other copied file.
+> Run `./docker/build.sh` and tell me whether it built or found an existing image of that name, then remove `work/template` so this repo does not keep a second copy of the template.
 
 ## Sync prompt (existing repo)
 
-> Bring this repo in line with the Claude Code template checked out at `<template>` (github.com/devansh-dvj/.claude), in one commit, and stop.
-> First run `<template>/derive.sh --check .` from this repo's root and show me its report.
-> If the history has no `template:` commit, the repo was never derived: stop, propose its categories from core (always), drawio, writing, slides, and latex, and once I confirm run `<template>/derive.sh --replace . <categories>` and make the two commits exactly as the derivation prompt describes.
-> Otherwise run `<template>/derive.sh --sync .`, read every `remove` and `copy` line it prints, and tell me about anything removed that this repo still relies on before going on.
-> Make the sync commit by running exactly the `git add` and `git commit` commands it prints, adding nothing to the message.
-> Never edit a copied file by hand; anything that needs changing changes in the template and arrives with the next sync.
-> Then run `./docker/build.sh`, tell me whether it built, and stop.
+> Update the Claude Code workflow in this repo to the current `github.com/devansh-dvj/.claude`.
+> Clone the template first: `git clone --depth 1 git@github.com:devansh-dvj/.claude.git work/template`, or `git -C work/template pull` if it is already there, and add `work/` to `.git/info/exclude` if it is not ignored yet.
+> If no commit message in `git log` starts with `template:`, this repo never took the template: list the tracked files that `--replace` would delete under `CLAUDE.md`, `.claude/`, `docker/`, and `format/`, wait for my go-ahead, then follow the derivation prompt in `work/template/README.md` from its "Ask me" step with `--replace` added to its first `derive.sh` command, and skip the rest of this prompt.
+> Otherwise run `work/template/derive.sh --check .` from this repo's root and show me its report, then run `work/template/derive.sh --sync .`; if it prints `already matches the template`, tell me; if a `remove` line names something this repo still uses, tell me and wait for my go-ahead.
+> Make the sync commit with exactly the commands it prints, touching no other copied file.
+> Run `./docker/build.sh --rebuild` and tell me whether it built; if containers still use the old image, tell me instead of passing `--force`.
+> Remove `work/template` so this repo does not keep a second copy of the template.
