@@ -7,16 +7,27 @@ set -euo pipefail
 FORMAT_DIR="$(cd "$(dirname "$0")" && pwd)"
 has() { command -v "$1" >/dev/null 2>&1; }
 
+# Run one formatter, or say it is not on PATH.
+run_fmt() {
+  local tool="$1"
+  shift
+  if has "$tool"; then
+    "$@"
+  else
+    echo "[format] skipping $tool: not on PATH" >&2
+  fi
+}
+
 # Format one file, dispatched by extension.
 fmt_file() {
   local f="$1"
   [ -f "$f" ] || return 0
   case "${f##*.}" in
-    rs) has rustfmt && rustfmt --config-path "$FORMAT_DIR" --config skip_children=true "$f" ;;
-    py) has ruff && ruff format -q --config "$FORMAT_DIR/pyproject.toml" "$f" ;;
-    sh) has shfmt && shfmt -w -i 2 -ci "$f" ;;
-    cc | cpp | h | hpp) has clang-format && clang-format --style="file:$FORMAT_DIR/.clang-format" -i "$f" ;;
-    md | json | yaml | yml | js | ts) has prettier && prettier --write --log-level warn --config "$FORMAT_DIR/.prettierrc.json" "$f" ;;
+    rs) run_fmt rustfmt rustfmt --config-path "$FORMAT_DIR" --config skip_children=true "$f" ;;
+    py) run_fmt ruff ruff format -q --config "$FORMAT_DIR/pyproject.toml" "$f" ;;
+    sh) run_fmt shfmt shfmt -w -i 2 -ci "$f" ;;
+    cc | cpp | h | hpp) run_fmt clang-format clang-format --style="file:$FORMAT_DIR/.clang-format" -i "$f" ;;
+    md | json | yaml | yml | js | ts) run_fmt prettier prettier --write --log-level warn --config "$FORMAT_DIR/.prettierrc.json" "$f" ;;
   esac
   return 0
 }
