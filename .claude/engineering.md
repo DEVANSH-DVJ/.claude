@@ -1,7 +1,7 @@
 # Engineering rules
 
 Project-agnostic engineering conventions.
-Project commands, layout, and any language-specific conventions live in `project.md`.
+Project commands, layout, and toolchain specifics live in `project.md`.
 
 ## Diff discipline
 
@@ -10,6 +10,7 @@ Project commands, layout, and any language-specific conventions live in `project
 - Don't add a dependency without asking.
 - Keep behavioral changes small and focused: land structural prep as its own commit, then the minimal behavioral delta on top.
 - One concern per commit.
+- Never edit a `.gitignore` or a `LICENSE`; ask. A machine-local ignore goes in `.git/info/exclude`.
 
 ## Comments
 
@@ -43,8 +44,15 @@ Project commands, layout, and any language-specific conventions live in `project
 - Blanket exception handlers or silent fallbacks that mask failures. During research, fail loudly: a stack trace beats a silently wrong result.
 - Overwhelmingly large files. Split into human-scale files.
 
+## Language style
+
+Conventions that hold in every project; the formatter configs in `format/` enforce the mechanical part.
+
+- Python: no `main()` wrapper. The entry-point body is inlined under `if __name__ == "__main__":`.
+
 ## Prose and house style
 
 - One sentence per line, with no character limit, in markdown (README and docs) and LaTeX (`.tex`). Never hard-wrap mid-sentence for width.
 - ASCII only in every text file: no em or en dashes, arrows, curly quotes, bullets, check marks, emoji, or other non-ASCII glyphs, in code, markdown, configs, or commit messages. Write `--`, `->`, straight quotes, `...`, and words instead. Binary assets are the only exception.
 - Check with `git ls-files | xargs grep -nP '[^\x00-\x7F]'`; the output must be empty.
+- Every text file ends with a newline.
