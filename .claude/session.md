@@ -16,6 +16,7 @@ These files are the durable memory that survives across machines and sessions.
 - Verify before writing docs. Every technical claim must trace to code read this session, using literal identifiers, not paraphrase. If you can't point to a line, don't write the sentence.
 - A search hit is a lead, not a finding: read the surrounding code before drawing a conclusion from it.
 - Preserve old content when rewriting a doc: move it under an "Old \<doc\>" section, and delete only once the new version is confirmed working.
+- Drafts and scratch files live in the repo's gitignored `work/`, where the owner can follow them in the editor; never in a temp directory outside the repo.
 
 ## Git / commits
 
@@ -23,6 +24,7 @@ These files are the durable memory that survives across machines and sessions.
 - Only an explicitly-authorized main agent commits; subagents report changes instead of running git writes. Stage and commit by explicit pathspec, never `git add -A`: otherwise a concurrent session's staged files get swept into your commit. Re-check `git status` and `git show --stat` after.
 - Commit messages are one line, `<area>: <short lowercase imperative>`, where the area is the directory or component touched; no body, no trailers.
 - Never override the commit author/committer identity, and never add `Co-Authored-By` trailers.
+- A session leaves a clean history whether or not it is pushed: a correction to one of its own commits is folded into that commit, never stacked on top, so no commit adds what a later one removes.
 - No AI references anywhere that ships: not in code, comments, filenames, or naming.
 - For a living notes or status doc, amend successive edits into its single local commit rather than stacking per-update commits, while the commits are still local-only.
 
