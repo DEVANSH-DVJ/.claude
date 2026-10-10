@@ -5,8 +5,20 @@ These are project-agnostic; project-specific overrides live in `project.md` or t
 
 ## Persistence across sessions
 
-Rules or project facts learned mid-session go into the right version-controlled file before the session ends: behavioral to `session.md`, project context to `project.md`, engineering to `engineering.md`.
-These files are the durable memory that survives across machines and sessions.
+- Record only what a later session needs and cannot get from the code: a durable fact about the project, or a preference the owner states as standing.
+- An instruction for the task at hand, a decision about current work, or a correction to this session is followed now and not recorded as a rule; if a later session must know it, it goes in the living status doc.
+- Before adding or changing a line in a rule file, show the owner the exact line and its place, and write it only on a yes.
+- Write a rule as narrow as it was said: name the case it covers, and never widen one remark into a general "never" or "always".
+- Replace or tighten an existing line before appending a new one, and remove a line the new one supersedes in the same edit.
+
+## What `project.md` holds
+
+- What is true of the whole project for as long as it exists: no status, dates, counts, or commit hashes, and nothing about one deliverable or the content of the work; those go in the status doc or that deliverable's plan.
+- Each fact once: when the README, a run doc, a skill, or a shared rule already says it, point there, and keep the layout to directories and entry points, not what each file does.
+- Every line sits under one of the file's sections; a project's own standing rule goes under Overrides, naming the shared rule it overrides when it does; a line that fits no section does not belong in the file.
+- One rule per bullet, about 40 words at most, with no tag for who said it or when.
+- The file stays under 1,000 words; a line that would take it past that replaces something else.
+- A change that removes or renames something the file names fixes that line in the same commit.
 
 ## Behavior
 
