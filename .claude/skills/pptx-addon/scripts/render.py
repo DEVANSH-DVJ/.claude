@@ -183,7 +183,7 @@ if __name__ == "__main__":
     ap.add_argument("pptx")
     ap.add_argument("--slides", help="1-based list/ranges, e.g. 1,3-5 (default: all)")
     ap.add_argument("--dpi", type=int, default=110)
-    ap.add_argument("--out", help="output dir (default render/<stem>/)")
+    ap.add_argument("--out", help="output dir (default render/<deck path>/)")
     ap.add_argument("--grid", action="store_true", help="also write grid.png")
     ap.add_argument("--cols", type=int, default=4, help="grid columns")
     args = ap.parse_args()
