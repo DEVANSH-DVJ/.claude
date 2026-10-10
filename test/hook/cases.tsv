@@ -1,0 +1,526 @@
+# seed allow
+ALLOW	./docker/exec.sh "pytest -q" 2>&1 | tee work/x.log
+ALLOW	mkdir -p render/x && ./docker/exec.sh "python tools/render.py"
+ALLOW	./docker/exec.sh "make pdf" && cp render/a.pdf poster/a.pdf
+ALLOW	rm -rf work/x; git show 112205e:docker/fonts.conf | wc -l
+ALLOW	cp docker/Dockerfile work/Dockerfile.bak
+ALLOW	cd ../other-repo && rm .claude/.unlock
+ALLOW	rm /home/devansh/PROJECTS/other-repo/.claude/.unlock
+ALLOW	./docker/exec.sh "markitdown deck.pptx > work/deck.md"
+ALLOW	./docker/exec.sh "python .claude/skills/pptx-addon/scripts/unpack.py deck.pptx work/deck"
+ALLOW	grep -rn foo .claude/ | tee work/hits.txt
+ALLOW	git add -- format/format.sh && git commit -m "format: x" -- format/format.sh
+ALLOW	./format/format.sh src/a.py
+ALLOW	touch work/x && cat .claude/settings.json
+ALLOW	git diff -- docker/ > work/docker.diff
+ALLOW	echo "see docker/build.sh" > notes.txt
+ALLOW	sed -i s/a/b/ docker/Dockerfile
+ALLOW	rm .claude/settings.local.json
+ALLOW	docker run --rm -v "$PWD":/w img ls docker/
+# seed block
+BLOCK	sed -i s/a/b/ docker/build.sh
+BLOCK	sed -E -i s/a/b/ docker/build.sh
+BLOCK	echo x > .claude/session.md
+BLOCK	echo x >> format/format.sh
+BLOCK	cat work/x > docker/build.sh
+BLOCK	rm -rf .claude/skills/commit
+BLOCK	rm -rf docker
+BLOCK	rm -rf .claude
+BLOCK	mv docker/build.sh docker/build2.sh
+BLOCK	cp work/x.sh docker/build.sh
+BLOCK	cp -r x .claude/
+BLOCK	rsync -a work/x/ docker/
+BLOCK	tee .gitignore < work/x
+BLOCK	echo x > sub/.gitignore
+BLOCK	rm LICENSE
+BLOCK	git checkout -- docker/build.sh
+BLOCK	git restore format/format.sh
+BLOCK	git rm docker/run.sh
+BLOCK	python3 -c "open('docker/build.sh','w').write('x')"
+BLOCK	python3 - <<'EOF'\nopen('.claude/session.md','w').write('x')\nEOF
+BLOCK	sudo rm docker/build.sh
+BLOCK	echo docker/build.sh | xargs rm
+BLOCK	touch .claude/.unlock
+BLOCK	cd docker && sed -i s/a/b/ build.sh
+BLOCK	bash -c "sed -i s/a/b/ docker/build.sh"
+BLOCK	find docker -name '*.sh' -exec sed -i s/a/b/ {} \;
+BLOCK	find format -delete
+BLOCK	./docker/exec.sh "sed -i s/a/b/ format/format.sh"
+# daily patterns
+ALLOW	./docker/exec.sh "ruff check src" 2>&1 | tail -20
+ALLOW	./docker/build.sh && ./docker/exec.sh "pytest -q"
+ALLOW	mkdir -p work/logs && ./docker/exec.sh "python train.py" > work/logs/train.log 2>&1 &
+ALLOW	./docker/exec.sh "cd src && rm -rf build && make -j8"
+ALLOW	./docker/exec.sh "cp render/a.pdf poster/ && rm -f work/tmp.*"
+ALLOW	git stash && ./docker/exec.sh "pytest -q"; git stash pop
+ALLOW	chmod +x tools/run.sh && ./docker/exec.sh "tools/run.sh"
+ALLOW	docker run --rm -v "$PWD":/w:ro -w /w --entrypoint bash img -lc 'ruff format --diff --config format/pyproject.toml work/hook/protect.py'
+ALLOW	./format/format.sh work/hook/protect.py && git diff --stat
+ALLOW	timeout 600 ./docker/exec.sh "pytest -q" | tee work/t.log
+ALLOW	ls -la docker/ .claude/ format/ && rm -f work/*.tmp
+ALLOW	rm -f work/a.log; ./docker/exec.sh "python x.py --config docker/environment.yml --out work/o"
+ALLOW	git commit -m "$(cat <<'EOF'\nformat: note\n\nrm docker/build.sh isn't allowed\nEOF\n)"
+ALLOW	git commit -m "docker: don't touch docker/build.sh" -- README.md
+# path tools
+ALLOW	@Edit docker/Dockerfile
+ALLOW	@Write work/x.py
+ALLOW	@Edit README.md
+BLOCK	@Edit docker/build.sh
+BLOCK	@Write @ROOT@/.claude/session.md
+BLOCK	@Edit .gitignore
+BLOCK	@NotebookEdit format/x.ipynb
+BLOCK	@MultiEdit LICENSE
+# shell syntax edges
+ALLOW	:
+ALLOW	echo ')' ; ls
+ALLOW	case $x in a) ls docker/ ;; esac
+ALLOW	> work/empty.txt
+ALLOW	echo x >
+ALLOW	sed -i
+ALLOW	xargs
+ALLOW	bash -c
+ALLOW	echo "$(echo "nested $(ls docker/)")"
+ALLOW	echo $((1 + 2)) > work/n.txt
+ALLOW	echo "a && rm docker/build.sh"
+ALLOW	grep -E 'a|b' docker/build.sh | tee work/out.txt
+ALLOW	ls docker/ # rm docker/build.sh
+ALLOW	awk '{print $1}' docker/build.sh > work/col.txt
+ALLOW	jq '.hooks | keys' .claude/settings.json
+ALLOW	cut -d '|' -f 2 docker/list | sort > work/x
+BLOCK	> docker/build.sh
+BLOCK	: > .gitignore
+BLOCK	echo $((1 + 2)) > docker/n.txt
+BLOCK	ls; rm docker/build.sh # cleanup
+BLOCK	case $x in a) rm docker/build.sh ;; esac
+BLOCK	ls docker/ |& tee docker/list
+BLOCK	ls | xargs rm	docker
+# comments
+ALLOW	rm work/x  # keeps docker/build.sh
+ALLOW	echo hi # note; rm docker/build.sh
+ALLOW	# don't\nls docker/\n# it's done
+BLOCK	# don't\nrm docker/build.sh\n# it's done
+BLOCK	echo "# Title" > .claude/session.md
+BLOCK	sed -i s#a#b# docker/build.sh
+BLOCK	rm docker/build.sh #cleanup
+# quoted operators
+ALLOW	echo 'a;b' '&&' "x|y" > work/ops.txt
+BLOCK	rm ';' docker/build.sh
+BLOCK	find docker '(' -name '*.sh' ')' -exec rm {} ';'
+BLOCK	echo 'x'>'docker/build.sh'
+BLOCK	echo a\;b > docker/build.sh
+# quoting
+ALLOW	echo 'rm -rf docker' > work/note.txt
+ALLOW	git commit -m "docker: rm docker/build.sh; sed -i fix" -- README.md
+ALLOW	grep -n 'sed -i' docker/build.sh
+ALLOW	echo "it's fine" && ls docker/
+ALLOW	sed -i 's/foo/LICENSE/' README.md
+ALLOW	sed -n '1,5p' docker/build.sh
+ALLOW	perl -pe 's/a/b/' docker/build.sh > work/build.sh
+ALLOW	rm work/x "unclosed
+BLOCK	rm "docker/build.sh"
+BLOCK	rm 'docker/run.sh' work/x
+BLOCK	echo x >"docker/build.sh"
+BLOCK	sed -i.bak 's/a/b/' format/format.sh
+BLOCK	sed --in-place -e 's/a/b/' -e 's/c/d/' docker/run.sh
+BLOCK	sed --in-place --expression=s/a/b/ docker/run.sh
+BLOCK	sed -Ei 's/a/b/' .claude/engineering.md
+BLOCK	perl -pi -e 's/a/b/' docker/build.sh
+BLOCK	rm docker/build.sh "unclosed
+# redirects
+ALLOW	./docker/exec.sh "pytest -q" > work/out.log 2>&1
+ALLOW	./docker/exec.sh "sleep 5" > work/log 2>&1 &
+ALLOW	ls docker/ 2>/dev/null >&2
+ALLOW	echo x > /dev/null; ls .claude/
+ALLOW	git diff | tee work/a.diff docs/b.diff
+BLOCK	echo x 2>docker/err.log
+BLOCK	ls &> docker/out.txt
+BLOCK	ls >| .gitignore
+BLOCK	./docker/exec.sh "pytest -q" 2>> format/err.log
+BLOCK	echo x | tee -a docker/build.sh >/dev/null
+BLOCK	diff <(sort work/a) <(sort work/b) > docker/build.sh
+# multi-line
+ALLOW	mkdir -p work/out\n./docker/exec.sh "make pdf"\ncp render/a.pdf work/out/
+ALLOW	for f in docker/*.sh; do wc -l "$f"; done
+ALLOW	# refresh docker/build.sh later\nls docker/
+BLOCK	ls docker\nrm docker/build.sh
+BLOCK	cp work/x.sh \\\n  docker/build.sh
+BLOCK	if true; then rm docker/build.sh; fi
+BLOCK	for i in 1 2; do\n  echo $i >> docker/build.sh\ndone
+BLOCK	{ rm docker/build.sh; }
+# heredocs
+ALLOW	cat > work/notes.md <<'EOF'\nrm -rf docker\nsed -i s/a/b/ docker/build.sh\nit's data\nEOF
+ALLOW	python3 - <<'EOF'\nprint(open('docker/Dockerfile').read())\nEOF
+ALLOW	python3 work/gen.py <<'EOF'\nplain data\nEOF
+ALLOW	cat <<EOF > work/a.txt\nsee .claude/session.md\nEOF\nls docker/
+BLOCK	cat > docker/build.sh <<'EOF'\n#!/bin/bash\necho hi\nEOF
+BLOCK	cat <<EOF | tee .claude/session.md\nhello\nEOF
+BLOCK	bash <<'EOF'\nrm docker/build.sh\nEOF
+BLOCK	cat <<'EOF' | bash\nrm docker/build.sh\nEOF
+BLOCK	cat <<'EOF' | python3\nopen('docker/build.sh', 'w')\nEOF
+ALLOW	cat <<'EOF' | tee work/a.txt; bash work/run.sh\nrm docker/build.sh\nEOF
+BLOCK	python3 <<EOF\nopen("format/format.sh","a").write("x")\nEOF
+BLOCK	cat <<EOF > work/a.txt\ndata\nEOF\nrm docker/build.sh
+# subshells and substitutions
+ALLOW	(cd docker && ls); rm build.sh
+ALLOW	echo "$(cat docker/build.sh)" > work/copy.sh
+ALLOW	N=$(ls docker | wc -l); echo $N > work/count.txt
+BLOCK	(cd work && ls); rm docker/build.sh
+BLOCK	(cd docker && rm build.sh)
+BLOCK	cp $(ls work/*.sh | head -1) docker/build.sh
+BLOCK	echo "$(rm docker/build.sh)"
+BLOCK	echo `rm docker/build.sh`
+ALLOW	OUT="$(./docker/exec.sh "pytest -q" 2>&1)"; echo "$OUT" | tee work/out.log
+ALLOW	echo '$(rm docker/build.sh)' > work/note.txt
+ALLOW	echo '`rm docker/build.sh`' > work/note.txt
+ALLOW	cd "$(git rev-parse --show-toplevel)" && rm -rf work/x
+BLOCK	OUT="$(./docker/exec.sh "sed -i s/a/b/ docker/build.sh" 2>&1)"; echo "$OUT"
+BLOCK	# don't\necho "$(rm docker/build.sh)"
+BLOCK	cd docker && X=$(rm build.sh)
+BLOCK	echo "$(echo ')' ; rm docker/build.sh)"
+BLOCK	rm $(echo x) docker/build.sh
+BLOCK	echo "$(bash -c "rm docker")"
+# cd tracking
+ALLOW	cd work && rm -rf docker
+ALLOW	cd docker && cp build.sh ../work/build.sh
+ALLOW	rm -rf docker	work
+ALLOW	sed -i s/a/b/ Dockerfile	docker
+BLOCK	cd .claude/hooks && rm protect.py
+BLOCK	cd work && rm ../docker/build.sh
+BLOCK	cd work\ncd ..\nrm format/format.sh
+BLOCK	sed -i s/a/b/ build.sh	docker
+BLOCK	echo x > ../.claude/session.md	work
+BLOCK	git -C docker checkout -- build.sh
+# absolute paths
+ALLOW	cp @ROOT@/docker/build.sh /tmp/build.sh
+BLOCK	rm @ROOT@/docker/build.sh
+BLOCK	echo x > @ROOT@/.claude/session.md
+BLOCK	cd /tmp && cp x.sh @ROOT@/format/format.sh
+BLOCK	cd @ROOT@/docker && rm build.sh
+BLOCK	rm @TILDE@/docker/build.sh
+# paths outside the repo
+ALLOW	rm -rf /tmp/scratch/docker
+ALLOW	cd /tmp && rm -rf docker .claude
+ALLOW	sed -i s/a/b/ ../other-repo/docker/build.sh
+ALLOW	cp docker/build.sh ~/backup/build.sh
+ALLOW	rm -rf work/docker
+ALLOW	rm -rf dockerfiles
+ALLOW	mkdir -p render/docker/x
+# file verbs
+ALLOW	dd if=docker/build.sh of=work/copy.sh
+ALLOW	cp -t work docker/build.sh docker/run.sh
+ALLOW	rsync -a docker/ work/docker-copy/
+ALLOW	cp work/Dockerfile docker/Dockerfile
+ALLOW	echo x >> .claude/project.md
+ALLOW	cat LICENSE > work/license.txt
+BLOCK	dd if=/dev/zero of=docker/build.sh bs=1 count=1
+BLOCK	cp -t docker work/a.sh work/b.sh
+BLOCK	cp --target-directory=.claude work/a.md
+BLOCK	ln -sf ../work/x.sh docker/build.sh
+BLOCK	install -m 755 work/x.sh docker/build.sh
+BLOCK	chmod +x docker/build.sh
+BLOCK	truncate -s 0 format/format.sh
+BLOCK	mkdir -p .claude/skills/new
+BLOCK	mv docker/Dockerfile docker/Dockerfile.old
+BLOCK	cp work/l LICENSE.md
+BLOCK	rm sub/dir/LICENSE-MIT
+BLOCK	rm -rf ./docker
+BLOCK	rm -rf format/
+# wrappers
+BLOCK	sudo -E rm docker/build.sh
+BLOCK	FOO=1 BAR=2 rm docker/build.sh
+BLOCK	env X=1 touch format/new
+BLOCK	nohup rm docker/build.sh &
+BLOCK	time rm -rf .claude/skills
+BLOCK	command rm docker/build.sh
+BLOCK	/bin/rm docker/build.sh
+# git
+ALLOW	git checkout -b docker/fonts
+ALLOW	git log --stat -- docker/
+ALLOW	git status && git diff --stat format/
+BLOCK	git stash push -- docker/build.sh
+BLOCK	git clean -fd format
+BLOCK	git mv docker/run.sh docker/go.sh
+BLOCK	git checkout HEAD~1 -- .claude/session.md
+# command-string carriers
+ALLOW	bash -c "ls docker/ && cat docker/build.sh"
+ALLOW	./docker/exec.sh "rm -rf work/build && make"
+BLOCK	eval "rm docker/build.sh"
+BLOCK	sh -c 'echo x > format/format.sh'
+BLOCK	bash -lc "cd docker && rm build.sh"
+BLOCK	./docker/exec.sh "cd docker && rm build.sh"
+BLOCK	docker/exec.sh 'echo x > .gitignore'
+BLOCK	cd work && ../docker/exec.sh "rm -rf docker"
+BLOCK	bash -c "bash -c 'rm docker/build.sh'"
+# find and xargs
+ALLOW	find work -name '*.log' -delete
+ALLOW	find docker -name '*.sh' -exec grep -n foo {} \;
+ALLOW	find docker -name '*.sh' -exec cp {} work/ \;
+ALLOW	grep -rl foo src | xargs sed -i s/foo/bar/
+ALLOW	ls docker/*.sh | xargs -I{} cp {} work/
+ALLOW	ls docker/ | xargs wc -l
+BLOCK	find docker -type f -delete
+BLOCK	find docker format -name '*.sh' -exec chmod +x {} +
+BLOCK	find docker \( -name '*.sh' -o -name '*.yml' \) -exec rm {} \;
+BLOCK	find docker -name '*.sh' | xargs sed -i s/a/b/
+BLOCK	grep -rl foo .claude/ | xargs -n 1 rm
+BLOCK	ls work/*.sh | xargs -I{} cp {} docker/
+# inline code
+ALLOW	python3 -c "print(open('README.md').read())"
+ALLOW	python3 tools/check.py docker/build.sh
+BLOCK	node -e "require('fs').writeFileSync('docker/build.sh','x')"
+BLOCK	perl -e 'open(F,">.claude/session.md")'
+BLOCK	python3.12 -c "import shutil; shutil.rmtree('format/')"
+# run-time targets
+ALLOW	OUT=work/x; ./docker/exec.sh "make" 2>&1 | tee "$OUT/log"
+ALLOW	./docker/exec.sh "pytest -q" > "$LOG" 2>&1
+ALLOW	rm -rf "$TMPDIR/x"
+ALLOW	mkdir -p "$PWD/work/x" && ./docker/exec.sh "make"
+ALLOW	LOG=work/a.log; ./docker/exec.sh "make" | tee "$LOG"; cat docker/Dockerfile
+ALLOW	./docker/exec.sh "./format/format.sh src/a.py" > "$LOG"
+ALLOW	F=docker/build.sh; rm "$F"	work
+BLOCK	for f in docker/*.sh; do sed -i s/a/b/ "$f"; done
+BLOCK	for f in docker/*.sh; do\n  sed -i s/a/b/ "$f"\ndone
+BLOCK	F=docker/build.sh; rm "$F"
+BLOCK	rm $(ls docker/*.sh)
+BLOCK	rm `ls docker/*.sh`
+BLOCK	rm "$PWD/docker/build.sh"
+BLOCK	rm "${PWD}/build.sh"	docker
+BLOCK	F="$PWD/docker/build.sh"; rm "$F"
+BLOCK	cat docker/build.sh | sed s/a/b/ > "$OUT"
+BLOCK	cp "$f" docker/
+# copies into a directory
+ALLOW	cp work/Dockerfile docker/
+ALLOW	cp work/environment.yml docker/
+ALLOW	cd docker && cp Dockerfile ..
+ALLOW	cp docker/build.sh work/
+ALLOW	cp work/settings.local.json .claude
+ALLOW	mv work/Dockerfile docker/
+ALLOW	install -m 644 work/environment.yml docker/
+ALLOW	cp -t docker work/Dockerfile work/environment.yml
+ALLOW	cp -r docker work/
+BLOCK	cp work/build.sh docker/
+BLOCK	cp work/a.md .claude
+BLOCK	cp -r work/Dockerfile docker/
+BLOCK	cp work/Dockerfile work/build.sh docker/
+BLOCK	mv docker/build.sh work/
+BLOCK	mv work/x/ docker/
+BLOCK	install -m 755 work/run.sh docker/
+BLOCK	ln -s ../work/x.sh docker/
+# wrappers with arguments
+ALLOW	timeout 600 ./docker/exec.sh "make" 2>&1 | tee "$LOG"
+ALLOW	stdbuf -oL ./docker/exec.sh "pytest -q" | tee "work/$RUN.log"
+ALLOW	nohup ./docker/exec.sh "make" > "$LOG" 2>&1 &
+ALLOW	timeout -k 5 600 ./docker/exec.sh "make"
+ALLOW	timeout 60 ./docker/exec.sh "rm -rf work/build"
+BLOCK	timeout 60 rm docker/build.sh
+BLOCK	timeout -s KILL 5m rm docker/build.sh
+BLOCK	sudo -u root sed -i s/a/b/ format/format.sh
+BLOCK	sudo -u root rm docker/build.sh
+BLOCK	nice -n 10 cp work/x.sh docker/build.sh
+BLOCK	exec rm -rf .claude
+BLOCK	exec rm docker/build.sh
+BLOCK	env FOO=1 rm docker/build.sh
+BLOCK	env -u FOO setsid rm docker/build.sh
+BLOCK	timeout 60 ./docker/exec.sh "rm docker/build.sh"
+# scratch and comments at run time
+ALLOW	# rebuild the docker/ image\n./docker/exec.sh "make" | tee "$LOG"
+ALLOW	cp LICENSE work/
+ALLOW	cp .gitignore work/
+ALLOW	for f in docker/*.sh; do cp "$f" work/; done
+ALLOW	./docker/exec.sh "python tools/x.py --config format/pyproject.toml" | tee "work/$RUN.log"
+ALLOW	echo x > work/template/.gitignore
+ALLOW	rm -rf work/template
+ALLOW	@Write work/template/.gitignore
+ALLOW	mkdir -p "$HOME/scratch"
+BLOCK	cp work/x .gitignore
+BLOCK	rm work/../docker/build.sh
+BLOCK	cp work/x LICENSE
+BLOCK	echo x > work/.gitignore	sub
+BLOCK	cp docker/build.sh "work/../$F"
+BLOCK	rm "$ROOT/docker/build.sh"
+BLOCK	sed -i s/a/b/ "${REPO}/format/format.sh"
+BLOCK	F=$ROOT/docker/build.sh; rm "$F"
+BLOCK	rm "$(git rev-parse --show-toplevel)/docker/build.sh"
+# heredoc delimiters and here-strings
+ALLOW	cat > work/notes.txt <<\\EOF\nDon't edit docker/run.sh; rm of it is blocked\nEOF
+ALLOW	cat > work/notes.md <<'END-NOTES'\nrm docker/run.sh is what the hook stops\nEND-NOTES
+ALLOW	cat <<'EOF' > work/x.txt\n$(rm -f docker/run.sh)\nEOF
+ALLOW	cat <<-EOF > work/x.txt\nsee docker/run.sh\nEOF\nls docker/
+BLOCK	echo "<<EOF"\nrm -f docker/run.sh\nEOF
+BLOCK	true # <<X\nrm -f docker/run.sh\nX
+BLOCK	cat <<<EOF\nrm -f docker/run.sh\nEOF
+BLOCK	cat <<EOF > work/x.txt\n$(rm -f docker/run.sh)\nEOF
+BLOCK	cat <<EOF > work/x.txt\n`touch docker/x`\nEOF
+BLOCK	cat <<A <<B > work/x.txt\nrm docker/a\nA\nrm docker/b\nB\nrm docker/c
+# nesting past the bound
+BLOCK	echo $($($($($($($($($($($($($($($($($($($($($($(ls docker/))))))))))))))))))))))
+ALLOW	find work -exec find work -exec find work -exec ls docker/ \; \; \;
+BLOCK	echo $($($($($($($($($($($($($($($($($($($($($($(rm docker/build.sh))))))))))))))))))))))
+BLOCK	find work -exec find work -exec find work -exec rm -f docker/run.sh \; \; \;
+BLOCK	find work docker -exec find {} -name x -exec rm {} \; \;
+# the runner by resolved path
+ALLOW	./docker/exec.sh "rm -rf /workspace/work/tmp && mkdir -p /workspace/work/tmp"
+ALLOW	cd ../other-repo && ./docker/exec.sh "rm -rf docker/tmp"
+ALLOW	../other-repo/docker/exec.sh "rm -rf docker/tmp"
+ALLOW	./docker/exec.sh "rm -rf docker/tmp"	/tmp
+ALLOW	./docker/exec.sh "rm /workspaces/docker/x"
+BLOCK	bash docker/exec.sh "echo x >> .gitignore"
+BLOCK	cd docker && ./exec.sh "rm -f docker/run.sh"
+BLOCK	@ROOT@/docker/exec.sh "rm docker/run.sh"	/tmp
+BLOCK	./docker/exec.sh "rm -rf /workspace/docker/fonts"
+BLOCK	./docker/exec.sh "echo x >> /workspace/.gitignore"
+BLOCK	./docker/exec.sh "cd /workspace/docker && rm run.sh"
+# owner, mode and reference operands
+ALLOW	./docker/exec.sh "make" && sudo chown -R "$(id -u):$(id -g)" work render
+ALLOW	sudo chown -R $USER:$USER work render && ls -la docker/ | head
+ALLOW	touch -r docker/run.sh work/stamp
+ALLOW	chmod --reference=docker/run.sh work/x.sh
+BLOCK	chown -R "$(id -u)" docker
+BLOCK	chmod -x docker/run.sh
+BLOCK	chmod -R go-w .claude
+BLOCK	touch -r work/stamp docker/run.sh
+# python code and data
+ALLOW	python3 scripts/lint.py -c format/pyproject.toml src/
+ALLOW	python3 -m pytest -c docker/pytest.ini
+ALLOW	python3 .claude/hooks/protect.py <<'EOF'\n{"tool_name":"Bash","tool_input":{"command":"rm docker/run.sh"}}\nEOF
+ALLOW	python3 .claude/hooks/protect.py <<< '{"tool_name":"Write","tool_input":{"file_path":"docker/run.sh"}}'; echo $?
+ALLOW	cat <<'EOF' | python3 work/filter.py > work/out.txt\ndocker/run.sh\nformat/format.sh\nEOF
+ALLOW	echo docker/run.sh | python3 -c "import sys; print(sys.stdin.read())"
+BLOCK	echo "open('docker/run.sh','w')" | python3
+BLOCK	python3 - <<< "open('docker/run.sh','w')"
+BLOCK	python3 -W ignore -c "open('docker/run.sh','w')"
+# cd home and cd into a missing directory
+ALLOW	cd && rm -rf .claude/tmp
+ALLOW	cd ~/PROJECTS/other-repo && sed -i 's/a/b/' docker/run.sh && git checkout -- .gitignore
+BLOCK	cd /nonexistent-dir; rm -f docker/run.sh
+BLOCK	cd work; cd nosuch; rm ../docker/run.sh
+# git pathspecs, messages and dry runs
+ALLOW	git clean -n -d -- docker/
+ALLOW	git clean --dry-run docker/
+ALLOW	git stash push -m "docker/ tweaks" -- docker/Dockerfile
+ALLOW	git checkout docker/fonts -- README.md
+BLOCK	git stash push -m wip -- docker/run.sh
+BLOCK	git clean -fd -- docker/
+# the LICENSE token
+ALLOW	python3 -c "import os; print(os.environ.get('LICENSE_KEY', 'none'))"
+BLOCK	python3 -c "import os; os.remove('LICENSE')"
+BLOCK	python3 -c "open('LICENSE-MIT','w')"
+# quoted parens in substitutions
+ALLOW	n=$(grep -c ')' docker/build.sh); echo "$n" | tee work/n.txt
+ALLOW	x=$(echo ')' "it's" ')'); rm work/x
+BLOCK	x=$(echo ")"; rm docker/build.sh)
+# bare owned-directory names
+ALLOW	for d in docker format; do ls "$d"; done
+ALLOW	for f in docker/*.sh; do cp "$f" work/backup/; done
+ALLOW	python3 -c "print('dockerfile', 'my format')"
+BLOCK	for d in docker format; do rm -rf "$d"; done
+BLOCK	for d in docker format; do rm -rf ${d}; done
+BLOCK	for f in run build; do rm docker/$f.sh; done
+BLOCK	python3 -c "import shutil; shutil.rmtree('docker')"
+BLOCK	python3 -c "from pathlib import Path; (Path('.claude') / 'session.md').write_text('')"
+BLOCK	python3 -c "import os; os.chdir('format'); os.remove('format.sh')"
+# a shell string further along the words
+ALLOW	docker run --rm -v "$PWD":/w -w /w img bash -c "python src/plot.py > work/logs/plot.log 2>&1"
+BLOCK	docker run --rm -v "$PWD":/w -w /w busybox sh -c "echo x >> .gitignore"
+BLOCK	docker exec box /bin/sh -c 'rm docker/run.sh'
+# in-place flags, awk programs, xargs stdin, literal strings
+ALLOW	perl -w -e 'print' docker/run.sh
+ALLOW	awk -F: '{print $1}' docker/list > work/col.txt
+ALLOW	xargs rm -f <<< "work/x"
+BLOCK	perl -wpi -e 's/a/b/' docker/run.sh
+BLOCK	awk 'BEGIN{print "x" > "docker/run.sh"}'
+BLOCK	xargs rm -f <<< "docker/run.sh"
+BLOCK	rm $'docker/run.sh'
+BLOCK	echo $'it\\'s' && X=1 rm -rf docker/fonts
+BLOCK	echo $'a\\'b'; rm -rf docker
+BLOCK	echo \\ #x; rm -f docker/run.sh
+# command words given by path
+ALLOW	/usr/bin/timeout 60 /bin/rm -rf work/x
+ALLOW	git ls-files src | xargs /bin/rm -f
+ALLOW	/bin/ls docker/ | xargs /usr/bin/wc -l
+BLOCK	/usr/bin/timeout 60 /bin/rm docker/build.sh
+BLOCK	/usr/bin/env FOO=1 /bin/rm docker/build.sh
+BLOCK	/usr/bin/sudo -u root /usr/bin/sed -i s/a/b/ format/format.sh
+BLOCK	git ls-files docker | xargs /bin/rm -f
+BLOCK	ls work/*.sh | xargs -I{} /bin/cp {} docker/
+# more shells, one-liners, wrappers and functions
+ALLOW	dash -c "ls docker/ && cat docker/build.sh"
+ALLOW	ksh -c "rm -rf work/build"
+ALLOW	node -p "require('fs').readFileSync('README.md').length"
+ALLOW	ruby -pe 'gsub(/a/, "b")' docker/run.sh > work/run.sh
+ALLOW	busybox ls docker/
+ALLOW	busybox rm -rf work/x
+ALLOW	function f { ls docker/; }; f
+ALLOW	f() { rm -rf work/x; }; f
+BLOCK	dash -c "rm -f docker/run.sh"
+BLOCK	ksh -c 'echo x > .gitignore'
+BLOCK	node -p "require('fs').unlinkSync('docker/run.sh')"
+BLOCK	ruby -pi -e 'gsub(/a/, "b")' docker/run.sh
+BLOCK	busybox rm -f docker/run.sh
+BLOCK	busybox sh -c "rm -f docker/run.sh"
+BLOCK	function f { rm -f docker/run.sh; }; f
+BLOCK	function f {\n  rm -f docker/run.sh\n}\nf
+BLOCK	f() { rm -f docker/run.sh; }; f
+# cd --, cd -, pushd and popd
+ALLOW	cd -- work && rm -rf docker
+ALLOW	cd docker && cd - && rm -f run.sh
+ALLOW	pushd work > /dev/null && rm -rf docker && popd > /dev/null
+ALLOW	pushd docker && popd && rm -f run.sh
+ALLOW	cd docker && (cd ../work && ls) && cd - && rm -f run.sh
+BLOCK	cd -- docker && rm -f run.sh
+BLOCK	cd work && cd - && rm docker/run.sh
+BLOCK	pushd docker > /dev/null && rm -f run.sh && popd > /dev/null
+BLOCK	pushd work && popd && rm docker/run.sh
+BLOCK	pushd work; pushd; rm docker/run.sh
+BLOCK	cd work && (cd ../docker && ls) && cd - && rm docker/run.sh
+BLOCK	pushd work; (popd); popd; rm docker/run.sh
+# find options ahead of the start paths
+ALLOW	find -L work -type f -delete
+ALLOW	find -L docker -type f
+ALLOW	find -H docker -name '*.sh' -exec cp {} work/ \;
+BLOCK	find -L docker -type f -delete
+BLOCK	find -H docker -name '*.sh' -exec rm {} \;
+BLOCK	find -P -L format -delete
+# git global options and root pathspecs
+ALLOW	git --work-tree=. checkout -- README.md
+ALLOW	git --git-dir=.git log -- docker/
+ALLOW	git checkout HEAD -- ':/README.md'
+ALLOW	git restore ':(top)src/a.py'	docker
+ALLOW	git -C work -c core.pager=cat checkout -- docker/x
+BLOCK	git --work-tree=. checkout -- docker/run.sh
+BLOCK	git --git-dir .git --work-tree . restore docker/run.sh
+BLOCK	git -c core.hooksPath=/dev/null checkout HEAD -- .claude/settings.json
+BLOCK	git checkout HEAD -- ':/docker/run.sh'
+BLOCK	git restore ':(top)docker/run.sh'	work
+BLOCK	git -C work checkout -- :/format/format.sh
+BLOCK	git -c core.pager=cat -C docker restore build.sh
+# -t inside a flag cluster
+ALLOW	cp -rt work/ docker/fonts
+ALLOW	cp -at work docker/Dockerfile docker/build.sh
+ALLOW	cp -vt docker work/Dockerfile
+BLOCK	cp -rt docker/ work/a work/b
+BLOCK	mv -vt .claude work/a.md
+BLOCK	install -Dt docker work/run.sh
+# brace lists
+ALLOW	rm -rf work/{a,b}
+ALLOW	rm -f {work,render}/tmp.log
+ALLOW	cp docker/{build,run}.sh work/
+ALLOW	rm -f docker/{Dockerfile,environment.yml}
+BLOCK	rm -f {docker,format}/run.sh
+BLOCK	chmod +x docker/{build,run}.sh
+BLOCK	rm -rf {work/x,format}
+BLOCK	touch {work/a,.gitignore}
+BLOCK	tee {work,docker}/x.log < work/in
+BLOCK	rm -f docker/{Dockerfile,build.sh}
+BLOCK	rm {work,docker}/{a,b}.sh
+BLOCK	for d in {docker,format}; do rm -rf "$d"; done
+# coarse rule for an open quote, stricter rule past the bound
+ALLOW	cat docker/build.sh "unclosed
+ALLOW	echo $($($($($($($($($($($($($($($($($($($($($($(ls work/))))))))))))))))))))))
+ALLOW	eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval rm -rf work/x
+ALLOW	find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec rm -f work/x \;
+BLOCK	eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval rm -f docker/run.sh
+BLOCK	eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval cat docker/run.sh
+BLOCK	eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval eval rm -rf docker
+BLOCK	find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec find work -exec rm -f docker/run.sh \;
+BLOCK	rm -f docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}docker/{a,b}
