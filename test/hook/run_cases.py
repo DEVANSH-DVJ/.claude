@@ -44,12 +44,12 @@ if __name__ == '__main__':
                 continue
             expect, shown, *rest = line.split('\t')
             # expand the escapes of the case table
-            command = re.sub(r"\\([\\n])", lambda m: '\n' if m[1] == 'n' else '\\', shown)
+            command = re.sub(r'\\([\\n])', lambda m: '\n' if m[1] == 'n' else '\\', shown)
             command = command.replace('@ROOT@', str(root)).replace('@TILDE@', tilde)
             cwd = str(root / rest[0] if rest else root)
             event = {'tool_name': 'Bash', 'tool_input': {'command': command}, 'cwd': cwd}
             # "@Tool path" sends a path tool call
-            if m := re.fullmatch(r"@(\w+) (.+)", command):
+            if m := re.fullmatch(r'@(\w+) (.+)', command):
                 key = 'notebook_path' if m[1] == 'NotebookEdit' else 'file_path'
                 event = {'tool_name': m[1], 'tool_input': {key: m[2]}, 'cwd': cwd}
             run = subprocess.run(
@@ -60,11 +60,11 @@ if __name__ == '__main__':
                 check=False,
                 env={**os.environ, 'HOME': str(home)},
             )
-            got = VERDICT.get(run.returncode, f"ERROR({run.returncode})")
+            got = VERDICT.get(run.returncode, f'ERROR({run.returncode})')
             cases += 1
             if got != expect:
                 bad += 1
-                where = f" [cwd={rest[0]}]" if rest else ''
-                print(f"MISMATCH line {n}: expect {expect} got {got}{where}: {shown}")
-    print(f"TOTAL: {cases} cases, {cases - bad} pass, {bad} mismatch")
+                where = f' [cwd={rest[0]}]' if rest else ''
+                print(f'MISMATCH line {n}: expect {expect} got {got}{where}: {shown}')
+    print(f'TOTAL: {cases} cases, {cases - bad} pass, {bad} mismatch')
     sys.exit(1 if bad else 0)

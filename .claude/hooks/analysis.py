@@ -12,19 +12,19 @@ from pathlib import Path
 # repo root and the patterns of protected names, set per command
 ROOT = TOKEN_RE = SPAN_RE = NAMES_RE = None
 # the path the project runner mounts the root at
-MOUNT_RE = re.compile(r"(?<![\w./~$}-])/workspace(?![\w.-])")
+MOUNT_RE = re.compile(r'(?<![\w./~$}-])/workspace(?![\w.-])')
 # a verb counts as a command only at a command position
-CMD = r"(?:^|[;&|(\n][^\S\n]*|\bsudo\s+|\bxargs\s+(?:-\S+\s+)*)"
+CMD = r'(?:^|[;&|(\n][^\S\n]*|\bsudo\s+|\bxargs\s+(?:-\S+\s+)*)'
 # commands that write: in-place edits, file ops, one-liners, git reverts
 WRITERS = CMD + (
-    r"(?:"
-    r"(?:tee|mv|cp|rm|ln|install|rsync|truncate|chmod|chown|touch|mkdir|dd|patch)\b"
-    r"|sed\s+(?:-\S*i|--in-place)"
-    r"|perl\s+-\S*i"
-    r"|python[0-9.]*\s+(?:-\s*<<|<<|-c\b)"
-    r"|(?:perl|ruby|node)\s+-e\b"
-    r"|git\s+(?:checkout|restore|rm|mv|stash|clean|apply)\b"
-    r")"
+    r'(?:'
+    r'(?:tee|mv|cp|rm|ln|install|rsync|truncate|chmod|chown|touch|mkdir|dd|patch)\b'
+    r'|sed\s+(?:-\S*i|--in-place)'
+    r'|perl\s+-\S*i'
+    r'|python[0-9.]*\s+(?:-\s*<<|<<|-c\b)'
+    r'|(?:perl|ruby|node)\s+-e\b'
+    r'|git\s+(?:checkout|restore|rm|mv|stash|clean|apply)\b'
+    r')'
 )
 # a quoted word of inline code
 LITERAL_RE = re.compile(r"(?<=['\"])[\w.-]+(?=['\"])")
@@ -32,20 +32,20 @@ LITERAL_RE = re.compile(r"(?<=['\"])[\w.-]+(?=['\"])")
 # shell text: plain word text, blanks, operators with the longest first
 LEX_RE = re.compile(
     r"(?P<word>[^\s\\'\"`$#();<>|&]+)|(?P<gap>[ \t\r]+)"
-    r"|(?P<op>\n|;;|&&|\|\||\|&|&>>|&>|>>|>\||>&|<<<|<<-|<<|<&|<>|[;&|()<>])"
+    r'|(?P<op>\n|;;|&&|\|\||\|&|&>>|&>|>>|>\||>&|<<<|<<-|<<|<&|<>|[;&|()<>])'
 )
 # single-quoted text; after a $ it takes backslash escapes
 QUOTE_RE = re.compile(r"(?s)\$'((?:[^'\\]|\\.)*)'|'([^']*)'")
 # double-quoted text free of escapes and expansions
-PLAIN_RE = re.compile(r"[^\\\"`$]+")
+PLAIN_RE = re.compile(r'[^\\\"`$]+')
 # a brace list of a word, outside a ${ } expansion
-BRACE_RE = re.compile(r"(?<!\$)\{([^{},]*(?:,[^{},]*)+)\}")
+BRACE_RE = re.compile(r'(?<!\$)\{([^{},]*(?:,[^{},]*)+)\}')
 # token lists of lifted $( ) and backtick bodies; a mark in a word holds the key
 DOCS = []
 # keywords ahead of the verb
 SKIP = {'if', 'then', 'else', 'elif', 'do', 'while', 'until', '!', '{'}
 # wrappers ahead of the verb, with their options that take a value
-WRAPS = {'sudo': "-[ug]", 'env': '-u', 'timeout': '-s', 'stdbuf': "-[ioe]", 'exec': '-a'}
+WRAPS = {'sudo': '-[ug]', 'env': '-u', 'timeout': '-s', 'stdbuf': '-[ioe]', 'exec': '-a'}
 WRAPS |= dict.fromkeys(['nice', 'time', 'nohup', 'setsid', 'command', 'busybox'], '')
 # words, command words and work units of the command being scanned
 WORDS, CMDS, WORK = [], set(), []
@@ -86,7 +86,7 @@ def braces(path):
 def at(cwd, paths):
     """Paths resolved against a directory, which $PWD names, with brace lists expanded."""
     paths = [b for p in paths for b in braces(p)]
-    paths = [re.sub(r"\$PWD\b|\$\{PWD\}", lambda m: str(cwd), p) for p in paths]
+    paths = [re.sub(r'\$PWD\b|\$\{PWD\}', lambda m: str(cwd), p) for p in paths]
     return [cwd / os.path.expanduser(p) for p in paths]
 
 
@@ -116,7 +116,7 @@ def bare(argv):
         elif word == 'function' or (held and re.fullmatch(held, word)):
             # the function name or the option value goes too
             i += 1
-        elif not (word in SKIP or re.match(r"-|\w+=|\d[\d.]*[smhd]?$", word)):
+        elif not (word in SKIP or re.match(r'-|\w+=|\d[\d.]*[smhd]?$', word)):
             # neither keyword, flag, assignment nor duration
             break
         i += 1
@@ -132,7 +132,7 @@ def subst(text, i):
     else:
         return text[i], i + 1
     DOCS.append(toks)
-    return f"$\x08{len(DOCS) - 1}\x08", end
+    return f'$\x08{len(DOCS) - 1}\x08', end
 
 
 def quoted(text, i, close):
@@ -149,7 +149,7 @@ def quoted(text, i, close):
             part, i = subst(text, i)
         out.append(part)
     if close and i >= len(text):
-        raise ValueError("open quote")
+        raise ValueError('open quote')
     return ''.join(out), i + 1
 
 
@@ -178,7 +178,7 @@ def lex(text, i=0, sub=False):
             # heredoc bodies follow the newline, each up to its end line
             while m[0] == '\n' and docs:
                 key = docs.pop(0)
-                mark = r"^[ \t]*%s[ \t]*$" % re.escape(toks[key][0])
+                mark = r'^[ \t]*%s[ \t]*$' % re.escape(toks[key][0])
                 if not toks[key][1] and (end := re.compile(mark, re.M).search(text, i)):
                     body, i = text[i : end.start()], end.end()
                     # a quoted delimiter makes the body data
@@ -188,9 +188,9 @@ def lex(text, i=0, sub=False):
             i = text.find('\n', i)
             i = len(text) if i < 0 else i
         elif q := QUOTE_RE.match(text, i):
-            part, i = q[2] if c == "'" else re.sub(r"(?s)\\(.)", r"\1", q[1]), q.end()
+            part, i = q[2] if c == "'" else re.sub(r'(?s)\\(.)', r'\1', q[1]), q.end()
         elif c == "'":
-            raise ValueError("open quote")
+            raise ValueError('open quote')
         elif c == '"':
             part, i = quoted(text, i + 1, '"')
         elif c == '\\':
@@ -200,7 +200,7 @@ def lex(text, i=0, sub=False):
             part, i = subst(text, i)
         if part is not None:
             # a quote or an escape makes the word literal
-            if c in "'\"\\":
+            if c in '\'"\\':
                 lit.add(len(toks))
             word = word or []
             word.append(part)
@@ -217,39 +217,39 @@ def writes(argv, cwd, deep=0, texts=(), pipe=()):
     pos, hits, tg, subs, code = plain(args), [], [], [], []
     if verb in ('chmod', 'chown'):
         # the mode or owner leads the operands, or a reference file does
-        tg = [a for a in args if not re.fullmatch(r"-[cfvRhHLP]+|--[\w-]+", a)][1:]
+        tg = [a for a in args if not re.fullmatch(r'-[cfvRhHLP]+|--[\w-]+', a)][1:]
     elif verb in ALL_ARGS:
         # touch reads its reference file
-        tg = plain(args, r"-[rdt]|--reference|--date") if verb == 'touch' else pos
+        tg = plain(args, r'-[rdt]|--reference|--date') if verb == 'touch' else pos
     elif verb in COPIES:
         # destination: the -t value, also of a flag cluster, else the last operand
-        held = r"-\w*t|-[mogS]|--target-directory" if verb != 'rsync' else None
-        into = after(args, r"-\w*t|--target-directory")[:1] if held else []
+        held = r'-\w*t|-[mogS]|--target-directory' if verb != 'rsync' else None
+        into = after(args, r'-\w*t|--target-directory')[:1] if held else []
         srcs = plain(argv[1:], held)
         srcs, tg = (srcs, into) if into else (srcs[:-1], srcs[-1:])
         # into a directory: a target per source name; the directory for a tree
         if tg and (into or isdir(cwd, tg[0])):
-            deep_copy = any(re.fullmatch(r"-\w*[rRa]\w*|--recursive|--archive", a) for a in args)
+            deep_copy = any(re.fullmatch(r'-\w*[rRa]\w*|--recursive|--archive', a) for a in args)
             deep_copy = deep_copy or any(isdir(cwd, s) for s in srcs)
-            tg = [f"{tg[0]}/{Path(s).name}" for s in srcs] + tg * deep_copy
+            tg = [f'{tg[0]}/{Path(s).name}' for s in srcs] + tg * deep_copy
         # mv writes its sources too
         tg = tg + srcs * (verb == 'mv')
     elif verb == 'dd':
         tg = [a[3:] for a in args if a.startswith('of=')]
     elif verb in ('sed', 'perl', 'ruby') and any(
-        re.match(r"-[nErsuzplaw0]*i|--in-place", a) for a in args
+        re.match(r'-[nErsuzplaw0]*i|--in-place', a) for a in args
     ):
         # in-place edit: operands after the script
-        tg = plain(args, r"-\w*[ef]|--expression|--file")
+        tg = plain(args, r'-\w*[ef]|--expression|--file')
         tg = tg[1:] if tg == pos else tg
     elif verb == 'git':
         # paths of a reverting subcommand, after -- when given; -C moves the directory
-        sub = plain(args, "-[CcbBm]|--work-tree|--git-dir")
-        dry = sub[:1] == ['clean'] and any(re.fullmatch(r"-\w*n\w*|--dry-run", a) for a in args)
+        sub = plain(args, '-[CcbBm]|--work-tree|--git-dir')
+        dry = sub[:1] == ['clean'] and any(re.fullmatch(r'-\w*n\w*|--dry-run', a) for a in args)
         if sub[:1] and sub[0] in GIT_WRITES and not dry:
             tg = args[args.index('--') + 1 :] if '--' in args else sub[1:]
             # a :/ or :(top) pathspec starts at the root
-            tg = [re.sub(r"^:(?:/|\(top\))", lambda m: f"{ROOT}/", t) for t in tg]
+            tg = [re.sub(r'^:(?:/|\(top\))', lambda m: f'{ROOT}/', t) for t in tg]
         cwd = cwd.joinpath(*after(args, '-C'))
     elif verb == 'find':
         # each start path stands in for {}; the options ahead of them go
@@ -280,27 +280,27 @@ def writes(argv, cwd, deep=0, texts=(), pipe=()):
         # the project runner's string starts at the root, which /workspace names
         subs, cwd = [MOUNT_RE.sub(lambda m: str(ROOT), ' '.join(ran[1:]))], ROOT
     elif verb in SHELLS:
-        subs = after(args, r"-\w*c")[:1] + list(texts)
+        subs = after(args, r'-\w*c')[:1] + list(texts)
     elif verb == 'eval':
         subs = [' '.join(argv[1:])]
-    elif re.fullmatch(r"python[0-9.]*", verb):
+    elif re.fullmatch(r'python[0-9.]*', verb):
         # options, then -c CODE, -m MODULE, a script, or - for stdin
         head = dropwhile(
-            lambda p: p[0] in ('-W', '-X') or re.fullmatch(r"-(?!\w*[cm]$).+", p[1]),
+            lambda p: p[0] in ('-W', '-X') or re.fullmatch(r'-(?!\w*[cm]$).+', p[1]),
             pairwise(['', *argv[1:]]),
         )
         head = [b for _, b in head] or ['-']
         # stdin code: heredoc texts and the words piped in
-        code = head[1:2] if re.fullmatch(r"-\w*c", head[0]) else [*texts, *pipe] * (head[0] == '-')
+        code = head[1:2] if re.fullmatch(r'-\w*c', head[0]) else [*texts, *pipe] * (head[0] == '-')
     elif verb in ('perl', 'ruby', 'node'):
         # node takes code after -p too
-        code = after(args, r"-\w*[ep]|--eval|--print" if verb == 'node' else r"-\w*e|--eval")
+        code = after(args, r'-\w*[ep]|--eval|--print' if verb == 'node' else r'-\w*e|--eval')
     elif verb == 'awk':
-        code = plain(args, "-[Fvf]")[:1]
+        code = plain(args, '-[Fvf]')[:1]
     elif verb not in ('find', 'xargs'):
         # a shell further along the words runs its -c string in place
         rest = dropwhile(lambda a: base(a) not in SHELLS, args)
-        subs = after(list(rest), r"-\w*c")[:1]
+        subs = after(list(rest), r'-\w*c')[:1]
     code = '\n'.join(code)
     # quoted words of inline code that name an owned directory
     dirs = [w for w in LITERAL_RE.findall(code) if NAMES_RE.fullmatch(w + '/')]
@@ -316,7 +316,7 @@ def walk(cmd, cwd, deep=0):
     back, dirs = cwd, []
     for tok, op in [*toks, ('\n', True)]:
         # a lifted body is a command too
-        for key in () if op else re.findall(r"\x08(\d+)\x08", tok):
+        for key in () if op else re.findall(r'\x08(\d+)\x08', tok):
             hits += walk(DOCS[int(key)], cwd, deep + 1)
         if redir and not op:
             # redirect operand: heredoc text or output file
@@ -341,7 +341,7 @@ def walk(cmd, cwd, deep=0):
             for words, files in each:
                 hits += writes(bare(words), cwd, deep, texts, pipe) + at(cwd, files)
             if run[:1] == ['for'] and run[2:3] == ['in']:
-                var, vals = re.compile(r"\$(\{)?%s\b(?(1)\})" % re.escape(run[1])), run[3:]
+                var, vals = re.compile(r'\$(\{)?%s\b(?(1)\})' % re.escape(run[1])), run[3:]
             # cd and pushd move the directory for later commands
             if run[:1] in (['cd'], ['pushd']):
                 # a bare cd goes home, a bare pushd goes back
@@ -375,10 +375,10 @@ def scan(cmd, cwd):
     hits = walk(cmd, cwd)
     # run-time target: an expansion not already under work/
     starts = [str(h).split('$')[0] + 'x' for h in hits if '$' in str(h)]
-    if any(not os.path.normpath(s).startswith(f"{ROOT}/work/") for s in starts):
+    if any(not os.path.normpath(s).startswith(f'{ROOT}/work/') for s in starts):
         # every protected token but a command word, less a leading expansion
         text = ' '.join(w for w in WORDS if w not in CMDS)
-        text = re.sub(r"\$(\w+|\{\w+\}|\x08\d+\x08)/", '', text)
+        text = re.sub(r'\$(\w+|\{\w+\}|\x08\d+\x08)/', '', text)
         hits += at(cwd, [t for t in tokens(text) if t not in CMDS])
     return hits
 
@@ -388,12 +388,12 @@ def targets(cmd, cwd, root, token, names):
     global ROOT, TOKEN_RE, SPAN_RE, NAMES_RE
     ROOT, TOKEN_RE, NAMES_RE = root, re.compile(token), re.compile(names)
     # token runs back to back, from the start of a path-like word
-    SPAN_RE = re.compile(r"(?<![\w./~${}*?-])(?:" + token + r")+")
+    SPAN_RE = re.compile(r'(?<![\w./~${}*?-])(?:' + token + r')+')
     try:
         return scan(cmd, cwd)
     except ValueError:
         # unparsable: any protected token, given a write verb or a redirect onto a name
-        wrote = re.search(r">\|?\s*[^\s>]*(?:" + names + r")|" + WRITERS, cmd)
+        wrote = re.search(r'>\|?\s*[^\s>]*(?:' + names + r')|' + WRITERS, cmd)
         return tokens(cmd) if wrote else []
     except RecursionError:
         # nested too deep: any word or protected token

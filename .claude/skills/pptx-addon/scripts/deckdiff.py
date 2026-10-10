@@ -23,7 +23,7 @@ def normalized(name, data):
 
 
 if __name__ == '__main__':
-    assert len(sys.argv) == 3, "Usage: python deckdiff.py old.pptx new.pptx"
+    assert len(sys.argv) == 3, 'Usage: python deckdiff.py old.pptx new.pptx'
     old, new = (zipfile.ZipFile(p) for p in sys.argv[1:3])
     old_names, new_names = set(old.namelist()), set(new.namelist())
     changed = sorted(
@@ -35,6 +35,6 @@ if __name__ == '__main__':
         ('changed', changed),
     ):
         for n in names:
-            print(f"{label}: {n}")
+            print(f'{label}: {n}')
     same = len(old_names & new_names) - len(changed)
-    print(f"identical: {same} parts")
+    print(f'identical: {same} parts')

@@ -20,7 +20,7 @@ DECLARATION = b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
 def strip_pretty(node):
     """Drop the newline-bearing whitespace nodes that pretty-printing added; real spaces have no newline."""
     for child in list(node.childNodes):
-        if child.nodeType == child.TEXT_NODE and "\n" in child.data and not child.data.strip():
+        if child.nodeType == child.TEXT_NODE and '\n' in child.data and not child.data.strip():
             node.removeChild(child)
         elif child.nodeType == child.ELEMENT_NODE:
             strip_pretty(child)
@@ -40,17 +40,17 @@ def check(pptx):
     try:
         from pptx import Presentation
     except ImportError:
-        return "XML well-formed; python-pptx not installed, open check skipped"
+        return 'XML well-formed; python-pptx not installed, open check skipped'
     Presentation(str(pptx))
-    return "XML well-formed, opens in python-pptx"
+    return 'XML well-formed, opens in python-pptx'
 
 
 if __name__ == '__main__':
-    assert len(sys.argv) == 3, "Usage: python pack.py <unpacked_dir> out.pptx"
+    assert len(sys.argv) == 3, 'Usage: python pack.py <unpacked_dir> out.pptx'
     src, out = Path(sys.argv[1]), Path(sys.argv[2])
-    files = sorted(p for p in src.rglob("*") if p.is_file())
+    files = sorted(p for p in src.rglob('*') if p.is_file())
     # content types first, as Office writes it
-    files.sort(key=lambda p: p.name != "[Content_Types].xml")
+    files.sort(key=lambda p: p.name != '[Content_Types].xml')
     # build beside the target; the deck changes only after a complete, checked archive exists
     tmp = out.with_name(out.name + '.tmp')
     try:
@@ -64,4 +64,4 @@ if __name__ == '__main__':
         tmp.unlink(missing_ok=True)
         raise
     os.replace(tmp, out)
-    print(f"packed {src}/ -> {out}: {report}")
+    print(f'packed {src}/ -> {out}: {report}')

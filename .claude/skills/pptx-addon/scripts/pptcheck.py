@@ -21,10 +21,10 @@ from xml.etree import ElementTree as ET
 
 from PIL import ImageFont
 
-P = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
-A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
-R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
-PR = "{http://schemas.openxmlformats.org/package/2006/relationships}"
+P = '{http://schemas.openxmlformats.org/presentationml/2006/main}'
+A = '{http://schemas.openxmlformats.org/drawingml/2006/main}'
+R = '{http://schemas.openxmlformats.org/officeDocument/2006/relationships}'
+PR = '{http://schemas.openxmlformats.org/package/2006/relationships}'
 
 EMU_PT = 12700
 DEFAULT_INS = 91440
@@ -41,7 +41,7 @@ def fc_match():
 def fc_file(pattern):
     """Font file fontconfig picks for a pattern."""
     out = subprocess.run(
-        [fc_match(), '-f', "%{file}", pattern], capture_output=True, text=True, check=True
+        [fc_match(), '-f', '%{file}', pattern], capture_output=True, text=True, check=True
     )
     return out.stdout
 
@@ -55,7 +55,7 @@ def font(face, bold, italic):
     key = (face, bold, italic)
     if key not in _fonts:
         style = ':bold' * bold + ':italic' * italic
-        path = fc_file(face.replace('-', r"\-") + style)
+        path = fc_file(face.replace('-', r'\-') + style)
         _fonts[key] = None if path == FALLBACK else ImageFont.truetype(path, MEASURE_PX)
     return _fonts[key]
 
@@ -90,7 +90,7 @@ class Deck:
 
 
 def ph_of(sp):
-    return sp.find(f"{P}nvSpPr/{P}nvPr/{P}ph")
+    return sp.find(f'{P}nvSpPr/{P}nvPr/{P}ph')
 
 
 def find_ph(tree, ph):
@@ -114,7 +114,7 @@ def text_style(master, ph):
     name = {'title': 'titleStyle', 'ctrTitle': 'titleStyle'}.get(ptype, 'bodyStyle')
     if ptype in ('dt', 'ftr', 'sldNum', 'hdr'):
         name = 'otherStyle'
-    return master.find(f"{P}txStyles/{P}{name}")
+    return master.find(f'{P}txStyles/{P}{name}')
 
 
 def check_shape(sp, chain, scale, theme, defaults):
@@ -127,28 +127,28 @@ def check_shape(sp, chain, scale, theme, defaults):
         if end is not None and list(p)[-1] is not end:
             text = ''.join(t.text or '' for t in p.iter(A + 't'))
             yield f'endParaRPr before the last child, PowerPoint drops "{text[:40]}"'
-    bodies = [tb.find(A + 'bodyPr')] + [s.find(f"{P}txBody/{A}bodyPr") for s in chain]
+    bodies = [tb.find(A + 'bodyPr')] + [s.find(f'{P}txBody/{A}bodyPr') for s in chain]
     bodies = [b for b in bodies if b is not None]
     fit = bodies[0].find(A + 'normAutofit') if bodies else None
     if fit is not None and (fit.get('fontScale') or fit.get('lnSpcReduction')):
-        yield "normAutofit stores fontScale or lnSpcReduction, PowerPoint ignores it"
+        yield 'normAutofit stores fontScale or lnSpcReduction, PowerPoint ignores it'
 
     def body_attr(name, default):
         return next((b.get(name) for b in bodies if b.get(name) is not None), default)
 
     if body_attr('wrap', 'square') == 'none' or body_attr('vert', 'horz') != 'horz':
         return
-    exts = [s.find(f"{P}spPr/{A}xfrm/{A}ext") for s in [sp] + chain]
+    exts = [s.find(f'{P}spPr/{A}xfrm/{A}ext') for s in [sp] + chain]
     ext = next((e for e in exts if e is not None), None)
     if ext is None:
         return
     ins = int(body_attr('lIns', DEFAULT_INS)) + int(body_attr('rIns', DEFAULT_INS))
     inner = (int(ext.get('cx')) * scale - ins) / EMU_PT
-    styles = [tb.find(A + 'lstStyle')] + [s.find(f"{P}txBody/{A}lstStyle") for s in chain]
+    styles = [tb.find(A + 'lstStyle')] + [s.find(f'{P}txBody/{A}lstStyle') for s in chain]
     styles += defaults
     for p in tb.findall(A + 'p'):
         ppr = p.find(A + 'pPr')
-        lvl = f"lvl{int(ppr.get('lvl', 0)) + 1 if ppr is not None else 1}pPr"
+        lvl = f'lvl{int(ppr.get("lvl", 0)) + 1 if ppr is not None else 1}pPr'
         inherited = [s.find(A + lvl) if s is not None else None for s in styles]
         inherited = [lv for lv in inherited if lv is not None]
         levels = ([ppr] if ppr is not None else []) + inherited
@@ -192,10 +192,10 @@ def styled(runs, defs, theme):
         face = theme.get(face, face)
         size = get('sz')
         if face is None or size is None:
-            raise LookupError("font unresolved" if face is None else "size unresolved")
+            raise LookupError('font unresolved' if face is None else 'size unresolved')
         f = font(face, get('b') == '1', get('i') == '1')
         if f is None:
-            raise LookupError(f"font unresolved ({face})")
+            raise LookupError(f'font unresolved ({face})')
         text = r.findtext(A + 't') or ''
         pieces.append((text, f, int(size) / 100, int(get('spc') or 0) / 100))
     return pieces
@@ -213,7 +213,7 @@ def width(pieces, start, end):
 
 def wrap(pieces, text, avail):
     """(start, end) of each line wrapped greedily at spaces, and of the line plus the word wrapped after it."""
-    words = [m.span() for m in re.finditer(r"\S+", text)]
+    words = [m.span() for m in re.finditer(r'\S+', text)]
     start, end = words[0]
     for s, e in words[1:]:
         if width(pieces, start, e) > avail:
@@ -228,8 +228,8 @@ def theme_fonts(deck, master_part):
     """Map +mj-lt and +mn-lt to the master's theme faces."""
     theme = deck.xml(deck.rel(master_part, 'theme'))
     out = {}
-    for key, tag in (("+mj-lt", 'majorFont'), ("+mn-lt", 'minorFont')):
-        latin = theme.find(f".//{A}{tag}/{A}latin")
+    for key, tag in (('+mj-lt', 'majorFont'), ('+mn-lt', 'minorFont')):
+        latin = theme.find(f'.//{A}{tag}/{A}latin')
         out[key] = latin.get('typeface')
     return out
 
@@ -240,7 +240,7 @@ def shapes(tree, scale=1.0):
         if el.tag == P + 'sp':
             yield el, scale
         elif el.tag == P + 'grpSp':
-            xfrm = el.find(f"{P}grpSpPr/{A}xfrm")
+            xfrm = el.find(f'{P}grpSpPr/{A}xfrm')
             ext, chext = xfrm.find(A + 'ext'), xfrm.find(A + 'chExt')
             sub = scale
             if ext is not None and chext is not None and int(chext.get('cx')):
@@ -257,13 +257,13 @@ def check(path):
         master_part = deck.rel(layout_part, 'slideMaster')
         layout, master = deck.xml(layout_part), deck.xml(master_part)
         theme = theme_fonts(deck, master_part)
-        for sp, scale in shapes(deck.xml(part).find(f"{P}cSld/{P}spTree")):
+        for sp, scale in shapes(deck.xml(part).find(f'{P}cSld/{P}spTree')):
             ph = ph_of(sp)
             chain, defaults = [], [pres_defaults]
             if ph is not None:
                 chain = [s for s in (find_ph(layout, ph), find_ph(master, ph)) if s is not None]
                 defaults = [text_style(master, ph)]
-            nv = sp.find(f"{P}nvSpPr/{P}cNvPr")
+            nv = sp.find(f'{P}nvSpPr/{P}cNvPr')
             for problem in check_shape(sp, chain, scale, theme, defaults):
                 print(f'slide {num}  shape "{nv.get("name")}" id={nv.get("id")}: {problem}')
                 hits += 1
@@ -271,10 +271,10 @@ def check(path):
 
 
 if __name__ == '__main__':
-    assert len(sys.argv) >= 2, "Usage: python pptcheck.py deck.pptx [deck2.pptx ...]"
+    assert len(sys.argv) >= 2, 'Usage: python pptcheck.py deck.pptx [deck2.pptx ...]'
     hits = 0
     for path in sys.argv[1:]:
         if len(sys.argv) > 2:
-            print(f"== {path}")
+            print(f'== {path}')
         hits += check(path)
     sys.exit(1 if hits else 0)

@@ -32,7 +32,7 @@ def parse_slides(spec, n):
         lo, hi = int(a), int(b or a)
         pages.update(range(lo, hi + 1))
     bad = sorted(p for p in pages if p < 1 or p > n)
-    assert not bad, f"slides out of range 1..{n}: {bad}"
+    assert not bad, f'slides out of range 1..{n}: {bad}'
     return sorted(pages)
 
 
@@ -73,13 +73,13 @@ def report_font_substitutions(pptx):
         return
     for font in deck_fonts(pptx):
         families = subprocess.run(
-            [fc, '-f', "%{family}", font], check=True, capture_output=True, text=True
+            [fc, '-f', '%{family}', font], check=True, capture_output=True, text=True
         ).stdout.strip()
         got = families.split(',')[0]
         # a face's own full name also matches
         if font.casefold() in families.casefold().split(','):
             continue
-        print(f"font SUBSTITUTED: {font} -> {got}", file=sys.stderr)
+        print(f'font SUBSTITUTED: {font} -> {got}', file=sys.stderr)
 
 
 def to_pdf(pptx, tmp):
@@ -88,7 +88,7 @@ def to_pdf(pptx, tmp):
     run = subprocess.run(
         [
             'soffice',
-            f"-env:UserInstallation=file://{profile}",
+            f'-env:UserInstallation=file://{profile}',
             '--headless',
             '--norestore',
             '--convert-to',
@@ -105,14 +105,14 @@ def to_pdf(pptx, tmp):
     for line in run.stderr.splitlines():
         if 'javaldx' not in line:
             print(line, file=sys.stderr)
-    pdf = tmp / f"{pptx.stem}.pdf"
-    assert pdf.exists(), "soffice produced no PDF"
+    pdf = tmp / f'{pptx.stem}.pdf'
+    assert pdf.exists(), 'soffice produced no PDF'
     return pdf
 
 
 def page_count(pdf):
     info = subprocess.run(['pdfinfo', str(pdf)], check=True, capture_output=True, text=True)
-    return int(re.search(r"^Pages:\s+(\d+)", info.stdout, re.MULTILINE).group(1))
+    return int(re.search(r'^Pages:\s+(\d+)', info.stdout, re.MULTILINE).group(1))
 
 
 def to_pngs(pdf, pages, dpi, out, tmp):
@@ -136,9 +136,9 @@ def to_pngs(pdf, pages, dpi, out, tmp):
             check=True,
         )
     outputs = []
-    for f in sorted(raw.glob("p-*.png")):
+    for f in sorted(raw.glob('p-*.png')):
         n = int(f.stem.split('-')[1])
-        dest = out / f"slide-{n:02d}.png"
+        dest = out / f'slide-{n:02d}.png'
         shutil.move(f, dest)
         outputs.append(dest)
     return outputs
@@ -162,7 +162,7 @@ def make_grid(pngs, out, cols, thumb_w=360):
     for i, (p, im) in enumerate(zip(pngs, ims)):
         x = pad + (i % cols) * (thumb_w + pad)
         y = pad + (i // cols) * (thumb_h + label_h + pad)
-        draw.text((x, y + 4), f"slide {int(p.stem.split('-')[1])}", fill='black')
+        draw.text((x, y + 4), f'slide {int(p.stem.split("-")[1])}', fill='black')
         thumb = im.resize((thumb_w, thumb_h))
         sheet.paste(thumb, (x, y + label_h))
         draw.rectangle([x, y + label_h, x + thumb_w - 1, y + label_h + thumb_h - 1], outline='#999')
@@ -179,17 +179,17 @@ def default_out(pptx):
 
 
 if __name__ == '__main__':
-    ap = argparse.ArgumentParser(description="Render pptx slides to PNG")
+    ap = argparse.ArgumentParser(description='Render pptx slides to PNG')
     ap.add_argument('pptx')
-    ap.add_argument('--slides', help="1-based list/ranges, e.g. 1,3-5 (default: all)")
+    ap.add_argument('--slides', help='1-based list/ranges, e.g. 1,3-5 (default: all)')
     ap.add_argument('--dpi', type=int, default=110)
-    ap.add_argument('--out', help="output dir (default render/<deck path>/)")
-    ap.add_argument('--grid', action='store_true', help="also write grid.png")
-    ap.add_argument('--cols', type=int, default=4, help="grid columns")
+    ap.add_argument('--out', help='output dir (default render/<deck path>/)')
+    ap.add_argument('--grid', action='store_true', help='also write grid.png')
+    ap.add_argument('--cols', type=int, default=4, help='grid columns')
     args = ap.parse_args()
 
     pptx = Path(args.pptx).resolve()
-    assert pptx.is_file(), f"no such file: {pptx}"
+    assert pptx.is_file(), f'no such file: {pptx}'
     out = Path(args.out) if args.out else default_out(pptx)
     out.mkdir(parents=True, exist_ok=True)
 
@@ -202,8 +202,8 @@ if __name__ == '__main__':
         shutil.copy(pdf, out / pdf.name)
         pngs = to_pngs(pdf, pages, args.dpi, out, tmp)
 
-    print(f"{n} slides in deck; rendered {len(pngs)} to {out}/")
+    print(f'{n} slides in deck; rendered {len(pngs)} to {out}/')
     for p in pngs:
-        print(f"  {p}")
+        print(f'  {p}')
     if args.grid:
-        print(f"  {make_grid(pngs, out, args.cols)}")
+        print(f'  {make_grid(pngs, out, args.cols)}')

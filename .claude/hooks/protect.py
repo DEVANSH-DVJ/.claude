@@ -36,14 +36,14 @@ PATH_TOOLS = {
     'NotebookEdit': 'notebook_path',
 }
 # names that mark a protected path in command text
-NAMES = r"\.claude/|docker/|format/|\.gitignore|LICENSE"
+NAMES = r'\.claude/|docker/|format/|\.gitignore|LICENSE'
 # path-like runs that name a protected path; LICENSE takes only a . or - suffix
-TOKEN = r"[\w./~${}*?-]*(?:\.claude/|docker/|format/|\.gitignore|LICENSE(?!\w))[\w./*?\[\]-]*"
+TOKEN = r'[\w./~${}*?-]*(?:\.claude/|docker/|format/|\.gitignore|LICENSE(?!\w))[\w./*?\[\]-]*'
 
 
 def protected(path):
     """Repo-relative path if path is template-owned, else None."""
-    p = Path(path.strip("\"'`(<[{").rstrip("\"'`;:,.)]}>"))
+    p = Path(path.strip('"\'`(<[{').rstrip('"\'`;:,.)]}>'))
     if not p.is_absolute():
         p = ROOT / p
     try:
@@ -74,9 +74,9 @@ if __name__ == '__main__':
         hits = sorted({r for r in map(protected, {str(f) for f in found}) if r})
     if hits:
         print(
-            f"blocked: {', '.join(hits)} is template-owned. Shared rule files, skills, docker, format, .gitignore and LICENSE files "
-            "change only in the template repo (github.com/devansh-dvj/.claude) and arrive here by sync. "
-            "Ask the user; only they may create .claude/.unlock.",
+            f'blocked: {", ".join(hits)} is template-owned. Shared rule files, skills, docker, format, .gitignore and LICENSE files '
+            'change only in the template repo (github.com/devansh-dvj/.claude) and arrive here by sync. '
+            'Ask the user; only they may create .claude/.unlock.',
             file=sys.stderr,
         )
         sys.exit(2)
