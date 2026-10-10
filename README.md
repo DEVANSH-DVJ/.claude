@@ -52,7 +52,8 @@ Everything from `# ==== project ====` on is the project tail, the repo's own; th
 ## Enforcement
 
 `.claude/hooks/protect.py` blocks any edit under `.claude/`, `docker/`, or `format/` and to any `.gitignore` or `LICENSE`, except `.claude/project.md`, `.claude/settings.local.json`, `docker/Dockerfile`, and `docker/environment.yml`.
-A hand-made, gitignored `.claude/.unlock` file lifts the block; keep one in this repo only.
+A hand-made, gitignored `.claude/.unlock` file lifts the block.
+It lasts only for the edit at hand: the owner creates it, and the session deletes it as soon as that edit is done.
 
 ## Skills
 
