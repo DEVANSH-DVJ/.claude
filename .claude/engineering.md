@@ -48,7 +48,7 @@ Project commands, layout, and toolchain specifics live in `project.md`.
 
 Conventions that hold in every project; the formatter configs in `format/` enforce the mechanical part.
 
-- Python: no `main()` wrapper. The entry-point body is inlined under `if __name__ == "__main__":`.
+- Python: no `main()` wrapper. The entry-point body is inlined under `if __name__ == '__main__':`.
 - Python: single quotes for a simple word; double quotes for a sentence, a regex, a docstring, or a block string. The formatter keeps the quotes as written.
 
 ## Prose and house style

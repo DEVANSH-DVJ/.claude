@@ -27,8 +27,8 @@ def parse_slides(spec, n):
     if not spec:
         return list(range(1, n + 1))
     pages = set()
-    for part in spec.split(","):
-        a, _, b = part.partition("-")
+    for part in spec.split(','):
+        a, _, b = part.partition('-')
         lo, hi = int(a), int(b or a)
         pages.update(range(lo, hi + 1))
     bad = sorted(p for p in pages if p < 1 or p > n)
@@ -53,7 +53,7 @@ def deck_fonts(pptx):
     fonts = set()
     with zipfile.ZipFile(pptx) as z:
         for name in z.namelist():
-            if name.startswith("ppt/") and name.endswith(".xml"):
+            if name.startswith('ppt/') and name.endswith('.xml'):
                 fonts.update(
                     re.findall(rb'<a:(?:latin|buFont) typeface="([^"+][^"]*)"', z.read(name))
                 )
@@ -62,8 +62,8 @@ def deck_fonts(pptx):
 
 def fc_match():
     """System fontconfig, the one LibreOffice uses."""
-    system = Path("/usr/bin/fc-match")
-    return str(system) if system.exists() else shutil.which("fc-match")
+    system = Path('/usr/bin/fc-match')
+    return str(system) if system.exists() else shutil.which('fc-match')
 
 
 def report_font_substitutions(pptx):
@@ -73,27 +73,27 @@ def report_font_substitutions(pptx):
         return
     for font in deck_fonts(pptx):
         families = subprocess.run(
-            [fc, "-f", "%{family}", font], check=True, capture_output=True, text=True
+            [fc, '-f', "%{family}", font], check=True, capture_output=True, text=True
         ).stdout.strip()
-        got = families.split(",")[0]
+        got = families.split(',')[0]
         # a face's own full name also matches
-        if font.casefold() in families.casefold().split(","):
+        if font.casefold() in families.casefold().split(','):
             continue
         print(f"font SUBSTITUTED: {font} -> {got}", file=sys.stderr)
 
 
 def to_pdf(pptx, tmp):
     """Convert with a private LibreOffice profile; safe to run in parallel."""
-    profile = tmp / "lo-profile"
+    profile = tmp / 'lo-profile'
     run = subprocess.run(
         [
-            "soffice",
+            'soffice',
             f"-env:UserInstallation=file://{profile}",
-            "--headless",
-            "--norestore",
-            "--convert-to",
-            "pdf",
-            "--outdir",
+            '--headless',
+            '--norestore',
+            '--convert-to',
+            'pdf',
+            '--outdir',
             str(tmp),
             str(pptx),
         ],
@@ -103,7 +103,7 @@ def to_pdf(pptx, tmp):
     )
     # drop the javaldx warning
     for line in run.stderr.splitlines():
-        if "javaldx" not in line:
+        if 'javaldx' not in line:
             print(line, file=sys.stderr)
     pdf = tmp / f"{pptx.stem}.pdf"
     assert pdf.exists(), "soffice produced no PDF"
@@ -111,33 +111,33 @@ def to_pdf(pptx, tmp):
 
 
 def page_count(pdf):
-    info = subprocess.run(["pdfinfo", str(pdf)], check=True, capture_output=True, text=True)
+    info = subprocess.run(['pdfinfo', str(pdf)], check=True, capture_output=True, text=True)
     return int(re.search(r"^Pages:\s+(\d+)", info.stdout, re.MULTILINE).group(1))
 
 
 def to_pngs(pdf, pages, dpi, out, tmp):
     """Rasterize the requested pages and rename to slide-NN.png."""
-    raw = tmp / "raw"
+    raw = tmp / 'raw'
     raw.mkdir()
     for lo, hi in contiguous_runs(pages):
         subprocess.run(
             [
-                "pdftoppm",
-                "-png",
-                "-r",
+                'pdftoppm',
+                '-png',
+                '-r',
                 str(dpi),
-                "-f",
+                '-f',
                 str(lo),
-                "-l",
+                '-l',
                 str(hi),
                 str(pdf),
-                str(raw / "p"),
+                str(raw / 'p'),
             ],
             check=True,
         )
     outputs = []
     for f in sorted(raw.glob("p-*.png")):
-        n = int(f.stem.split("-")[1])
+        n = int(f.stem.split('-')[1])
         dest = out / f"slide-{n:02d}.png"
         shutil.move(f, dest)
         outputs.append(dest)
@@ -154,19 +154,19 @@ def make_grid(pngs, out, cols, thumb_w=360):
     pad, label_h = 12, 22
     rows = -(-len(ims) // cols)
     sheet = Image.new(
-        "RGB",
+        'RGB',
         (cols * (thumb_w + pad) + pad, rows * (thumb_h + label_h + pad) + pad),
-        "white",
+        'white',
     )
     draw = ImageDraw.Draw(sheet)
     for i, (p, im) in enumerate(zip(pngs, ims)):
         x = pad + (i % cols) * (thumb_w + pad)
         y = pad + (i // cols) * (thumb_h + label_h + pad)
-        draw.text((x, y + 4), f"slide {int(p.stem.split('-')[1])}", fill="black")
+        draw.text((x, y + 4), f"slide {int(p.stem.split('-')[1])}", fill='black')
         thumb = im.resize((thumb_w, thumb_h))
         sheet.paste(thumb, (x, y + label_h))
-        draw.rectangle([x, y + label_h, x + thumb_w - 1, y + label_h + thumb_h - 1], outline="#999")
-    dest = out / "grid.png"
+        draw.rectangle([x, y + label_h, x + thumb_w - 1, y + label_h + thumb_h - 1], outline='#999')
+    dest = out / 'grid.png'
     sheet.save(dest)
     return dest
 
@@ -174,18 +174,18 @@ def make_grid(pngs, out, cols, thumb_w=360):
 def default_out(pptx):
     """render/<deck path under the repo, without suffix>, else render/<stem>."""
     if pptx.is_relative_to(Path.cwd()):
-        return Path("render") / pptx.relative_to(Path.cwd()).with_suffix("")
-    return Path("render") / pptx.stem
+        return Path('render') / pptx.relative_to(Path.cwd()).with_suffix('')
+    return Path('render') / pptx.stem
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     ap = argparse.ArgumentParser(description="Render pptx slides to PNG")
-    ap.add_argument("pptx")
-    ap.add_argument("--slides", help="1-based list/ranges, e.g. 1,3-5 (default: all)")
-    ap.add_argument("--dpi", type=int, default=110)
-    ap.add_argument("--out", help="output dir (default render/<deck path>/)")
-    ap.add_argument("--grid", action="store_true", help="also write grid.png")
-    ap.add_argument("--cols", type=int, default=4, help="grid columns")
+    ap.add_argument('pptx')
+    ap.add_argument('--slides', help="1-based list/ranges, e.g. 1,3-5 (default: all)")
+    ap.add_argument('--dpi', type=int, default=110)
+    ap.add_argument('--out', help="output dir (default render/<deck path>/)")
+    ap.add_argument('--grid', action='store_true', help="also write grid.png")
+    ap.add_argument('--cols', type=int, default=4, help="grid columns")
     args = ap.parse_args()
 
     pptx = Path(args.pptx).resolve()
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     out.mkdir(parents=True, exist_ok=True)
 
     report_font_substitutions(pptx)
-    with tempfile.TemporaryDirectory(prefix="render-") as td:
+    with tempfile.TemporaryDirectory(prefix='render-') as td:
         tmp = Path(td)
         pdf = to_pdf(pptx, tmp)
         n = page_count(pdf)

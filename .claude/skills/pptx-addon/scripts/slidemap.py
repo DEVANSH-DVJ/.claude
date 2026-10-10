@@ -19,20 +19,20 @@ R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 def title_of(slide_xml):
     """Text of the title placeholder, else the first text run."""
     root = ET.fromstring(slide_xml)
-    for sp in root.iter(P + "sp"):
+    for sp in root.iter(P + 'sp'):
         ph = sp.find(f"./{P}nvSpPr/{P}nvPr/{P}ph")
-        if ph is not None and ph.get("type") in ("title", "ctrTitle"):
-            return "".join(t.text or "" for t in sp.iter(A + "t"))
-    first = next(root.iter(A + "t"), None)
-    return (first.text or "") if first is not None else ""
+        if ph is not None and ph.get('type') in ('title', 'ctrTitle'):
+            return ''.join(t.text or '' for t in sp.iter(A + 't'))
+    first = next(root.iter(A + 't'), None)
+    return (first.text or '') if first is not None else ''
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     assert len(sys.argv) == 2, "Usage: python slidemap.py deck.pptx"
     z = zipfile.ZipFile(sys.argv[1])
-    rels = ET.fromstring(z.read("ppt/_rels/presentation.xml.rels"))
-    target = {rel.get("Id"): rel.get("Target") for rel in rels}
-    pres = ET.fromstring(z.read("ppt/presentation.xml"))
-    for i, sld in enumerate(pres.iter(P + "sldId"), 1):
-        part = "ppt/" + target[sld.get(R + "id")]
+    rels = ET.fromstring(z.read('ppt/_rels/presentation.xml.rels'))
+    target = {rel.get('Id'): rel.get('Target') for rel in rels}
+    pres = ET.fromstring(z.read('ppt/presentation.xml'))
+    for i, sld in enumerate(pres.iter(P + 'sldId'), 1):
+        part = 'ppt/' + target[sld.get(R + 'id')]
         print(f"slide {i:2d} -> {part:24s} {title_of(z.read(part))[:60]}")

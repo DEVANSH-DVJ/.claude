@@ -29,13 +29,13 @@ def strip_pretty(node):
 def minified(part):
     dom = minidom.parse(str(part))
     strip_pretty(dom.documentElement)
-    return DECLARATION + dom.documentElement.toxml().encode("utf-8")
+    return DECLARATION + dom.documentElement.toxml().encode('utf-8')
 
 
 def check(pptx):
     with zipfile.ZipFile(pptx) as z:
         for name in z.namelist():
-            if name.endswith((".xml", ".rels")):
+            if name.endswith(('.xml', '.rels')):
                 ET.fromstring(z.read(name))
     try:
         from pptx import Presentation
@@ -45,19 +45,19 @@ def check(pptx):
     return "XML well-formed, opens in python-pptx"
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     assert len(sys.argv) == 3, "Usage: python pack.py <unpacked_dir> out.pptx"
     src, out = Path(sys.argv[1]), Path(sys.argv[2])
     files = sorted(p for p in src.rglob("*") if p.is_file())
     # content types first, as Office writes it
     files.sort(key=lambda p: p.name != "[Content_Types].xml")
     # build beside the target; the deck changes only after a complete, checked archive exists
-    tmp = out.with_name(out.name + ".tmp")
+    tmp = out.with_name(out.name + '.tmp')
     try:
-        with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
+        with zipfile.ZipFile(tmp, 'w', zipfile.ZIP_DEFLATED) as z:
             for f in files:
                 name = f.relative_to(src).as_posix()
-                data = minified(f) if f.suffix in (".xml", ".rels") else f.read_bytes()
+                data = minified(f) if f.suffix in ('.xml', '.rels') else f.read_bytes()
                 z.writestr(name, data)
         report = check(tmp)
     except BaseException:
