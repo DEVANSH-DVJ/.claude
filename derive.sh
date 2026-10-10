@@ -3,7 +3,7 @@
 #   derive.sh [--force] <target-dir> [category...]   copy, then print the commit 1 commands
 #   derive.sh --replace <target-dir> [category...]   same, over a clean repo's own template roots
 #   derive.sh --check <target-dir>                   one status line per path; exit 1 on drift
-#   derive.sh --sync <target-dir>                    mirror the template, then print the commit commands
+#   derive.sh --sync <target-dir>                    copy the template's changes since the last sync, then print the commit commands
 #   derive.sh --slug <name> <target-dir>             set the slug, then print the commit 2 commands
 # Core is always included; implied categories are added. Copies tracked files only.
 # settings.json and docker/Dockerfile lose the parts of categories not taken.
@@ -64,6 +64,10 @@ declare -A BLOCKS=(
 
 # Dockerfile marker of the project tail, never compared or synced
 PROJECT_MARKER="# ==== project ===="
+
+# Scratch block of a target's root .gitignore
+SCRATCH_BLOCK='# scratch for sessions and tools
+work/'
 
 die() {
   echo "derive.sh: $*" >&2
@@ -151,6 +155,28 @@ read_slug() {
   fi
 }
 
+# Set BASE to the template commit the target last took; empty means a full sync
+read_base() {
+  BASE=$(git -C "$1" log -1 --format=%s -E --grep='^template: (import|sync) .*@[0-9a-f]+$')
+  BASE=${BASE##*@}
+  if [ -z "$BASE" ]; then
+    echo "full sync: $1 records no template commit"
+  elif ! git -C "$TEMPLATE" cat-file -e "$BASE^{commit}" 2>/dev/null; then
+    echo "full sync: template commit $BASE is not in $TEMPLATE"
+    BASE=
+  fi
+}
+
+# Set CHANGED to the status of each template file changed since BASE under PATHS
+template_diff() {
+  local st f
+  declare -gA CHANGED=()
+  [ -n "$BASE" ] || return 0
+  while IFS= read -r -d '' st && IFS= read -r -d '' f; do
+    CHANGED[$f]=$st
+  done < <(git -C "$TEMPLATE" diff --name-status --no-renames -z "$BASE" HEAD -- "${PATHS[@]}")
+}
+
 # Print the add and commit commands for a message and paths
 print_commit() {
   local msg=$1
@@ -233,6 +259,26 @@ filled() {
   esac
 }
 
+# Docker script, which carries the slug
+slug_script() {
+  [[ $1 == docker/*.sh && $1 != docker/*/* ]]
+}
+
+# Target file differs from the template's at BASE, the slug filled in
+local_change() {
+  local f=$2
+  if owned "$f" || [[ $f == CLAUDE.md || $f == docker/Dockerfile || $f == .claude/settings.json ]]; then
+    return 1
+  fi
+  [ -e "$1/$f" ] || return 1
+  git -C "$TEMPLATE" cat-file -e "$BASE:$f" 2>/dev/null || return 0
+  if slug_script "$f" && [ -n "$SLUG" ]; then
+    ! cmp -s <(git -C "$TEMPLATE" show "$BASE:$f" | sed "s/myproject/$SLUG/g") "$1/$f"
+  else
+    ! cmp -s <(git -C "$TEMPLATE" show "$BASE:$f") "$1/$f"
+  fi
+}
+
 # Rewrite the target's shared Dockerfile blocks, its project tail byte for byte
 sync_dockerfile() {
   local file=$1/docker/Dockerfile tail
@@ -281,6 +327,40 @@ status() {
   fi
 }
 
+# Die unless the target's copied hook passes a Bash call and blocks a rules edit
+hook_check() {
+  local hook=$1/.claude/hooks/protect.py err rc=0
+  err=$(python3 "$hook" 2>&1 >/dev/null <<<"{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"true\"},\"cwd\":\"$1\"}") || rc=$?
+  [ "$rc" -eq 0 ] || die "$hook exits $rc on a Bash call, not 0:"$'\n'"$err"
+  if [ ! -e "$1/.claude/.unlock" ]; then
+    err=$(python3 "$hook" 2>&1 >/dev/null <<<"{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"$1/.claude/session.md\"},\"cwd\":\"$1\"}") || rc=$?
+    [ "$rc" -eq 2 ] || die "$hook exits $rc on an edit of .claude/session.md, not 2:"$'\n'"$err"
+  fi
+}
+
+# Set APPENDED unless the target's root .gitignore ignores work/; die when it is dirty
+scratch_due() {
+  local src
+  APPENDED=()
+  src=$(git -C "$1" check-ignore -v work/x) || true
+  [[ $src != .gitignore:* ]] || return 0
+  [ -z "$(git -C "$1" status --porcelain -- .gitignore)" ] ||
+    die "target has uncommitted changes in .gitignore; commit or stash them first"
+  APPENDED=(.gitignore)
+}
+
+# Append the scratch block to the target's root .gitignore when APPENDED is set
+ignore_scratch() {
+  local file=$1/.gitignore
+  [ "${#APPENDED[@]}" -gt 0 ] || return 0
+  if [ -s "$file" ]; then
+    # end the last line, then one blank line
+    [ -z "$(tail -c 1 "$file")" ] || echo >>"$file"
+    [ -z "$(tail -n 1 "$file")" ] || echo >>"$file"
+  fi
+  printf '%s\n' "$SCRATCH_BLOCK" >>"$file"
+}
+
 # Copy the selected categories, then print the commit 1 commands
 derive() {
   local target=$1 p f sha cats files=() conflicts=()
@@ -292,6 +372,7 @@ derive() {
     files+=("${FILES[@]}")
   done
   template_clean
+  scratch_due "$target"
 
   # replace: drop the target's tracked files under the roots
   if [ "$REPLACE" -eq 1 ]; then
@@ -310,9 +391,11 @@ derive() {
     die "${#conflicts[@]} existing file(s) differ from the template; rerun with --force to overwrite"
   fi
 
+  ignore_scratch "$target"
   (cd "$TEMPLATE" && rsync -a --relative "${files[@]}" "$target/")
   expected .claude/settings.json >"$target/.claude/settings.json"
   expected docker/Dockerfile >"$target/docker/Dockerfile"
+  hook_check "$target"
 
   # replace: commit 1 stages the roots whole, removals included
   if [ "$REPLACE" -eq 1 ]; then
@@ -321,33 +404,59 @@ derive() {
   sha=$(git -C "$TEMPLATE" rev-parse --short HEAD)
   cats=$(printf '%s, ' "${SELECTED[@]}")
   cats=${cats%, }
+  if [ "${#APPENDED[@]}" -gt 0 ]; then
+    echo "append .gitignore"
+  fi
   echo "copied ${#files[@]} files ($cats) into $target"
   echo "commit 1, run from $target:"
-  print_commit "template: import $cats from devansh-dvj/.claude@$sha" "${PATHS[@]}"
+  print_commit "template: import $cats from devansh-dvj/.claude@$sha" "${PATHS[@]}" "${APPENDED[@]}"
 }
 
-# Mirror the template into a derived target, keeping its project-owned parts
+# Copy the template's changes since BASE into a derived target; every path without a BASE
 sync_target() {
   local target=$1 e p f sha merged files=() gone=() line n=0
+  local -A drift=()
   infer "$target"
   read_slug "$target"
   select_paths
   template_clean
   target_clean "$target"
+  scratch_due "$target"
   # the Dockerfile merge needs the project marker
   if [ -e "$target/docker/Dockerfile" ]; then
     grep -qxF "$PROJECT_MARKER" "$target/docker/Dockerfile" ||
       die "no '$PROJECT_MARKER' line in $target/docker/Dockerfile; add it above the project's own lines first"
   fi
+  ignore_scratch "$target"
+  read_base "$target"
+  template_diff
 
-  # keep owned paths, merge CLAUDE.md and Dockerfile, mirror the rest
+  # note local changes before any overwrite; remove what the template dropped
+  for f in "${!CHANGED[@]}"; do
+    if local_change "$target" "$f"; then
+      drift[$f]=1
+    fi
+    if [[ ${CHANGED[$f]} == D ]]; then
+      git -C "$target" rm -q --ignore-unmatch -- "$f"
+    fi
+  done
+  # keep owned paths, merge CLAUDE.md and Dockerfile, copy the rest
   for p in "${PATHS[@]}"; do
     tracked "$p"
     if [ -e "$target/$p" ] && { owned "$p" || [[ $p == CLAUDE.md || $p == docker/Dockerfile ]]; }; then
       continue
     fi
-    git -C "$target" rm -r -q --ignore-unmatch -- "$p"
-    files+=("${FILES[@]}")
+    # without a BASE or the path, every file is copied
+    if [ -z "$BASE" ] || [ ! -e "$target/$p" ]; then
+      git -C "$target" rm -r -q --ignore-unmatch -- "$p"
+      files+=("${FILES[@]}")
+      continue
+    fi
+    for f in "${FILES[@]}"; do
+      if [ -n "${CHANGED[$f]:-}" ]; then
+        files+=("$f")
+      fi
+    done
   done
   # paths of categories not taken are removed
   for e in "${MANIFEST[@]}"; do
@@ -356,7 +465,7 @@ sync_target() {
       gone+=("${e#*:}")
     fi
   done
-  if [ -e "$target/CLAUDE.md" ]; then
+  if [ -e "$target/CLAUDE.md" ] && { [ -z "$BASE" ] || [ -n "${CHANGED[CLAUDE.md]:-}" ]; }; then
     # trailing dot keeps the final newlines
     merged=$(claude_merge "$target/CLAUDE.md" && echo .)
     printf '%s' "${merged%.}" >"$target/CLAUDE.md"
@@ -366,14 +475,19 @@ sync_target() {
     sync_dockerfile "$target"
   fi
 
-  (cd "$TEMPLATE" && rsync -a --relative "${files[@]}" "$target/")
+  if [ "${#files[@]}" -gt 0 ]; then
+    (cd "$TEMPLATE" && rsync -a --relative "${files[@]}" "$target/")
+  fi
   expected .claude/settings.json >"$target/.claude/settings.json"
   if [[ " ${files[*]} " == *" docker/Dockerfile "* ]]; then
     expected docker/Dockerfile >"$target/docker/Dockerfile"
   fi
-  if [ -n "$SLUG" ]; then
-    sed -i "s/myproject/$SLUG/g" "$target"/docker/*.sh
-  fi
+  # the slug goes into the copied docker scripts
+  for f in "${files[@]}"; do
+    if [ -n "$SLUG" ] && slug_script "$f"; then
+      sed -i "s/myproject/$SLUG/g" "$target/$f"
+    fi
+  done
 
   # index back to HEAD; every change under the roots is the sync's own
   git -C "$target" reset -q -- "${ROOTS[@]}"
@@ -391,20 +505,28 @@ sync_target() {
         continue 2
       fi
     done
+    if [ -n "${drift[$f]:-}" ]; then
+      echo "local  $f"
+    fi
     if [[ ${line:0:2} == " D" ]]; then
       echo "remove $f"
     else
       echo "copy   $f"
     fi
   done < <(git -C "$target" status --porcelain -z --untracked-files=all -- "${ROOTS[@]}")
+  if [ "${#APPENDED[@]}" -gt 0 ]; then
+    n=$((n + 1))
+    echo "append .gitignore"
+  fi
   if [ "$n" -eq 0 ]; then
-    echo "$target already matches the template"
+    echo "$target is up to date with the template"
     return
   fi
+  hook_check "$target"
   sha=$(git -C "$TEMPLATE" rev-parse --short HEAD)
   echo "synced $n changed file(s) into $target"
   echo "commit, run from $target:"
-  print_commit "template: sync from devansh-dvj/.claude@$sha" "${ROOTS[@]}"
+  print_commit "template: sync from devansh-dvj/.claude@$sha" "${ROOTS[@]}" "${APPENDED[@]}"
 }
 
 # Put the slug into the target's docker scripts, then print the commit 2 commands
