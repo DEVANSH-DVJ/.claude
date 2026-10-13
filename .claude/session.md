@@ -37,7 +37,7 @@ These are project-agnostic; project-specific overrides live in `project.md` or t
 - Commit messages are one line, `<area>: <short lowercase imperative>`, where the area is the directory or component touched; no body, no trailers.
 - Never override the commit author/committer identity, and never add `Co-Authored-By` trailers.
 - A session leaves a clean history whether or not it is pushed: a correction to one of its own commits is folded into that commit, never stacked on top, so no commit adds what a later one removes.
-- No AI references anywhere that ships: not in code, comments, filenames, or naming.
+- No AI references anywhere that ships: not in code, comments, filenames, naming, or file metadata such as a draw.io `agent` attribute or a document author field.
 - For a living notes or status doc, amend successive edits into its single local commit rather than stacking per-update commits, while the commits are still local-only.
 
 ## Subagents

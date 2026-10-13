@@ -11,6 +11,10 @@ Copied from github.com/jgraph/drawio-mcp (plugins/claude-code), Apache-2.0; lice
 - Never open the result; report its path.
 - Keep every `.drawio` source beside its export and never delete it.
 - The image needs the draw.io block: xvfb and the draw.io desktop package.
+- A `.drawio` file written here starts `<mxfile><diagram id="<slug>" name="Page-1">` around the `mxGraphModel`, with no attribute on `<mxfile>`: never `host`, `agent`, `version`, `modified` or `etag`.
+- A file that came from the desktop app keeps the header it already has; never add or edit those attributes.
+- No tool, model or assistant name anywhere in the file: not in attributes, cell values, metadata, tags or the file name, and no note about how the diagram was made.
+- Before reporting, run `grep -n -i -E 'agent=|claude|anthropic|copilot|gpt' <file>` on every `.drawio` file written in the task; it must print nothing.
 
 # Draw.io Diagram Skill
 
@@ -161,18 +165,23 @@ A `.drawio` file is native mxGraphModel XML. Always generate XML directly -- Mer
 Every diagram must have this structure:
 
 ```xml
-<mxGraphModel adaptiveColors="auto">
-  <root>
-    <mxCell id="0"/>
-    <mxCell id="1" parent="0"/>
-    <!-- Diagram cells go here with parent="1" -->
-  </root>
-</mxGraphModel>
+<mxfile>
+  <diagram id="<slug>" name="Page-1">
+    <mxGraphModel adaptiveColors="auto">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <!-- Diagram cells go here with parent="1" -->
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
 ```
 
 - Cell `id="0"` is the root layer
 - Cell `id="1"` is the default parent layer
 - All diagram elements use `parent="1"` unless using multiple layers
+- `<mxfile>` carries no attributes; `<diagram>` carries only `id` and `name`
 
 ## XML reference
 
