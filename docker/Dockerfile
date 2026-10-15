@@ -35,13 +35,12 @@ RUN curl -fsSL "https://repo.anaconda.com/miniconda/Miniconda3-${MINICONDA_VERSI
 # rust / cargo, minimal profile plus clippy and rustfmt
 ENV RUSTUP_HOME=/opt/rustup CARGO_HOME=/opt/cargo
 ENV PATH=$CARGO_HOME/bin:$PATH
-RUN curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain stable -c clippy -c rustfmt
+RUN curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.99.0 -c clippy -c rustfmt
 
 # formatters, grouped last so they are easy to edit
-RUN apt-get update && apt-get install -y --no-install-recommends shfmt clang-format \
-    && rm -rf /var/lib/apt/lists/* \
-    && npm install -g prettier \
-    && pip install --no-cache-dir ruff
+RUN CONDA_AUTO_UPDATE_CONDA=false conda install -n base -y conda-forge::ruff=0.17.0 conda-forge::clang-format=23.1.3 conda-forge::go-shfmt=3.14.1 \
+    && conda clean -afy \
+    && npm install -g prettier@3.9.10
 
 # interactive entrypoint (exec.sh overrides this with bash)
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
