@@ -26,6 +26,9 @@ These are project-agnostic; project-specific overrides live in `project.md` or t
 - Minimize token usage: concise responses and diffs, no narration of paths not taken.
 - When in doubt, ask. A 30-second clarification beats a mis-reverted change.
 - Verify before writing docs. Every technical claim must trace to code read this session, using literal identifiers, not paraphrase. If you can't point to a line, don't write the sentence.
+- The living status doc holds the present only: status, open items, decisions in force, traps, and the latest figure per measurement. An update replaces the line it supersedes.
+- The status doc takes no dated or per-session entry. A measurement series worth keeping is one table with a row per run, not a section per run.
+- The status doc aims under 15,000 characters. Past 20,000, the next edit first compresses it back under 15,000: finished items deleted, a series folded into one table, duplicate lines merged.
 - A search hit is a lead, not a finding: read the surrounding code before drawing a conclusion from it.
 - Preserve old content when rewriting a doc: move it under an "Old \<doc\>" section, and delete only once the new version is confirmed working.
 - Drafts and scratch files live in the repo's gitignored `work/`, where the owner can follow them in the editor; never in a temp directory outside the repo.
