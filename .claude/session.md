@@ -25,6 +25,9 @@ These are project-agnostic; project-specific overrides live in `project.md` or t
 - Do small, focused tasks. If a request feels large, ask to split it before starting.
 - Minimize token usage: concise responses and diffs, no narration of paths not taken.
 - When in doubt, ask. A 30-second clarification beats a mis-reverted change.
+- Number every question to the owner; a number is never reused in a session, so the count runs on across turns and "7." names one question for the whole thread.
+- Give every question a suggested default, so the owner can answer "12. default" or "12. <comment>" per number.
+- A number the owner has not answered stays open and is asked again, by the same number, until the owner answers it or says "default" for it.
 - Verify before writing docs. Every technical claim must trace to code read this session, using literal identifiers, not paraphrase. If you can't point to a line, don't write the sentence.
 - The living status doc holds the present only: status, open items, decisions in force, traps, and the latest figure per measurement. An update replaces the line it supersedes.
 - The status doc takes no dated or per-session entry. A measurement series worth keeping is one table with a row per run, not a section per run.
