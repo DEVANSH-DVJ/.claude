@@ -1,5 +1,6 @@
 #!/bin/bash
 # Format source files. Skips any formatter not on PATH (and says which).
+# In a git work tree, tree walks skip whatever git ignores.
 #   whole tree:   ./format/format.sh
 #   paths/globs:  ./format/format.sh src/ lib/util.py *.rs      (shell expands globs; a single file works too)
 set -euo pipefail
@@ -37,38 +38,58 @@ PRUNE=(! -path "*/.git/*" ! -path "*/target/*" ! -path "*/node_modules/*" ! -pat
 # Project's own skips.
 PRUNE+=()
 
+# List files under the roots matching the find tests in "$@", NUL-separated.
+list_files() {
+  local root f
+  for root in "${roots[@]}"; do
+    # Git tree: tracked and unignored files; an ignored root is walked whole.
+    if [ "$(git -C "$root" rev-parse --is-inside-work-tree 2>/dev/null)" = true ] &&
+      ! git -C "$root" check-ignore -q .; then
+      # shellcheck disable=SC2185 # find reads its paths from stdin
+      git -C "$root" ls-files -z -co --exclude-standard |
+        while IFS= read -r -d '' f; do
+          f="${root%/}/$f"
+          [ -f "$f" ] || continue
+          printf '%s\0' "$f"
+        done | find -files0-from - "$@" "${PRUNE[@]}" -print0
+    else
+      find "$root" "$@" "${PRUNE[@]}" -print0
+    fi
+  done
+}
+
 # Format all matching files under one or more directory roots.
 fmt_tree() {
   local roots=("$@")
   if has rustfmt; then
     echo "[format] rust"
-    find "${roots[@]}" -name "*.rs" "${PRUNE[@]}" -print0 |
+    list_files -name "*.rs" |
       xargs -0 -r rustfmt --config-path "$FORMAT_DIR" --config skip_children=true
   else
     echo "[format] skipping rustfmt: not on PATH" >&2
   fi
   if has ruff; then
     echo "[format] python"
-    find "${roots[@]}" -name "*.py" "${PRUNE[@]}" -print0 |
+    list_files -name "*.py" |
       xargs -0 -r ruff format -q --config "$FORMAT_DIR/pyproject.toml"
   else
     echo "[format] skipping ruff: not on PATH" >&2
   fi
   if has shfmt; then
     echo "[format] bash"
-    find "${roots[@]}" -name "*.sh" "${PRUNE[@]}" -print0 | xargs -0 -r shfmt -w -i 2 -ci
+    list_files -name "*.sh" | xargs -0 -r shfmt -w -i 2 -ci
   else
     echo "[format] skipping shfmt: not on PATH" >&2
   fi
   if has prettier; then
     echo "[format] markdown/json/yaml"
-    find "${roots[@]}" \( -name "*.md" -o -name "*.json" -o -name "*.yaml" -o -name "*.yml" \) "${PRUNE[@]}" -print0 |
+    list_files \( -name "*.md" -o -name "*.json" -o -name "*.yaml" -o -name "*.yml" \) |
       xargs -0 -r prettier --write --log-level warn --config "$FORMAT_DIR/.prettierrc.json"
   else
     echo "[format] skipping prettier: not on PATH" >&2
   fi
   if has clang-format; then
-    mapfile -t cpp_files < <(find "${roots[@]}" \( -name "*.cpp" -o -name "*.cc" -o -name "*.h" -o -name "*.hpp" \) "${PRUNE[@]}")
+    mapfile -d '' -t cpp_files < <(list_files \( -name "*.cpp" -o -name "*.cc" -o -name "*.h" -o -name "*.hpp" \))
     if [ "${#cpp_files[@]}" -gt 0 ]; then
       echo "[format] c++"
       clang-format --style="file:$FORMAT_DIR/.clang-format" -i "${cpp_files[@]}"
