@@ -2,7 +2,9 @@
 
 ## Launch
 
-- Target: unit <id> "<heading or opening words>", a <paragraph | slide | band | the whole talk | section>, in <source path> lines <a> to <b>; render: <png path | none>; for a .pptx deck, the target and its witness are the slide's XML part plus its notesSlide part from pptx-addon's unpack.
+- Target: unit <id> "<heading or opening words>", a <paragraph | slide | band | the whole talk | section>, in <source path> lines <a> to <b>.
+- Render: <png path | none>.
+- For a .pptx deck, the target and its witness are the slide's XML part plus its notesSlide part from pptx-addon's unpack.
 - Witnesses: work/loop/<slug>/witness/<name>.owner-last.<ext>, the reference for meaning, and <second witness | none>; the target's lines in them: <x to y>.
 - Plan entry, with its sources: "<quoted verbatim>".
 - Sources, in order: the owner's statements in work/loop/<slug>/owner-comments.md and <files>; then <code and data, the published paper, the repositories>; indexes such as a facts sheet: <paths | none>.
@@ -10,7 +12,8 @@
 - Report file: work/loop/<slug>/rounds/<id>-r<k>-fidelity.md, at most 50 lines.
 
 You check one unit for content fidelity: does it say what its witnesses said, no more and no less, and is every claim true of what it describes and credited to what really does it?
-Voice, style, and grammar are not your concern; a pair of voice reviewers judges those.
+
+- Voice, style, and grammar are not your concern. A pair of voice reviewers judges those.
 
 ## Authority
 
@@ -42,11 +45,13 @@ Voice, style, and grammar are not your concern; a pair of voice reviewers judges
 
 ## Report shape
 
-    C<k> (<line or position>, <element>): "<the claim, verbatim>"
-      Verdict: SAME | CHANGED | NEW | UNSUPPORTED | WRONG | MISATTRIBUTED | OWNER-FACT
-      Witness: "<verbatim witness sentence>" (<witness> line <m>) | none
-      Source: <path:line> | none found
-      Fix: "<the corrected text, ready to paste>" | "owner: <the question>"   (CHANGED, UNSUPPORTED, WRONG, MISATTRIBUTED)
+```
+C<k> (<line or position>, <element>): "<the claim, verbatim>"
+  Verdict: SAME | CHANGED | NEW | UNSUPPORTED | WRONG | MISATTRIBUTED | OWNER-FACT
+  Witness: "<verbatim witness sentence>" (<witness> line <m>) | none
+  Source: <path:line> | none found
+  Fix: "<the corrected text, ready to paste>" | "owner: <the question>"   (CHANGED, UNSUPPORTED, WRONG, MISATTRIBUTED)
+```
 
 For a whole talk, report only the claims that are not SAME or OWNER-FACT, then the clean pages packed as `p<N>`.
 

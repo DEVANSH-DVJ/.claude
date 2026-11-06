@@ -5,7 +5,7 @@ disable-model-invocation: false
 user-invocable: true
 context: fork
 background: false
-allowed-tools: Read, Grep, Glob, Bash(git diff *), Bash(git status *), Bash(git log *)
+allowed-tools: Read, Grep, Glob, Bash(git diff *), Bash(git status *), Bash(git log *), Bash(python3 .claude/skills/review-diff/mdcheck.py *)
 ---
 
 Review the working diff of this repository and report findings. Change nothing.
@@ -15,6 +15,7 @@ Review the working diff of this repository and report findings. Change nothing.
 3. Review every hunk, in priority order:
    - correctness bugs and behavior changes not implied by the task,
    - violations of the loaded rules (diff discipline, comment style, dependency additions, non-ASCII characters in any text file),
+   - markdown blobs: one finding per line of `python3 .claude/skills/review-diff/mdcheck.py <each changed .md file>`,
    - missing symmetry the rules imply (a "why" comment that belongs in the living docs),
    - style only when it obscures meaning.
 4. Report one line per finding: `SEVERITY file:line -- issue -- suggested fix`. Severities: BLOCKER / MAJOR / MINOR / NIT. End with a one-paragraph verdict.

@@ -47,16 +47,21 @@ The exact path list per category is the `MANIFEST` array in `derive.sh`.
 
 ## Images
 
-`docker/Dockerfile` is one buildable file, split by the marker lines `# ==== base ====`, `# ==== drawio ====`, `# ==== slides ====`, and `# ==== project ====` into blocks that run to the next marker.
-Everything from `# ==== project ====` on is the project tail, the repo's own; the blocks above it are shared and never edited in a repo.
-`docker/build.sh` builds it in one `docker build` as `<slug>:latest-<arch>`, passing `BASE_OS` as the `OS` build argument.
+`docker/Dockerfile` is one buildable file in blocks, each running from its marker line to the next.
+
+- `# ==== base ====`, `# ==== drawio ====`, `# ==== slides ====`: the shared blocks, never edited in a repo.
+- `# ==== project ====`: the project tail, the repo's own, from that marker to the end.
+- `docker/build.sh`: one `docker build` of the file as `<slug>:latest-<arch>`, passing `BASE_OS` as the `OS` build argument.
 
 ## Enforcement
 
-`.claude/hooks/protect.py` blocks any edit under `.claude/`, `docker/`, or `format/` and to any `.gitignore` or `LICENSE`, except `.claude/project.md`, `.claude/settings.local.json`, `docker/Dockerfile`, `docker/environment.yml`, and anything under `work/`.
-A shell command is blocked only when what it writes, moves, or deletes is one of those paths; reading them or running their scripts is not.
-A hand-made, gitignored `.claude/.unlock` file lifts the block.
-It lasts only for the edit at hand: the owner creates it, and the session deletes it as soon as that edit is done.
+`.claude/hooks/protect.py` keeps the template-owned files as the template shipped them.
+
+- Blocked: any edit under `.claude/`, `docker/`, or `format/`, and to any `.gitignore` or `LICENSE`.
+- Open: `.claude/project.md`, `.claude/settings.local.json`, `docker/Dockerfile`, `docker/environment.yml`, and anything under `work/`.
+- A shell command is blocked only when what it writes, moves, or deletes is a blocked path; reading one or running its script is not.
+- A hand-made, gitignored `.claude/.unlock` file lifts the block for the edit at hand: the owner creates it, and the session deletes it as soon as that edit is done.
+- `.claude/skills/review-diff/mdcheck.py` lists every markdown paragraph or list item over 240 characters, about two rendered lines. `/review-diff` runs it on the changed markdown.
 
 ## Skills
 
@@ -89,31 +94,48 @@ A repo takes the template in two commits and later picks up template changes wit
 - `derive.sh --slug <slug> <repo>` writes the slug into `docker/*.sh` and prints the commit 2 commands.
 - `derive.sh --check <repo>` prints one status per template path: `identical`, `filled` (a project-owned part), `differs`, `missing`, or `extra` (a category the repo did not take); exit 1 on `differs` or `missing`.
 - `derive.sh --sync <repo>` copies what the template changed since the repo's last `template:` commit, removes what it dropped, leaves every other file as the repo has it, keeps the project-owned parts, and prints the sync commit.
-  A `local` line names each file it overwrites that the repo had changed, and without that commit in the clone it recopies every template path after a `full sync:` line.
+  - A `local` line names each file it overwrites that the repo had changed.
+  - Without a `template:` commit in the clone, it recopies every template path after a `full sync:` line.
 
-An import and a sync also append a `work/` ignore block to the repo's root `.gitignore` when that file does not already ignore `work/`, and stop without printing a commit when the copied hook does not run.
-`test/derive/run.sh` and `python3 test/hook/run_cases.py` check `derive.sh` and the hook; run them before changing either.
+- An import and a sync append a `work/` ignore block to the repo's root `.gitignore` when that file does not already ignore `work/`.
+- Both stop without printing a commit when the copied hook does not run.
+- `test/derive/run.sh` and `python3 test/hook/run_cases.py` check `derive.sh` and the hook. Run them before changing either.
 
 The two prompts below drive this from a Claude Code session in the repo.
 
 ## Derivation prompt (new repo)
 
 > Set up the Claude Code workflow from `github.com/devansh-dvj/.claude` in this repo, in two commits.
-> Clone the template: `git clone --depth 1 git@github.com:devansh-dvj/.claude.git work/template`.
-> Ask me, in one question, what this project's goal is.
-> Propose its categories from the Categories table in `work/template/README.md`, one line each on why it fits, plus a project name and a short lowercase slug, then wait for my confirmation.
-> Run `work/template/derive.sh . <categories>` and make commit 1 with exactly the commands it prints; if a `derive.sh` command fails, show me its output and wait.
-> Run `work/template/derive.sh --slug <slug> .`, fill `.claude/project.md` from my answer and the repo, fill the two placeholders at the top of `CLAUDE.md`, and make commit 2 with exactly the commands `--slug` printed.
-> Run `./docker/build.sh` in the background, tell me whether it built or found an existing image of that name, and remove `work/template`.
+>
+> 1. Clone the template: `git clone --depth 1 git@github.com:devansh-dvj/.claude.git work/template`.
+> 2. Ask me, in one question, what this project's goal is.
+> 3. Propose its categories from the Categories table in `work/template/README.md`, one line each on why it fits, plus a project name and a short lowercase slug.
+>    Then wait for my confirmation.
+> 4. Run `work/template/derive.sh . <categories>` and make commit 1 with exactly the commands it prints.
+>    - If a `derive.sh` command fails, show me its output and wait.
+> 5. Run `work/template/derive.sh --slug <slug> .`, fill `.claude/project.md` from my answer and the repo, and fill the two placeholders at the top of `CLAUDE.md`.
+>    Make commit 2 with exactly the commands `--slug` printed.
+> 6. Run `./docker/build.sh` in the background, tell me whether it built or found an existing image of that name, and remove `work/template`.
 
 ## Sync prompt (existing repo)
 
 > Update the Claude Code workflow in this repo to the current `github.com/devansh-dvj/.claude`.
-> Clone the template with its history: `git clone --filter=blob:none git@github.com:devansh-dvj/.claude.git work/template`.
-> If no commit message in `git log` starts with `template:`, show me what `--replace` would delete under `CLAUDE.md`, `.claude/`, `docker/`, and `format/`, wait for my go-ahead, then follow the derivation prompt in `work/template/README.md` from its "Ask me" step with `--replace` on its first `derive.sh` command, carrying the old project facts and toolchain into `.claude/project.md` and the Dockerfile's project tail.
-> Otherwise run `work/template/derive.sh --sync .`; if it says the repo is up to date, remove `work/template` and you are done; if a `remove` line names something this repo still uses, tell me and wait.
-> On either route, before any commit, cross-check the whole diff under `CLAUDE.md`, `.claude/`, `docker/`, and `format/` for project-specific changes it drops: on the `--sync` route, each file a `local` line names, or after a `full sync:` line whatever this repo's own commits to those paths since its last `template:` commit added; on the `--replace` route, whatever the deleted files hold that the template does not, such as an extra formatter exclude.
-> Make the sync commit with exactly the commands it prints, touching no other copied file.
-> If the diff dropped project-specific changes, list them for me, ask me to create `.claude/.unlock`, restore each one on top of the new files, delete `.claude/.unlock`, and make a second commit; they were approved when first committed, so never leave them dropped and never fold them into the sync commit.
-> If a commit touched `docker/`, run `./docker/build.sh --rebuild` in the background; if containers still use the old image, tell me instead of passing `--force`.
-> Remove `work/template`.
+>
+> 1. Clone the template with its history: `git clone --filter=blob:none git@github.com:devansh-dvj/.claude.git work/template`.
+> 2. If no commit message in `git log` starts with `template:`, take the replace route:
+>    - Show me what `--replace` would delete under `CLAUDE.md`, `.claude/`, `docker/`, and `format/`, and wait for my go-ahead.
+>    - Then follow the derivation prompt in `work/template/README.md` from its "Ask me" step, with `--replace` on its first `derive.sh` command.
+>    - Carry the old project facts and toolchain into `.claude/project.md` and the Dockerfile's project tail.
+> 3. Otherwise run `work/template/derive.sh --sync .`:
+>    - If it says the repo is up to date, remove `work/template` and you are done.
+>    - If a `remove` line names something this repo still uses, tell me and wait.
+> 4. On either route, before any commit, cross-check the whole diff under `CLAUDE.md`, `.claude/`, `docker/`, and `format/` for project-specific changes it drops:
+>    - on the `--sync` route, each file a `local` line names, or after a `full sync:` line whatever this repo's own commits to those paths since its last `template:` commit added.
+>    - on the `--replace` route, whatever the deleted files hold that the template does not, such as an extra formatter exclude.
+> 5. Make the sync commit with exactly the commands it prints, touching no other copied file.
+> 6. If the diff dropped project-specific changes, list them for me and ask me to create `.claude/.unlock`.
+>    - Restore each one on top of the new files, delete `.claude/.unlock`, and make a second commit.
+>    - They were approved when first committed, so never leave them dropped and never fold them into the sync commit.
+> 7. If a commit touched `docker/`, run `./docker/build.sh --rebuild` in the background.
+>    - If containers still use the old image, tell me instead of passing `--force`.
+> 8. Remove `work/template`.

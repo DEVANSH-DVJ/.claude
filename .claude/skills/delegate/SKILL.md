@@ -72,7 +72,7 @@ The subagent's final report is not shown to the user; relay what matters in your
 
 ## Keep agents out of each other's way
 
-- Partition before launching: each parallel agent owns a disjoint set of paths, named in its brief as the only paths it may write. Two agents with a write path in common run in sequence, or one of them gets a worktree.
+- Partition before launching: each parallel agent owns a disjoint set of paths, named in its brief as the only paths it may write. Two agents with a write path in common run in sequence. No worktree.
 - Shared docs (README, status and plan docs, `project.md`) are edited by the main session, or by one agent after the others have reported.
 - Scratch and runs are per agent: its own `work/<task>/` dir, unique container and log names, and never the same build or test target in the same tree as another agent at the same time.
 - Formatting is per touched file (`./format/format.sh <paths>`); the whole-tree mode is for the main session on a clean tree.
@@ -81,4 +81,5 @@ The subagent's final report is not shown to the user; relay what matters in your
 ## Footguns
 
 - A brief that says "look at the conversation" gets nothing; forks are the only launch that sees it.
-- Whether a fresh subagent loads `CLAUDE.md` and its includes is undocumented, and path-scoped skills may not trigger inside one; treat the rules as absent and name the ones that apply in the brief, with the checks (format, lint, build) to run before it reports.
+- Whether a fresh subagent loads `CLAUDE.md` and its includes is undocumented, and path-scoped skills may not trigger inside one.
+  - Treat the rules as absent, and name the ones that apply in the brief, with the checks (format, lint, build) to run before it reports.

@@ -1,8 +1,9 @@
 # Voice
 
 The owner's prose rules for papers, slides, posters, speaker notes, and docs.
-A project's own voice files, when the owner's prompt or `project.md` names them, and the owner's comments win where they disagree with this file.
-Numbers on length describe the owner's typical shape, never limits, and reviewers never count.
+
+- A project's own voice files, when the owner's prompt or `project.md` names them, and the owner's comments win where they disagree with this file.
+- Numbers on length describe the owner's typical shape, never limits, and reviewers never count.
 
 ## Structure
 
@@ -88,7 +89,8 @@ Numbers on length describe the owner's typical shape, never limits, and reviewer
 - Each point is said once; a repetition is cut unless it is a deliberate callback.
 - A note is said in one breath to a room: stacked clauses, paper phrasing, parentheses, and read-out lists of nouns are revised.
 - A formulaic opener ("To summarize,", "Now,", "So,") or a closing tagline stays only where the owner's own notes do the same.
-- Cues such as `<next slide>` and `<pause>` sit inline where the owner's earlier notes put them; the cue spellings, the title note, and the register of a given talk live in the talk's voice file, when the owner's prompt or `project.md` names one.
+- Cues such as `<next slide>` and `<pause>` sit inline where the owner's earlier notes put them.
+- The cue spellings, the title note, and the register of a given talk live in the talk's voice file, when the owner's prompt or `project.md` names one.
 
 ## Connectives
 

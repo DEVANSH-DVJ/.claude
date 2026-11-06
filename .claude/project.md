@@ -18,22 +18,29 @@
 
 <A short map of where the main pieces live; point to README.md for the full version rather than duplicating it.>
 
+## Docs map
+
+<!-- One bullet per living doc this project keeps, so nothing is duplicated here.
+     Avoid a top-level docs/ folder: it collides with docker/ on tab-completion. Prefer notes/. -->
+
+- `README.md`: orientation + layout
+- <`run.md` for run commands, `notes/` for deeper guides, or whatever this project keeps; delete what does not exist>
+
 ## Environment & commands
 
 <How to build, run, and test this project: the exact commands, run through the project runner (e.g. `./docker/exec.sh "<cmd>"`), plus `./format/format.sh` to format.>
+
+## Machines
+
+<Optional: one bullet per machine, named by its ssh alias alone, and which one commits and which ones measure. Delete the section when the laptop is the only machine.>
 
 ## Language & toolchain specifics
 
 <Anything a session needs beyond the defaults: toolchain versions, feature flags, per-language style not covered by `format/`.>
 
-## Docs map
+## Subagents
 
-<!-- Link the living docs so nothing is duplicated here. Adjust to this project.
-     Avoid a top-level docs/ folder: it collides with docker/ on tab-completion. Prefer notes/, guides/, or reference/. -->
-
-- `README.md`: orientation + layout
-- `run.md`: every run command
-- `notes/`: deeper guides
+<Which model plays which role here: the main session, the agents that write, the agents that only read, and how many run at once. Delete the section when the shared rule, model and effort set explicitly per launch, is enough.>
 
 ## Overrides to the shared rules
 

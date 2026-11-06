@@ -8,10 +8,17 @@ argument-hint: <deliverable path> [paper|slides|poster|notes|docs]
 # Writing loop
 
 Prose in the owner's voice is drafted once from a plan, then reviewed one unit at a time until no must-fix remains.
-The main session orchestrates: it adjudicates, applies or launches an applier, and commits when asked; subagents read and report.
-The house prose rules are in `voice.md`, and the launch texts are in `briefs/`.
-The owner's prompt or the repo's `project.md` names the project's voice files, exemplars, glossary, inline-note form, model overrides, and script tool when they exist; otherwise the loop proceeds without them.
-It serves a new piece, a redraft the owner asked for, or a revision; a wording fix the owner dictates needs no loop and is applied as given.
+
+- The main session orchestrates: it adjudicates, applies or launches an applier, and commits when asked. Subagents read and report.
+- The house prose rules are in `voice.md`, and the launch texts are in `briefs/`.
+- The owner's prompt or the repo's `project.md` names, when they exist:
+  - the project's voice files, exemplars, and glossary
+  - the inline-note form
+  - model overrides
+  - the script tool
+- Otherwise the loop proceeds without them.
+- It serves a new piece, a redraft the owner asked for, or a revision.
+- A wording fix the owner dictates needs no loop and is applied as given.
 
 ## Vocabulary
 
@@ -34,21 +41,27 @@ It serves a new piece, a redraft the owner asked for, or a revision; a wording f
 | Speaker notes | the whole talk                        | each page's note and each hand-off            | page renders beside the script                                                 |
 | Docs          | section                               | sentence and heading                          | none                                                                           |
 
-Units run top-down, one at a time; the next opens only when the current one is clean.
-A paper's section titles, captions, and floats belong to the unit whose text they sit beside.
-A paragraph's page is found with `./docker/exec.sh "pdftotext -layout '<pdf>' -" | awk '/\f/{p++} index($0,"<first words>"){print p+1; exit}'`; a beamer frame's page, by the same search on its title.
-A beamer slide with builds `-A`, `-B` is one unit, and its `\speakernote` text is an element of it in a slides loop and part of the whole talk in a speaker-notes loop.
-The script is `perl -0ne 'print "$2\n\n" while /\\speakernote(\{((?:[^{}]++|(?1))*)\})/g' tex/*/*.tex`, or the tool the owner's prompt or `project.md` names.
+- Units run top-down, one at a time; the next opens only when the current one is clean.
+- A paper's section titles, captions, and floats belong to the unit whose text they sit beside.
+- A paragraph's page is found with `./docker/exec.sh "pdftotext -layout '<pdf>' -" | awk '/\f/{p++} index($0,"<first words>"){print p+1; exit}'`; a beamer frame's page, by the same search on its title.
+- A beamer slide with builds `-A`, `-B` is one unit, and its `\speakernote` text is an element of it in a slides loop and part of the whole talk in a speaker-notes loop.
+  - The script is `perl -0ne 'print "$2\n\n" while /\\speakernote(\{((?:[^{}]++|(?1))*)\})/g' tex/*/*.tex`, or the tool the owner's prompt or `project.md` names.
 
-Decks (`.pptx`): the unit is one slide, and its text is the slide's XML part plus its notesSlide part, unpacked to `work/loop/<slug>/deck/` with `.claude/skills/pptx-addon/scripts/unpack.py` and mapped by `slidemap.py`.
-The witness is the same parts from the owner-last deck; the applier edits those parts, packs in place with `pack.py`, and `pptcheck.py` must exit 0.
-The scope proof is `deckdiff.py old.pptx new.pptx` listing only those parts, and renders come from pptx-addon's `render.py`.
+Decks (`.pptx`):
+
+- The unit is one slide, and its text is the slide's XML part plus its notesSlide part.
+- Those parts are unpacked to `work/loop/<slug>/deck/` with `.claude/skills/pptx-addon/scripts/unpack.py` and mapped by `slidemap.py`.
+- The witness is the same parts from the owner-last deck.
+- The applier edits those parts, packs in place with `pack.py`, and `pptcheck.py` must exit 0.
+- The scope proof is `deckdiff.py old.pptx new.pptx` listing only those parts.
+- Renders come from pptx-addon's `render.py`.
 
 ## Roles
 
 Defaults, which the owner's prompt or the repo's `project.md` may override.
-Every launch runs in the background as `subagent_type: general-purpose`, except a writer launched as a fork when the thread holds the plan discussion.
-Every launch sets the model, and the effort where the launch mechanism accepts it.
+
+- Every launch runs in the background as `subagent_type: general-purpose`, except a writer launched as a fork when the thread holds the plan discussion.
+- Every launch sets the model, and the effort where the launch mechanism accepts it.
 
 | Role     | Model           | Effort | Brief                                                                       |
 | -------- | --------------- | ------ | --------------------------------------------------------------------------- |
@@ -61,16 +74,30 @@ Every launch sets the model, and the effort where the launch mechanism accepts i
 
 ## Loop records
 
-Everything the loop writes lives in `work/loop/<slug>/` at the repo root, never committed; `<slug>` is the deck's file stem for a `.pptx`, else the deliverable's directory name with spaces and colons replaced by `-`.
-If `work/` is not ignored, ask the owner to ignore it; never edit a `.gitignore` yourself.
+Everything the loop writes lives in `work/loop/<slug>/` at the repo root, never committed.
 
-Rounds are numbered per unit, r1 to r3; after r3 what remains goes to the owner.
-Every report is written to `rounds/` the moment its agent finishes, as `rounds/<unit>-r<k>-<role>.md` for voice-a, voice-b, fidelity, and the applier of round k, `rounds/all-r0-writer.md` for the writer, `rounds/all-r0-applier.md` for a build-only applier (an applier launched with no changes, only to build and render), and `rounds/all-rF-final.md` for the final read.
-`decisions.md` gets a unit's calls as they are made at adjudication, and the record closes when the unit is clean or sent to the owner; in-flight state lives in `rounds/` and in the Loop position block, the summary at the top of `decisions.md` shown below.
+- `<slug>`: the deck's file stem for a `.pptx`, else the deliverable's directory name with spaces and colons replaced by `-`.
+- If `work/` is not ignored, ask the owner to ignore it. Never edit a `.gitignore` yourself.
+- Rounds are numbered per unit, r1 to r3; after r3 what remains goes to the owner.
+- `decisions.md` gets a unit's calls as they are made at adjudication, and the record closes when the unit is clean or sent to the owner.
+- In-flight state lives in `rounds/` and in the Loop position block, the summary at the top of `decisions.md` shown below.
+
+Every report is written to `rounds/` the moment its agent finishes, as:
+
+| Report                         | For                                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------------------ |
+| `rounds/<unit>-r<k>-<role>.md` | voice-a, voice-b, fidelity, and the applier of round k                               |
+| `rounds/all-r0-writer.md`      | the writer                                                                           |
+| `rounds/all-r0-applier.md`     | a build-only applier (an applier launched with no changes, only to build and render) |
+| `rounds/all-rF-final.md`       | the final read                                                                       |
 
 - `plan.md`: the unit list with ids, each unit's job, the facts it must carry with their `path:line` sources, the glossary; a committed project plan, when one exists, is referenced instead.
-- `owner-comments.md`: the owner's comments verbatim, from the conversation and from the owner's inline notes in the source (the note form the owner's prompt or `project.md` names), filed per unit or under "All"; a line marked `Decided:` is closed.
-- `witness/<name>.owner-last.<ext>`: the owner's last version before the loop, from the working tree when it differs from HEAD and the owner confirms the edits are theirs, else `git show HEAD:<path>`; `witness/<name>.<label>.<ext>` is an older second witness, and owner-last wins where they differ.
+- `owner-comments.md`: the owner's comments verbatim, from the conversation and from the owner's inline notes in the source, filed per unit or under "All".
+  - The inline notes take the form the owner's prompt or `project.md` names.
+  - A line marked `Decided:` is closed.
+- `witness/<name>.owner-last.<ext>`: the owner's last version before the loop.
+  - It comes from the working tree when that differs from HEAD and the owner confirms the edits are theirs, else from `git show HEAD:<path>`.
+- `witness/<name>.<label>.<ext>`: an older second witness. Owner-last wins where they differ.
 - `briefs/<unit>-r<k>-<role>.md`: every filled brief, saved here before its launch, so a round can be relaunched exactly.
 - `rounds/`: the reports, named as above.
 - `pre/<unit>-r<k>/`: the applier's copy of the write paths before its edit.
@@ -97,9 +124,12 @@ Per-unit record; drop a line only when it has nothing to hold:
 ## The loop
 
 1. Plan.
-   Write `plan.md` or reference the project's plan, collect `owner-comments.md`, save the witnesses before anything changes, and create `decisions.md`.
-   Settle with the owner any call only the owner can make.
-   End with a current build and render; when the build is long, a build-only applier makes it.
+   - Write `plan.md` or reference the project's plan.
+   - Collect `owner-comments.md`.
+   - Save the witnesses before anything changes.
+   - Create `decisions.md`.
+   - Settle with the owner any call only the owner can make.
+   - End with a current build and render. When the build is long, a build-only applier makes it.
 2. Draft, when the piece is new or rejected.
    The writer drafts the whole piece from the plan in one pass, builds, renders, and reports the passages it is least sure of.
 3. Round k: voice pair and fidelity, launched in one message, each with its filled brief and its own report file.
@@ -108,8 +138,10 @@ Per-unit record; drop a line only when it has nothing to hold:
 5. Apply.
    A few lines: exact-string edits in the main session, then a build-only applier.
    More: the applier, with the exact old and new text of every adopted change; it builds and renders.
-6. Round k+1, whenever round k changed the text: after musts were applied, the voice pair plus fidelity; after a nits-only apply, fidelity alone.
-   Readers never build; they confirm the output is newer than its sources, view the render the applier made, and judge every element again.
+6. Round k+1, whenever round k changed the text.
+   - After musts were applied: the voice pair plus fidelity.
+   - After a nits-only apply: fidelity alone.
+   - Readers never build. They confirm the output is newer than its sources, view the render the applier made, and judge every element again.
 7. Next unit, once this one is clean or sent to the owner.
    An Upstream finding is adjudicated like any other and, when adopted, reopens its unit through steps 5 and 6.
 8. Final read, when every unit is clean: the final reader goes through the whole piece as its audience would.
@@ -145,9 +177,12 @@ The loop commits only when the owner asks, by the rules in `session.md`; `work/l
 
 ## Resume after compaction
 
-Read this file, then the Loop position block and the last three records of `decisions.md`, `owner-comments.md`, and the plan entry of the unit in review; run `git status --short <deliverable>`; find the unit by its heading with `grep -n`, never by a recorded line number.
-For each agent in flight, run its check command; if its report file is missing after its expected minutes, relaunch the last round from its saved brief.
-Then report the unit, its stage, what is uncommitted, and what was relaunched, and wait for the owner's go unless told to run unattended.
+1. Read this file, then the Loop position block and the last three records of `decisions.md`, `owner-comments.md`, and the plan entry of the unit in review.
+2. Run `git status --short <deliverable>`.
+3. Find the unit by its heading with `grep -n`, never by a recorded line number.
+4. For each agent in flight, run its check command; if its report file is missing after its expected minutes, relaunch the last round from its saved brief.
+5. Then report the unit, its stage, what is uncommitted, and what was relaunched.
+6. Wait for the owner's go unless told to run unattended.
 
 Resume prompt, for the owner to paste as the first message after a compaction:
 

@@ -28,7 +28,10 @@ You do not judge or improve the text; the reviewers and the orchestrator have do
 - Keep the file's own markup: its escaped specials, its italic macro, its link and cue style, one sentence per line.
 - A file the owner edits by hand, such as a speaker script, is not yours: when a change makes a line there untrue, report the exact old line and its replacement.
 - A layout problem is fixed only by the layout fixes the launch allows, never by changing the adopted words.
-- A .pptx deck: unpack to `work/loop/<slug>/deck/` with `.claude/skills/pptx-addon/scripts/unpack.py`, edit only the target slide's XML part and its notesSlide part, pack in place with `pack.py`, and `pptcheck.py` must exit 0; the scope proof is `deckdiff.py <pre-edit deck> <new deck>` listing only those parts.
+- A .pptx deck: unpack to `work/loop/<slug>/deck/` with `.claude/skills/pptx-addon/scripts/unpack.py`.
+  - Edit only the target slide's XML part and its notesSlide part.
+  - Pack in place with `pack.py`, and `pptcheck.py` must exit 0.
+  - The scope proof is `deckdiff.py <pre-edit deck> <new deck>` listing only those parts.
 - When the tree marks revisions with a macro such as `\revised{}`, wrap every new text in it.
 - Never run the formatter on a prose file (`.tex`, `.md`); format any other touched file before the scope proof.
 

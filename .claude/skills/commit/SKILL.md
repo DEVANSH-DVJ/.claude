@@ -16,7 +16,12 @@ Make one focused, safe commit. Never override author identity, never add Co-Auth
 6. Verify: `git show --stat HEAD`.
 
 Message format: one line, no body, no trailers.
-The area is the top-level directory or component the commit touches (`docker:`, `.claude:`, `docs:`, `scripts:`, a package name); the rest is a short lowercase imperative that says what changed, with `--` rather than a dash if a separator is needed.
-Examples: `docker: add the dev image for the pptx toolchain`, `.claude: drop the upstream/external rules`, `format.sh: exclude .venv`.
+
+- The area is the top-level directory or component the commit touches (`docker:`, `.claude:`, `docs:`, `scripts:`, a package name).
+- The rest is a short lowercase imperative that says what changed, with `--` rather than a dash if a separator is needed.
+- Examples:
+  - `docker: add the dev image for the pptx toolchain`
+  - `.claude: drop the upstream/external rules`
+  - `format.sh: exclude .venv`
 
 If anything looks off (unrelated staged files, a large mixed diff), do not commit -- report the concern and continue.

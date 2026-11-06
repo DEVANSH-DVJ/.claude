@@ -7,8 +7,10 @@ description: Edit slide decks (.pptx) a few slides at a time -- render to PNG, m
 
 A .pptx is a ZIP of XML parts plus media: edit the parts, render, look, repeat.
 This skill carries the loop and its scripts.
-Building a deck from HTML, filling a template deck, and schema validation belong to Anthropic's `pptx` skill, invoked as `/document-skills:pptx`.
-`.claude/settings.json` registers its marketplace and enables the plugin; if it is missing on a machine, run `/plugin marketplace add anthropics/skills` and `/plugin install document-skills@anthropic-agent-skills`.
+
+- Building a deck from HTML, filling a template deck, and schema validation belong to Anthropic's `pptx` skill, invoked as `/document-skills:pptx`.
+- `.claude/settings.json` registers its marketplace and enables the plugin.
+- If it is missing on a machine, run `/plugin marketplace add anthropics/skills` and `/plugin install document-skills@anthropic-agent-skills`.
 
 ## Environment
 
@@ -18,9 +20,9 @@ Every command runs through the project runner from the repo root:
 ./docker/exec.sh "<command>"
 ```
 
-Scripts live at `.claude/skills/pptx-addon/scripts/`; paths in this file are repo-relative.
-Trust only container renders; a host without the image's fonts wraps text differently.
-Scratch (unpacked XML, text dumps) goes in `work/`, renders in `render/`; keep both gitignored.
+- Scripts live at `.claude/skills/pptx-addon/scripts/`. Paths in this file are repo-relative.
+- Trust only container renders. A host without the image's fonts wraps text differently.
+- Scratch (unpacked XML, text dumps) goes in `work/`, renders in `render/`. Keep both gitignored.
 
 Slide numbers are 1-based like PowerPoint.
 `ppt/slides/slideN.xml` numbering is file identity, not deck order; `slidemap.py` gives the order-to-part mapping.
@@ -53,8 +55,8 @@ Use this for every "change slides X..Y" request. Change only what was asked; eve
    ```bash
    ./docker/exec.sh "python .claude/skills/pptx-addon/scripts/render.py deck_v7.pptx --slides 3-5 --grid"
    ```
-   Check for text overflowing its box or the slide edge, overlapping text or shapes, misaligned titles, columns, or icons, low contrast, wrong line wraps, and leftover placeholder text.
-   If anything is off, go back to step 3. Stop only when every touched slide is clean.
+   - Check for text overflowing its box or the slide edge, overlapping text or shapes, misaligned titles, columns, or icons, low contrast, wrong line wraps, and leftover placeholder text.
+   - If anything is off, go back to step 3. Stop only when every touched slide is clean.
 6. **Check PowerPoint parity** before hand-off; a clean render is not enough (see below):
    ```bash
    ./docker/exec.sh "python .claude/skills/pptx-addon/scripts/pptcheck.py deck_v7.pptx"
@@ -69,7 +71,10 @@ Use this for every "change slides X..Y" request. Change only what was asked; eve
 - `unpack.py deck.pptx work/<name>`: extracts the ZIP and pretty-prints every XML part.
 - `pack.py work/<name> out.pptx`: reverses the pretty print, zips, and checks the result.
 - `deckdiff.py old.pptx new.pptx`: lists added, removed, and changed parts, ignoring XML whitespace and attribute order.
-- `pptcheck.py deck.pptx [...]`: flags what PowerPoint lays out differently from LibreOffice (an `<a:endParaRPr>` before the paragraph's end, a stored `normAutofit` scale, a line or a line plus the word wrapped after it within 97-103% of its box's width); exits 1 on any hit.
+- `pptcheck.py deck.pptx [...]`: flags what PowerPoint lays out differently from LibreOffice, and exits 1 on any hit.
+  - An `<a:endParaRPr>` before the paragraph's end.
+  - A stored `normAutofit` scale.
+  - A line, or a line plus the word wrapped after it, within 97-103% of its box's width.
 
 ## Editing the XML
 
@@ -87,10 +92,18 @@ A LibreOffice render is not proof of the PowerPoint look: PowerPoint differs in 
 - PowerPoint ignores a stored `normAutofit` `fontScale` or `lnSpcReduction` and draws the text at full size, while LibreOffice applies the shrink: never rely on autofit, state the font size explicitly and use `<a:noAutofit/>`.
 - PowerPoint drops the runs after an `<a:endParaRPr>` that is not the last child of its `<a:p>`, while LibreOffice shows them: `<a:endParaRPr>` is always the paragraph's last child.
 
+## Deck conventions
+
+- Every pptx and the pdf beside it stay in sync: a change to a pptx re-exports its pdf, and both land in the same commit.
+- Binary decks are committed as-is; renders and scratch never are.
+- A deck's spoken script lives in its `speaker.md`, one section per PDF page, backup slides included, never in the pptx notes.
+- Before a slide set is handed over, a review-and-fix pass views every render for hanging words, split labels, uneven gaps and inconsistent styling, and fixes them without changing meaning.
+
 ## Image requirements
 
 The project image (the template's drawio and slides blocks) must provide:
 
-- apt: `libreoffice-impress poppler-utils fontconfig`, plus the deck's font families copied from `docker/fonts` into the image and `fc-cache -f` (the Dockerfile's fonts block); a family the image lacks shows up as `font SUBSTITUTED` in the render output.
+- apt: `libreoffice-impress poppler-utils fontconfig`, plus the deck's font families copied from `docker/fonts` into the image and `fc-cache -f` (the Dockerfile's fonts block).
+  - A family the image lacks shows up as `font SUBSTITUTED` in the render output.
 - conda or pip: `python-pptx pdf2image pillow lxml markitdown[pptx]`.
 - Only for the plugin's html2pptx workflow: Node 20 or newer with `pptxgenjs playwright sharp react-icons react react-dom`, `npx playwright install --with-deps chromium`, and `NODE_PATH=/usr/local/lib/node_modules`.

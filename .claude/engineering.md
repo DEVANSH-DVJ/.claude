@@ -34,7 +34,8 @@ Project commands, layout, and toolchain specifics live in `project.md`.
 
 ## Build, format, environment
 
-- All build / lint / test / run commands go through the project's runner (e.g. a `docker/exec.sh` wrapper), never the host toolchain directly. The exact commands live in `project.md`. LaTeX is the one exception: `make` for papers and talks runs on the host.
+- Build, lint, test, and run commands go through the runner `project.md` names, such as a `docker/exec.sh` wrapper.
+- The host toolchain is used only where `project.md` says so. LaTeX is the standing exception: `make` for papers and talks runs on the host.
 - After editing, run the build or typecheck. Before finishing, run the linter and treat warnings as failures.
 - Format edited files before committing, using the project's formatter (`format/format.sh`). Per-language style lives in `format/`.
 
@@ -55,13 +56,27 @@ Conventions that hold in every project; the formatter configs in `format/` enfor
 
 ## Prose and house style
 
-- One sentence per line in markdown (README and docs) and LaTeX (`.tex`); a line break ends a sentence, never wraps one for width.
-- A sentence carries one idea in about 20 words, 30 at most. Split a chain of `and`, `which`, `whose`, or `so that` clauses into sentences.
-- Three or more parallel items (targets, flags, variants, file roles, status values) are a bulleted list, one per line, never a comma or semicolon list inside a sentence.
-- Per-item data (name, default, meaning; one row per model or target) is a table, not a run of sentences or one section per item.
-- Bullets are the default in a doc: each fact, rule, step, or item is one bullet of one or two sentences.
-- A paragraph is for the intro of a doc or section, or an argument whose sentences must run in order: one to four sentences, then a blank line, since consecutive lines render as one.
-- A shell command goes in a fenced block, never inside a sentence.
-- ASCII only in every text file: no em or en dashes, arrows, curly quotes, bullets, check marks, emoji, or other non-ASCII glyphs, in code, markdown, configs, or commit messages. Write `--`, `->`, straight quotes, `...`, and words instead. Binary assets are the only exception.
-- Check with `git ls-files | xargs grep -nP '[^\x00-\x7F]'`; the output must be empty.
+Prose and text-file conventions: sentences in any doc, markdown and LaTeX layout, and what every text file must satisfy.
+
+- In markdown, GitHub joins consecutive lines into one paragraph. A line is its own block only as a bullet, a table row, a heading, a fenced line, or with a blank line on each side.
+- One sentence per line in markdown (README and docs) and LaTeX (`.tex`). A line break ends a sentence, never wraps one for width.
+- In markdown, a paragraph or a list item stays under 240 characters, about two rendered lines.
+- A paragraph is only for the opening of a doc or a section: what the thing is and why it exists. A reader who skips it loses no fact they need to act on.
+- Everything a reader acts on is a bullet, a table row, or a fenced command: what a script does, a flag, an image, a machine, a step, a rule, a knob.
+- A bullet carries one fact in one or two sentences. A second fact is a second bullet, and a sub-detail is a nested bullet, one level deep.
+- A bullet about a named thing opens with the name in backticks or bold and a colon, so the left edge scans.
+- Items that share fields (images, flags, machines, models, targets, status values) are a table with one row per item and one column per field.
+- Three or more parallel items inside a sentence are a bulleted list, one per line, never a comma or semicolon chain.
+- Prefer two sentences or two bullets over a semicolon between two facts. In LaTeX prose, never a semicolon.
+- A shell command goes in a fenced block, one command per line, never inside a sentence. Its flags are bullets under the block.
+- A doc longer than a screen has a heading every 5 to 15 bullets, so GitHub's outline navigates it.
+- A sentence carries one idea in about 20 words, 30 at most. A chain of `and`, `which`, `whose`, or `so that` clauses is split into sentences.
+- Prose that leaves the repo as prose, such as a rebuttal, a report body, or speaker notes, keeps its paragraphs. `project.md` names such files.
+- Metadata lines (conference, deadline, status) are one table, never one line per paragraph.
+- Check: `.claude/skills/review-diff/mdcheck.py` lists every paragraph or list item over the limit, and `/review-diff` runs it on the changed markdown.
+- ASCII only in every text file: code, markdown, configs, and commit messages.
+  - No em or en dashes, arrows, curly quotes, bullets, check marks, emoji, or other non-ASCII glyphs.
+  - Write `--`, `->`, straight quotes, `...`, and words instead.
+  - Binary assets and the third-party trees `project.md` names are the only exceptions.
+- Check with `git ls-files | xargs grep -nP '[^\x00-\x7F]'`. The output must be empty.
 - Every text file ends with a newline.

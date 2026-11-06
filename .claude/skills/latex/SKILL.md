@@ -6,8 +6,10 @@ argument-hint: "[paper or talk dir]"
 ---
 
 Papers for any venue class, and beamer talks.
-Builds run on the host with the repo's own `make`, never inside the container; the container only exports diagrams and renders PDFs.
-Follow the repo's layout and the prior repos the owner shows; prose rules are the `writing` skill's.
+
+- Builds run on the host with the repo's own `make`, never inside the container. The container only exports diagrams and renders PDFs.
+- Follow the repo's layout and the prior repos the owner shows.
+- Prose rules are the `writing` skill's.
 
 ## Build
 
@@ -44,5 +46,7 @@ Follow the repo's layout and the prior repos the owner shows; prose rules are th
 
 ## Requirements
 
-- Host: TeX Live with latexmk, latexdiff, poppler, fontaxes, and mweights; `TEXMFHOME` pointing at `docker/fonts/texmf` (built once with autoinst over `docker/fonts`), and each document loading its families' maps with `\pdfmapfile{+<Family>.map}`.
+- Host: TeX Live with latexmk, latexdiff, poppler, fontaxes, and mweights.
+  - `TEXMFHOME` points at `docker/fonts/texmf`, built once with autoinst over `docker/fonts`.
+  - Each document loads its families' maps with `\pdfmapfile{+<Family>.map}`.
 - Image: the drawio layer (draw.io, poppler, fonts) for export and rendering.

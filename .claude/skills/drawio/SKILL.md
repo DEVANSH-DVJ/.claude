@@ -7,7 +7,9 @@ Copied from github.com/jgraph/drawio-mcp (plugins/claude-code), Apache-2.0; lice
 
 ## This repo
 
-- Export only inside the container: `./docker/exec.sh ".claude/skills/drawio/scripts/export.sh <in.drawio> <out.png or out.pdf> [scale] [page]"`; a multi-page diagram exports one page per call. There is no host draw.io CLI, so the steps below that locate one do not apply.
+- Export only inside the container: `./docker/exec.sh ".claude/skills/drawio/scripts/export.sh <in.drawio> <out.png or out.pdf> [scale] [page]"`.
+  - A multi-page diagram exports one page per call.
+- There is no host draw.io CLI, so the steps below that locate one do not apply.
 - Never open the result; report its path.
 - Keep every `.drawio` source beside its export and never delete it.
 - The image needs the draw.io block: xvfb and the draw.io desktop package.
@@ -24,8 +26,11 @@ Generate draw.io diagrams as native `.drawio` files. Optionally export to PNG, S
 
 1. **Generate draw.io XML** in mxGraphModel format for the requested diagram
 2. **Write the XML** to a `.drawio` file in the current working directory using the Write tool
-3. **Post-process edge routing** (optional): If `npx @drawio/postprocess` is available, run it on the `.drawio` file to optimize edge routing (simplify waypoints, fix edge-vertex collisions, straighten approach angles). Skip silently if not available -- do not install it or ask the user about it
-4. **If the user requested an export format** (png, svg, pdf), locate the draw.io CLI (see below), export with `--embed-diagram`, then delete the source `.drawio` file. If the CLI is not found, keep the `.drawio` file and tell the user they can install the draw.io desktop app to enable export, or open the `.drawio` file directly
+3. **Post-process edge routing** (optional): If `npx @drawio/postprocess` is available, run it on the `.drawio` file to optimize edge routing
+   - It simplifies waypoints, fixes edge-vertex collisions, and straightens approach angles
+   - Skip silently if not available -- do not install it or ask the user about it
+4. **If the user requested an export format** (png, svg, pdf), locate the draw.io CLI (see below), export with `--embed-diagram`, then delete the source `.drawio` file
+   - If the CLI is not found, keep the `.drawio` file and tell the user they can install the draw.io desktop app to enable export, or open the `.drawio` file directly
 5. **Open the result** -- the exported file if exported, or the `.drawio` file otherwise. If the open command fails, print the file path so the user can open it manually
 
 ## Choosing the output format
@@ -185,8 +190,19 @@ Every diagram must have this structure:
 
 ## XML reference
 
-For the complete draw.io XML reference including common styles, edge routing, containers, layers, tags, metadata, dark mode colors, and XML well-formedness rules, fetch and follow the instructions at:
+For the complete draw.io XML reference, fetch and follow the instructions at:
 https://raw.githubusercontent.com/jgraph/drawio-mcp/main/shared/xml-reference.md
+
+It covers:
+
+- Common styles
+- Edge routing
+- Containers
+- Layers
+- Tags
+- Metadata
+- Dark mode colors
+- XML well-formedness rules
 
 ## Troubleshooting
 

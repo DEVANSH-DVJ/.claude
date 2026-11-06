@@ -6,7 +6,9 @@ description: Review PDFs visually and between versions -- render pages to PNG wi
 # PDF review loop
 
 Look at pages as images, read the text, and compare versions page by page.
-Extraction, creation, merging, splitting, forms, and OCR belong to Anthropic's `pdf` skill, invoked as `/document-skills:pdf`; `.claude/settings.json` installs its plugin.
+
+- Extraction, creation, merging, splitting, forms, and OCR belong to Anthropic's `pdf` skill, invoked as `/document-skills:pdf`.
+- `.claude/settings.json` installs its plugin.
 
 ## Environment
 
