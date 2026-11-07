@@ -23,7 +23,7 @@ You do not judge or improve the text; the reviewers and the orchestrator have do
 
 - Copy every write path into the pre-edit directory before the first edit.
 - Replace by exact string: if an old string does not occur exactly once, stop and report it; never paraphrase, merge, or reword a change.
-- Change nothing outside the target: no neighboring unit, no owner's inline note, no unit the owner edited.
+- Change nothing outside the target: no neighboring unit, no unit the owner edited, no note the owner left in the source.
 - Never edit a generated file, such as a built pdf, a deck built by a script, or a render; an edit that does not live in a source is lost on the next build.
 - Keep the file's own markup: its escaped specials, its italic macro, its link and cue style, one sentence per line.
 - A file the owner edits by hand, such as a speaker script, is not yours: when a change makes a line there untrue, report the exact old line and its replacement.

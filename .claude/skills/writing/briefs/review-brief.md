@@ -53,14 +53,15 @@ E<k> (<kind>, <line or position>): "<verbatim text>"
   Severity: must | nit   (a must changes meaning, clarity, or a plan fact; a nit is taste)
   Reason: one line naming the rule, the listed habit, the plan fact, the owner comment, or the reader's stumble.
   Proposed: "<the complete replacement, ready to paste>"   (REVISE; MOVE also says where it goes)
-  Question: "<the one question only the owner can answer>"   (OWNER)
+  Question: "<the one question only the owner can answer, about a fact or a decision, never a name or a wording>"   (OWNER)
 ```
 
 Then, each as a short block:
 
 - Unit verdict: whether it does its plan job, opens on its topic, and closes on a consequence, a pointer, or a hand-off, with each missing plan fact as the text to add and where.
 - Flow: does it follow from the unit above and hand off to the next?
-- Names: every term that differs from the clean units or the glossary, with the settled form.
+- Names: every term that is not the owner's (the prompt, the frozen units, the glossary) or differs from the clean units, with the owner's form.
+  - A term you would rather use goes here, never into a Proposed text.
 - Reader's stumble: the single place a reader would stop, and why.
 - Upstream: anything in a clean unit that this one shows should change, as `<unit id or line>: <issue>: <proposal>`; the orchestrator adjudicates it.
 

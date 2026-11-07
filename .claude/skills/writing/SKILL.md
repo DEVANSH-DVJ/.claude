@@ -1,6 +1,6 @@
 ---
 name: writing
-description: Draft, revise, or review a prose deliverable the owner asks for -- a paper, slide text, a poster, speaker notes, or a doc -- one unit at a time through a review loop of plan, draft, a two-reader voice review, a fidelity check, adjudication, apply, further rounds, and a final whole-piece read. Use when the owner asks to draft or review such a piece, or asks for the loop, a voice review, or a fidelity check; a doc edit that rides along with a code change does not use it.
+description: Draft, revise, or review a prose deliverable the owner asks for -- a paper, slide text, a poster, speaker notes, or a doc -- one unit at a time through a review loop of plan, draft, a two-reader voice review, a fidelity check, adjudication, apply, further rounds, and a final whole-piece read, in the shape the owner confirms first. Use when the owner asks to draft or review such a piece, or asks for the loop, a voice review, or a fidelity check; a doc edit that rides along with a code change does not use it.
 user-invocable: true
 argument-hint: <deliverable path> [paper|slides|poster|notes|docs]
 ---
@@ -13,12 +13,14 @@ Prose in the owner's voice is drafted once from a plan, then reviewed one unit a
 - The house prose rules are in `voice.md`, and the launch texts are in `briefs/`.
 - The owner's prompt or the repo's `project.md` names, when they exist:
   - the project's voice files, exemplars, and glossary
-  - the inline-note form
   - model overrides
   - the script tool
 - Otherwise the loop proceeds without them.
 - It serves a new piece, a redraft the owner asked for, or a revision.
 - A wording fix the owner dictates needs no loop and is applied as given.
+- The full loop is the default shape, not a mandate: before the first round, the session proposes the shape and the owner confirms it.
+- What sets the shape: the piece's state, the urgency, the scope of the review, and which units are frozen.
+- A shape may drop a pass, run one pass alone, or cover the open units only.
 
 ## Vocabulary
 
@@ -26,6 +28,8 @@ Prose in the owner's voice is drafted once from a plan, then reviewed one unit a
 - Unit: the piece of text one round reviews (see the table); its id is `u<NN>-<name>`, assigned in `plan.md`, and distinct from the loop dir `<slug>`.
 - Element: the smallest thing a reviewer gives a verdict on, a sentence, a line, a label, a caption.
 - Witness: the text the unit must stay faithful to; owner-last is the owner's last version before the loop.
+- Frozen: a unit the owner has reviewed and approved, marked in `plan.md`. A prior piece counts as frozen only when the owner names it.
+- Any other draft, an earlier session's included, is unreviewed prose and never stands as the owner's voice.
 - Must or nit: a finding's severity, must for meaning, clarity, or a plan fact, nit for taste.
 - Clean: a unit with no must left; decided: an item the owner has ruled on or a call recorded in `decisions.md`.
 - Upstream: a finding about a clean unit, raised while reviewing a later one.
@@ -92,8 +96,8 @@ Every report is written to `rounds/` the moment its agent finishes, as:
 | `rounds/all-rF-final.md`       | the final read                                                                       |
 
 - `plan.md`: the unit list with ids, each unit's job, the facts it must carry with their `path:line` sources, the glossary; a committed project plan, when one exists, is referenced instead.
-- `owner-comments.md`: the owner's comments verbatim, from the conversation and from the owner's inline notes in the source, filed per unit or under "All".
-  - The inline notes take the form the owner's prompt or `project.md` names.
+- `owner-comments.md`: the owner's comments verbatim, from the conversation, filed per unit or under "All".
+  - A note the owner leaves in the source is not for the loop: never read as a comment, never edited, never removed.
   - A line marked `Decided:` is closed.
 - `witness/<name>.owner-last.<ext>`: the owner's last version before the loop.
   - It comes from the working tree when that differs from HEAD and the owner confirms the edits are theirs, else from `git show HEAD:<path>`.
@@ -128,16 +132,19 @@ Per-unit record; drop a line only when it has nothing to hold:
    - Collect `owner-comments.md`.
    - Save the witnesses before anything changes.
    - Create `decisions.md`.
+   - Before any sentence is drafted, `plan.md` lists the owner's approved text on the subject (the prompt, the frozen units, the prior pieces the owner names) as the voice sample and first source.
    - Settle with the owner any call only the owner can make.
    - End with a current build and render. When the build is long, a build-only applier makes it.
 2. Draft, when the piece is new or rejected.
-   The writer drafts the whole piece from the plan in one pass, builds, renders, and reports the passages it is least sure of.
+   - The writer drafts the whole piece from the plan in one pass, builds, renders, and reports the passages it is least sure of.
+   - A skeleton or outline of headings and placeholder sentences is a draft like any other, and its units get the same voice and fidelity rounds.
 3. Round k: voice pair and fidelity, launched in one message, each with its filled brief and its own report file.
    Fidelity runs whenever the unit's text changed since it last passed, and is skipped otherwise.
 4. Adjudicate in the main session by the rules below, and record every call in `decisions.md`.
 5. Apply.
-   A few lines: exact-string edits in the main session, then a build-only applier.
-   More: the applier, with the exact old and new text of every adopted change; it builds and renders.
+   - A few lines: exact-string edits in the main session, then a build-only applier.
+   - More: the applier, with the exact old and new text of every adopted change; it builds and renders.
+   - No change is reported as in the output until the applier's build has run on it and the output is newer than its sources.
 6. Round k+1, whenever round k changed the text.
    - After musts were applied: the voice pair plus fidelity.
    - After a nits-only apply: fidelity alone.
@@ -151,7 +158,6 @@ Per-unit record; drop a line only when it has nothing to hold:
 
 - An owner comment is applied, not weighed; a proposal that contradicts one is dropped.
 - A decided item is not reopened: a `Decided:` line, a call in `decisions.md`, or a unit the owner edited.
-- The owner's inline notes are never edited, answered inline, or removed.
 - Both readers agree: adopt verbatim.
   They differ: prefer the wording that matches the owner's own earlier text or exemplars, then the shorter.
 - A must raised by one reader is applied unless the other reader explicitly KEEPs the same element; then the orchestrator decides and records why.
@@ -159,6 +165,8 @@ Per-unit record; drop a line only when it has nothing to hold:
 - KEEP against REVISE with a replacement: adopt the replacement only when it fixes a stated must, else KEEP.
 - The owner's earlier wording is a tie-break, not a shield: a restatement is cut whoever wrote it.
 - The owner's exact wording is applied as given, substituting only the value the sources give; it is never expanded with a clause or trimmed of a name.
+- Every term is the owner's, from the prompt, the frozen units, or the glossary.
+  A term a reader proposes is recorded as a finding, never adopted as a rename.
 - Never adopt text that adds a fact no witness or source states; a fidelity NEW that is a textbook gloss the plan asked for may stay.
 - A fidelity WRONG, CHANGED, or MISATTRIBUTED is corrected from its source first, and the voice rewrite goes on top of the corrected text.
 - A DROPPED claim is restored unless the owner dropped it or the plan moves it elsewhere.

@@ -17,6 +17,7 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 - A design is stated with its positive reason, never framed against an alternative nobody raised.
 - A takeaway, the boxed or italic claim that closes an evaluation paragraph, is one claim with its number and its named comparison, never a trailing scope tail.
 - A sentence that waits on a result keeps its placeholder; the prose never admits incompleteness.
+- A plan note never stands as a sentence: no bare fragment ("to measure"), no label for the work ("this paper's proposal"), and no sentence saying what the paragraph will do instead of doing it.
 - Run-in headings are `\textbf{Title Case Noun Phrase.}` of one to four words with a period, prose on the next line, about one per two paragraphs; never one per paragraph, never a question, never a colon.
 
 ## Sentences
@@ -106,6 +107,8 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 
 - The venue's words, never the codebase's: no internal tool, variable, or run vocabulary in prose, and no "decision" as a noun.
 - Each project keeps its glossary where the owner's prompt or `project.md` says, every brief names it, and one thing has one name everywhere, in its settled form.
+- A term whose common meaning differs from the piece's is defined at its first use, and every later use carries that meaning.
 - No absolute ("only", "all", "every", "no one") that the sources do not back, no stress on a point the story does not need, and no loaded or commanding words.
+- A prior system or a named company is contrasted on what it does, never bashed.
 - Do not introduce contractions, article slips, "a.k.a.", "w.r.t.", "as per", or "upto".
 - American spelling, ASCII only, and one sentence per line in `.tex` and `.md`.

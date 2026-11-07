@@ -5,7 +5,8 @@
 - Piece: <what the deliverable is, its audience, and its venue or room>; medium: <paper | slides | poster | notes | docs>.
 - Write paths, and nothing else: <the source files the draft goes into>.
 - Plan and glossary: work/loop/<slug>/plan.md, or <the project's plan file>.
-- Voice files: `.claude/skills/writing/voice.md`, then <the project's voice files the owner's prompt or project.md names | none>; exemplars: <the owner's earlier work to calibrate on>.
+- Voice files: `.claude/skills/writing/voice.md`, then <the project's voice files the owner's prompt or project.md names | none>.
+- Exemplars: <the owner's approved text on the subject: the prompt, the frozen units, the prior pieces the owner names. Never an unreviewed draft or an inferred list>.
 - Witness: work/loop/<slug>/witness/<name>.owner-last.<ext> | none for a new piece.
 - Owner comments: work/loop/<slug>/owner-comments.md.
 - Build and render: <commands, through the project runner, or make on the host for LaTeX>; output: <the built file>; renders: <paths>.
@@ -25,9 +26,13 @@ You draft the whole piece once, in the owner's voice, from the plan; the loop th
 
 - One pass over the whole piece, unit by unit in plan order; do not polish a unit twice.
 - Every fact comes from the plan's sources or the witness; invent nothing, estimate nothing, and leave a placeholder where a value is missing.
-- Every name comes from the glossary, in its settled form.
+- Start from the owner's own sentence wherever the exemplars already say a thing.
+  A plan or a summary supplies facts, never sentences.
+- Every name and term comes from the owner's words (the prompt, the exemplars, the glossary) in its settled form.
+  Coin none.
+- Never leave a note to the owner inside the piece. A question only the owner can settle, about a fact or a decision, goes in the report.
 - Keep the file's own markup: its macros, its escaped specials, one sentence per line, ASCII only.
-- Never edit outside the write paths, never touch an owner's inline note, never run git.
+- Never edit outside the write paths, never touch a note the owner left in the source, never run git.
 
 ## Then
 
