@@ -69,7 +69,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends fontconfig \
 COPY fonts/ /usr/share/fonts/truetype/local/
 RUN fc-cache -f
 
-# ==== slides ====
+# ==== pptx ====
 # LibreOffice Impress and deck python tools for the pptx addon.
 
 # LibreOffice Impress for deck rendering

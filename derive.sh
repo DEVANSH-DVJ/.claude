@@ -2,20 +2,22 @@
 # Copy the template's files for some categories into a repo, or check or sync a derived repo.
 #   derive.sh [--force] <target-dir> [category...]   copy, then print the commit 1 commands
 #   derive.sh --replace <target-dir> [category...]   same, over a clean repo's own template roots
-#   derive.sh --check <target-dir>                   one status line per path; exit 1 on drift
-#   derive.sh --sync <target-dir>                    copy the template's changes since the last sync, then print the commit commands
+#   derive.sh --check <target-dir> [category...]     one status line per path; exit 1 on drift
+#   derive.sh --sync <target-dir> [category...]      copy the template's changes since the last sync, then print the commit commands
 #   derive.sh --slug <name> <target-dir>             set the slug, then print the commit 2 commands
 # Core is always included; implied categories are added. Copies tracked files only.
+# --check and --sync take the named categories, else those the last template commit records.
 # settings.json and docker/Dockerfile lose the parts of categories not taken.
 set -euo pipefail
 
 TEMPLATE="$(cd "$(dirname "$0")" && pwd)"
-CATEGORIES=(core drawio writing slides latex)
+CATEGORIES=(core drawio writing slides-pptx paper-latex slides-latex)
 
-# Categories each category pulls in
+# Categories each category pulls in; shfmt needs dashed keys quoted
 declare -A IMPLIES=(
-  [slides]="drawio writing"
-  [latex]="drawio writing"
+  ["slides-pptx"]="drawio writing"
+  ["paper-latex"]="drawio writing"
+  ["slides-latex"]="paper-latex"
 )
 
 # Template-owned paths, as category:path
@@ -31,6 +33,7 @@ MANIFEST=(
   core:.claude/skills/commit
   core:.claude/skills/delegate
   core:.claude/skills/format
+  core:.claude/skills/plans
   core:.claude/skills/review-diff
   core:.claude/skills/comment-style
   core:format
@@ -48,26 +51,23 @@ MANIFEST=(
   drawio:docker/fonts
   # writing: prose review loop
   writing:.claude/skills/writing
-  # slides: deck skill; keeps the plugin keys in settings.json
-  slides:.claude/skills/pptx-addon
-  # latex: paper and talk builds on the host
-  latex:.claude/skills/latex
+  # slides-pptx: deck skill; keeps the plugin keys in settings.json
+  slides-pptx:.claude/skills/pptx-addon
+  # paper-latex: paper and talk builds on the host
+  paper-latex:.claude/skills/latex
+  # slides-latex: beamer talk decks
+  slides-latex:.claude/skills/beamer
 )
 
-# Category of each Dockerfile block; a block runs from its marker to the next
+# Dockerfile blocks of each category; a block runs from its marker to the next
 declare -A BLOCKS=(
-  [base]=core
-  [drawio]=drawio
-  [slides]=slides
-  [project]=core
+  [core]="base project"
+  [drawio]="drawio"
+  ["slides-pptx"]="pptx"
 )
 
 # Dockerfile marker of the project tail, never compared or synced
 PROJECT_MARKER="# ==== project ===="
-
-# Scratch block of a target's root .gitignore
-SCRATCH_BLOCK='# scratch for sessions and tools
-work/'
 
 die() {
   echo "derive.sh: $*" >&2
@@ -77,19 +77,33 @@ die() {
 usage() {
   cat <<USAGE
 Usage: derive.sh [--force] [--replace] <target-dir> [category...]
-       derive.sh --check <target-dir>
-       derive.sh --sync <target-dir>
+       derive.sh --check <target-dir> [category...]
+       derive.sh --sync <target-dir> [category...]
        derive.sh --slug <name> <target-dir>
-Categories: ${CATEGORIES[*]} (core always; slides and latex imply drawio and writing)
+Categories: ${CATEGORIES[*]} (core always; slides-pptx and paper-latex imply drawio and writing; slides-latex implies paper-latex)
 USAGE
+}
+
+# Print a category and all it pulls in, space-terminated
+implied() {
+  local c
+  printf '%s ' "$1"
+  for c in ${IMPLIES[$1]:-}; do
+    implied "$c"
+  done
+}
+
+# Category is a current one
+known() {
+  [[ " ${CATEGORIES[*]} " == *" $1 "* ]]
 }
 
 # Set SELECTED to core, the given categories, and implied ones, in canonical order
 resolve() {
   local want=" core " c
   for c in "$@"; do
-    [[ " ${CATEGORIES[*]} " == *" $c "* ]] || die "unknown category: $c (one of: ${CATEGORIES[*]})"
-    want+="$c ${IMPLIES[$c]:-} "
+    known "$c" || die "unknown category: $c (one of: ${CATEGORIES[*]})"
+    want+=$(implied "$c")
   done
   SELECTED=()
   for c in "${CATEGORIES[@]}"; do
@@ -99,16 +113,36 @@ resolve() {
   done
 }
 
-# Set SELECTED from the target's skills, core always
-infer() {
-  local e p found=()
-  for e in "${MANIFEST[@]}"; do
-    p=${e#*:}
-    if [[ $p == .claude/skills/* && -e $1/$p ]]; then
-      found+=("${e%%:*}")
-    fi
-  done
-  resolve "${found[@]}"
+# SELECTED as the list a template commit records
+category_list() {
+  local s
+  s=$(printf '%s, ' "${SELECTED[@]}")
+  printf '%s' "${s%, }"
+}
+
+# Set LAST to the target's last template commit subject, matched on subjects alone; empty if none
+read_last() {
+  LAST=$(git -C "$1" log --format=%s | awk '/^template: (import|sync) .*@[0-9a-f]+$/ && !n++')
+}
+
+# Set RECORDED to the list LAST records, SELECTED from the named categories or it; die if none
+select_categories() {
+  local target=$1 re='^template: (import|sync) (.+) from [^ ]+$' c recorded=()
+  local fix="name them: derive.sh --$MODE $target <category>..."
+  shift
+  RECORDED=
+  if [[ $LAST =~ $re ]]; then
+    RECORDED=${BASH_REMATCH[2]}
+  fi
+  if [ $# -eq 0 ] && [ -n "$RECORDED" ]; then
+    read -r -a recorded <<<"${RECORDED//,/ }"
+    for c in "${recorded[@]}"; do
+      known "$c" || die "the last template commit of $target records unknown category $c; $fix"
+    done
+    set -- "${recorded[@]}"
+  fi
+  [ $# -gt 0 ] || die "the categories of $target are not recorded; $fix"
+  resolve "$@"
 }
 
 # Category of an entry is selected
@@ -135,8 +169,9 @@ tracked() {
 
 # Copies must equal HEAD, which the commit message names
 template_clean() {
-  [ -z "$(git -C "$TEMPLATE" status --porcelain --untracked-files=no -- "${PATHS[@]}")" ] ||
-    die "template has uncommitted changes under the selected paths; commit them first"
+  local dirty
+  dirty=$(git -C "$TEMPLATE" status --porcelain --untracked-files=no -- "${PATHS[@]}")
+  [ -z "$dirty" ] || die "template has uncommitted changes under the selected paths; commit them first"
 }
 
 # Set ROOTS to the top-level paths of PATHS; die on target changes there
@@ -155,13 +190,17 @@ read_slug() {
   fi
 }
 
-# Set BASE to the template commit the target last took; empty means a full sync
+# Set BASE to the template commit LAST names; empty means a full sync
 read_base() {
-  BASE=$(git -C "$1" log -1 --format=%s -E --grep='^template: (import|sync) .*@[0-9a-f]+$')
-  BASE=${BASE##*@}
+  local kind
+  BASE=${LAST##*@}
   if [ -z "$BASE" ]; then
     echo "full sync: $1 records no template commit"
-  elif ! git -C "$TEMPLATE" cat-file -e "$BASE^{commit}" 2>/dev/null; then
+    return
+  fi
+  # a commit the clone lacks prints missing, a git failure dies
+  kind=$(git -C "$TEMPLATE" cat-file --batch-check='%(objecttype)' <<<"$BASE^{commit}")
+  if [[ $kind != commit ]]; then
     echo "full sync: template commit $BASE is not in $TEMPLATE"
     BASE=
   fi
@@ -175,6 +214,7 @@ template_diff() {
   while IFS= read -r -d '' st && IFS= read -r -d '' f; do
     CHANGED[$f]=$st
   done < <(git -C "$TEMPLATE" diff --name-status --no-renames -z "$BASE" HEAD -- "${PATHS[@]}")
+  wait $! || die "git diff of $BASE failed in $TEMPLATE"
 }
 
 # Print the add and commit commands for a message and paths
@@ -185,15 +225,20 @@ print_commit() {
   echo "git commit -m '$msg' -- $*"
 }
 
+# Print the empty commit command for a message, limited to paths
+print_empty_commit() {
+  local msg=$1
+  shift
+  echo "git commit --allow-empty -m '$msg' -- $*"
+}
+
 # Print the Dockerfile without the blocks of categories not SELECTED
 dockerfile_blocks() {
-  local b keep=" "
-  for b in "${!BLOCKS[@]}"; do
-    if picked "${BLOCKS[$b]}"; then
-      keep+="$b "
-    fi
+  local c keep=" "
+  for c in "${SELECTED[@]}"; do
+    keep+="${BLOCKS[$c]:-} "
   done
-  awk -v keep="$keep" -v all=" ${!BLOCKS[*]} " 'BEGIN { on = 1 }
+  awk -v keep="$keep" -v all=" ${BLOCKS[*]} " 'BEGIN { on = 1 }
     /^# ==== [a-z]+ ====$/ {
       if (!index(all, " " $3 " ")) { print "derive.sh: no category for Dockerfile block " $3 > "/dev/stderr"; exit 1 }
       on = index(keep, " " $3 " ") > 0
@@ -206,9 +251,9 @@ shared() {
   sed "/^$PROJECT_MARKER\$/,\$d"
 }
 
-# Print a path's template content; without slides, settings.json loses the plugin keys
+# Print a path's template content; without slides-pptx, settings.json loses the plugin keys
 expected() {
-  if [[ $1 == .claude/settings.json && " ${SELECTED[*]} " != *" slides "* ]]; then
+  if [[ $1 == .claude/settings.json && " ${SELECTED[*]} " != *" slides-pptx "* ]]; then
     python3 -c 'import json, sys; d = json.load(open(sys.argv[1])); del d["extraKnownMarketplaces"], d["enabledPlugins"]; json.dump(d, sys.stdout, indent=2); print()' "$TEMPLATE/$1"
   elif [[ $1 == docker/Dockerfile ]]; then
     dockerfile_blocks
@@ -266,17 +311,25 @@ slug_script() {
 
 # Target file differs from the template's at BASE, the slug filled in
 local_change() {
-  local f=$2
+  local f=$2 old
   if owned "$f" || [[ $f == CLAUDE.md || $f == docker/Dockerfile || $f == .claude/settings.json ]]; then
     return 1
   fi
   [ -e "$1/$f" ] || return 1
-  git -C "$TEMPLATE" cat-file -e "$BASE:$f" 2>/dev/null || return 0
-  if slug_script "$f" && [ -n "$SLUG" ]; then
-    ! cmp -s <(git -C "$TEMPLATE" show "$BASE:$f" | sed "s/myproject/$SLUG/g") "$1/$f"
+  # a file added since BASE is a local one
+  [[ ${CHANGED[$f]} != A ]] || return 0
+  if slug_script "$f"; then
+    old=$(git -C "$TEMPLATE" show "$BASE:$f" | sed "s/myproject/$SLUG/g" | git hash-object --stdin)
   else
-    ! cmp -s <(git -C "$TEMPLATE" show "$BASE:$f") "$1/$f"
-  fi
+    old=$(git -C "$TEMPLATE" show "$BASE:$f" | git hash-object --stdin)
+  fi || die "cannot read $f at template commit $BASE"
+  [ "$old" != "$(git hash-object --stdin <"$1/$f")" ]
+}
+
+# Die unless a target Dockerfile has the project marker
+marked() {
+  grep -qxF "$PROJECT_MARKER" "$1" ||
+    die "no '$PROJECT_MARKER' line in $1; add it above the project's own lines first"
 }
 
 # Rewrite the target's shared Dockerfile blocks, its project tail byte for byte
@@ -290,7 +343,8 @@ sync_dockerfile() {
 # Target file matches where compared; the Dockerfile's project tail never is
 matches() {
   if [[ $2 == docker/Dockerfile ]]; then
-    grep -qxF "$PROJECT_MARKER" "$1/$2" && cmp -s <(expected "$2" | shared) <(shared <"$1/$2")
+    marked "$1/$2"
+    cmp -s <(expected "$2" | shared) <(shared <"$1/$2")
   else
     same "$1" "$2"
   fi
@@ -338,27 +392,21 @@ hook_check() {
   fi
 }
 
-# Set APPENDED unless the target's root .gitignore ignores work/; die when it is dirty
-scratch_due() {
-  local src
-  APPENDED=()
-  src=$(git -C "$1" check-ignore -v work/x) || true
-  [[ $src != .gitignore:* ]] || return 0
-  [ -z "$(git -C "$1" status --porcelain -- .gitignore)" ] ||
-    die "target has uncommitted changes in .gitignore; commit or stash them first"
-  APPENDED=(.gitignore)
-}
-
-# Append the scratch block to the target's root .gitignore when APPENDED is set
-ignore_scratch() {
-  local file=$1/.gitignore
-  [ "${#APPENDED[@]}" -gt 0 ] || return 0
-  if [ -s "$file" ]; then
-    # end the last line, then one blank line
-    [ -z "$(tail -c 1 "$file")" ] || echo >>"$file"
-    [ -z "$(tail -n 1 "$file")" ] || echo >>"$file"
+# Add work/ to the target's .git/info/exclude unless already ignored; set EXCLUDED
+exclude_scratch() {
+  local file
+  EXCLUDED=0
+  if git -C "$1" check-ignore -q work/x; then
+    return 0
   fi
-  printf '%s\n' "$SCRATCH_BLOCK" >>"$file"
+  file=$(git -C "$1" rev-parse --path-format=absolute --git-path info/exclude)
+  mkdir -p "$(dirname "$file")"
+  # end the last line first
+  if [ -s "$file" ] && [ -n "$(tail -c 1 "$file")" ]; then
+    echo >>"$file"
+  fi
+  echo 'work/' >>"$file"
+  EXCLUDED=1
 }
 
 # Copy the selected categories, then print the commit 1 commands
@@ -372,7 +420,6 @@ derive() {
     files+=("${FILES[@]}")
   done
   template_clean
-  scratch_due "$target"
 
   # replace: drop the target's tracked files under the roots
   if [ "$REPLACE" -eq 1 ]; then
@@ -391,7 +438,7 @@ derive() {
     die "${#conflicts[@]} existing file(s) differ from the template; rerun with --force to overwrite"
   fi
 
-  ignore_scratch "$target"
+  exclude_scratch "$target"
   (cd "$TEMPLATE" && rsync -a --relative "${files[@]}" "$target/")
   expected .claude/settings.json >"$target/.claude/settings.json"
   expected docker/Dockerfile >"$target/docker/Dockerfile"
@@ -402,32 +449,33 @@ derive() {
     PATHS=("${ROOTS[@]}")
   fi
   sha=$(git -C "$TEMPLATE" rev-parse --short HEAD)
-  cats=$(printf '%s, ' "${SELECTED[@]}")
-  cats=${cats%, }
-  if [ "${#APPENDED[@]}" -gt 0 ]; then
-    echo "append .gitignore"
+  cats=$(category_list)
+  if [ "$EXCLUDED" -eq 1 ]; then
+    echo "exclude work/"
   fi
   echo "copied ${#files[@]} files ($cats) into $target"
   echo "commit 1, run from $target:"
-  print_commit "template: import $cats from devansh-dvj/.claude@$sha" "${PATHS[@]}" "${APPENDED[@]}"
+  print_commit "template: import $cats from devansh-dvj/.claude@$sha" "${PATHS[@]}"
 }
 
 # Copy the template's changes since BASE into a derived target; every path without a BASE
 sync_target() {
-  local target=$1 e p f sha merged files=() gone=() line n=0
+  local target=$1 e p f sha cats msg merged files=() gone=() line n=0
   local -A drift=()
-  infer "$target"
+  shift
+  read_last "$target"
+  select_categories "$target" "$@"
   read_slug "$target"
+  [[ -n $SLUG && $SLUG != myproject ]] ||
+    die "no slug in $target/docker/build.sh: want IMAGE_NAME=\"<slug>:...\" with the placeholder filled"
   select_paths
   template_clean
   target_clean "$target"
-  scratch_due "$target"
   # the Dockerfile merge needs the project marker
   if [ -e "$target/docker/Dockerfile" ]; then
-    grep -qxF "$PROJECT_MARKER" "$target/docker/Dockerfile" ||
-      die "no '$PROJECT_MARKER' line in $target/docker/Dockerfile; add it above the project's own lines first"
+    marked "$target/docker/Dockerfile"
   fi
-  ignore_scratch "$target"
+  exclude_scratch "$target"
   read_base "$target"
   template_diff
 
@@ -484,7 +532,7 @@ sync_target() {
   fi
   # the slug goes into the copied docker scripts
   for f in "${files[@]}"; do
-    if [ -n "$SLUG" ] && slug_script "$f"; then
+    if slug_script "$f"; then
       sed -i "s/myproject/$SLUG/g" "$target/$f"
     fi
   done
@@ -492,7 +540,7 @@ sync_target() {
   # index back to HEAD; every change under the roots is the sync's own
   git -C "$target" reset -q -- "${ROOTS[@]}"
   echo "categories: ${SELECTED[*]}"
-  echo "slug: ${SLUG:-unknown}"
+  echo "slug: $SLUG"
   if [ "${#gone[@]}" -gt 0 ]; then
     printf 'remove %s\n' "${gone[@]}"
   fi
@@ -514,25 +562,36 @@ sync_target() {
       echo "copy   $f"
     fi
   done < <(git -C "$target" status --porcelain -z --untracked-files=all -- "${ROOTS[@]}")
-  if [ "${#APPENDED[@]}" -gt 0 ]; then
-    n=$((n + 1))
-    echo "append .gitignore"
+  wait $! || die "git status failed in $target"
+  if [ "$EXCLUDED" -eq 1 ]; then
+    echo "exclude work/"
   fi
-  if [ "$n" -eq 0 ]; then
+  # up to date unless named categories differ from the recorded ones
+  cats=$(category_list)
+  if [ "$n" -eq 0 ] && { [ $# -eq 0 ] || [[ $cats == "$RECORDED" ]]; }; then
     echo "$target is up to date with the template"
     return
   fi
   hook_check "$target"
   sha=$(git -C "$TEMPLATE" rev-parse --short HEAD)
+  msg="template: sync $cats from devansh-dvj/.claude@$sha"
+  # nothing to copy: an empty commit records the categories
+  if [ "$n" -eq 0 ]; then
+    echo "nothing to copy into $target; the commit records its categories"
+    echo "commit, run from $target:"
+    print_empty_commit "$msg" "${ROOTS[@]}"
+    return
+  fi
   echo "synced $n changed file(s) into $target"
   echo "commit, run from $target:"
-  print_commit "template: sync from devansh-dvj/.claude@$sha" "${ROOTS[@]}" "${APPENDED[@]}"
+  print_commit "$msg" "${ROOTS[@]}"
 }
 
 # Put the slug into the target's docker scripts, then print the commit 2 commands
 fill_slug() {
   local target=$1 name=$2
   [[ $name =~ ^[a-z0-9][a-z0-9._-]*$ ]] || die "slug must be lowercase letters, digits, dots, dashes, underscores: $name"
+  grep -q myproject "$target"/docker/*.sh || die "no myproject placeholder left to replace in $target/docker/*.sh"
   sed -i "s/myproject/$name/g" "$target"/docker/*.sh
   echo "set the slug $name in $target/docker/*.sh"
   echo "commit 2, run from $target once .claude/project.md and the CLAUDE.md heading and description line are filled:"
@@ -542,9 +601,14 @@ fill_slug() {
 # Print a status line per template-owned path in the target; return 1 on drift
 check() {
   local target=$1 e p drift=0
-  infer "$target"
+  shift
+  read_last "$target"
+  select_categories "$target" "$@"
   read_slug "$target"
   select_paths
+  # a template the comparisons cannot read dies here, not as differs
+  expected .claude/settings.json >/dev/null
+  expected docker/Dockerfile >/dev/null
   echo "categories: ${SELECTED[*]}"
   echo "slug: ${SLUG:-unknown}"
 
@@ -576,13 +640,14 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --force) FORCE=1 ;;
     --replace) REPLACE=1 ;;
-    --check) MODE=check ;;
-    --sync) MODE=sync ;;
-    --slug)
-      [ -n "${2:-}" ] || die "--slug takes a name"
-      MODE=slug
-      NAME=$2
-      shift
+    --check | --sync | --slug)
+      [ "$MODE" = derive ] || die "one mode flag at most, got --$MODE and $1"
+      MODE=${1#--}
+      if [ "$MODE" = slug ]; then
+        [ -n "${2:-}" ] || die "--slug takes a name"
+        NAME=$2
+        shift
+      fi
       ;;
     -h | --help)
       usage
@@ -593,17 +658,18 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+[ "$MODE" = derive ] || [ $((FORCE + REPLACE)) -eq 0 ] || die "--force and --replace go with an import only, not --$MODE"
 [ "${#ARGS[@]}" -ge 1 ] || {
   usage >&2
   exit 1
 }
 [ -d "${ARGS[0]}" ] || die "no such directory: ${ARGS[0]}"
 TARGET=$(cd "${ARGS[0]}" && pwd)
-[ "$MODE" = derive ] || [ "${#ARGS[@]}" -eq 1 ] || die "--$MODE takes one target dir"
+[ "$MODE" != slug ] || [ "${#ARGS[@]}" -eq 1 ] || die "--slug takes one target dir"
 
 case $MODE in
-  check) check "$TARGET" ;;
-  sync) sync_target "$TARGET" ;;
+  check) check "$TARGET" "${ARGS[@]:1}" ;;
+  sync) sync_target "$TARGET" "${ARGS[@]:1}" ;;
   slug) fill_slug "$TARGET" "$NAME" ;;
   derive) derive "$TARGET" "${ARGS[@]:1}" ;;
 esac
