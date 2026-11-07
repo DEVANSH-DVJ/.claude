@@ -60,7 +60,8 @@ Prose and text-file conventions: sentences in any doc, markdown and LaTeX layout
 
 - In markdown, GitHub joins consecutive lines into one paragraph. A line is its own block only as a bullet, a table row, a heading, a fenced line, or with a blank line on each side.
 - One sentence per line in markdown (README and docs) and LaTeX (`.tex`). A line break ends a sentence, never wraps one for width.
-- In markdown, a paragraph or a list item stays under 240 characters, about two rendered lines.
+- In markdown, a paragraph or a list item is best under 200 characters, about two rendered lines. A big blob is rare.
+- A paragraph is a few consecutive lines that GitHub joins into one. It is rare and the owner's call: one that a session wrote is turned into bullets.
 - A paragraph is only for the opening of a doc or a section: what the thing is and why it exists. A reader who skips it loses no fact they need to act on.
 - Everything a reader acts on is a bullet, a table row, or a fenced command: what a script does, a flag, an image, a machine, a step, a rule, a knob.
 - A bullet carries one fact in one or two sentences. A second fact is a second bullet, and a sub-detail is a nested bullet, one level deep.
@@ -73,10 +74,10 @@ Prose and text-file conventions: sentences in any doc, markdown and LaTeX layout
 - A sentence carries one idea in about 20 words, 30 at most. A chain of `and`, `which`, `whose`, or `so that` clauses is split into sentences.
 - Prose that leaves the repo as prose, such as a rebuttal, a report body, or speaker notes, keeps its paragraphs. `project.md` names such files.
 - Metadata lines (conference, deadline, status) are one table, never one line per paragraph.
-- Check: `.claude/skills/review-diff/mdcheck.py` lists every paragraph or list item over the limit, and `/review-diff` runs it on the changed markdown.
+- `.claude/skills/review-diff/mdcheck.py` lists every paragraph or list item over 200 characters as a lead for `/review-diff`, not a failure.
 - ASCII only in every text file: code, markdown, configs, and commit messages.
   - No em or en dashes, arrows, curly quotes, bullets, check marks, emoji, or other non-ASCII glyphs.
   - Write `--`, `->`, straight quotes, `...`, and words instead.
   - Binary assets and the third-party trees `project.md` names are the only exceptions.
-- Check with `git ls-files | xargs grep -nP '[^\x00-\x7F]'`. The output must be empty.
+- Check with `git ls-files | xargs grep -nIP '[^\x00-\x7F]'`. The output must be empty.
 - Every text file ends with a newline.
