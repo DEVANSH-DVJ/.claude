@@ -1,6 +1,7 @@
 ---
 name: drawio
 description: Always use when user asks to create, generate, draw, or design a diagram, flowchart, architecture diagram, ER diagram, sequence diagram, class diagram, network diagram, mockup, wireframe, or UI sketch, or mentions draw.io, drawio, drawoi, .drawio files, or diagram export to PNG/SVG/PDF.
+user-invocable: true
 ---
 
 Copied from github.com/jgraph/drawio-mcp (plugins/claude-code), Apache-2.0; license text in LICENSE next to this file.

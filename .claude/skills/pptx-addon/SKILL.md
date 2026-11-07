@@ -1,6 +1,7 @@
 ---
 name: pptx-addon
 description: Edit slide decks (.pptx) a few slides at a time -- render to PNG, map slide numbers to XML parts, unpack, edit, pack, prove the untouched slides unchanged, re-render. Use for any task that reads, edits, or reviews a .pptx. Building a deck from HTML or filling a template belongs to the pptx skill of the document-skills plugin.
+user-invocable: true
 ---
 
 # Deck editing loop
@@ -22,7 +23,7 @@ Every command runs through the project runner from the repo root:
 
 - Scripts live at `.claude/skills/pptx-addon/scripts/`. Paths in this file are repo-relative.
 - Trust only container renders. A host without the image's fonts wraps text differently.
-- Scratch (unpacked XML, text dumps) goes in `work/`, renders in `render/`. Keep both gitignored.
+- Scratch (unpacked XML, text dumps) goes in `work/`, renders in `render/`. Keep both ignored through `.git/info/exclude`.
 
 Slide numbers are 1-based like PowerPoint.
 `ppt/slides/slideN.xml` numbering is file identity, not deck order; `slidemap.py` gives the order-to-part mapping.

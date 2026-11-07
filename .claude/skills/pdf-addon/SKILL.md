@@ -1,6 +1,7 @@
 ---
 name: pdf-addon
 description: Review PDFs visually and between versions -- render pages to PNG with a contact sheet, dump text, and diff two PDFs page by page by text and pixels. Use when a PDF (a built paper, a deck export, a report) must be checked by eye or compared with its previous version. Extraction, creation, merging, forms, and OCR belong to the pdf skill of the document-skills plugin.
+user-invocable: true
 ---
 
 # PDF review loop
@@ -19,7 +20,7 @@ Every command runs through the project runner from the repo root:
 ```
 
 Scripts live at `.claude/skills/pdf-addon/scripts/`; paths in this file are repo-relative.
-Renders go in `render/`, scratch in `work/`; keep both gitignored.
+Renders go in `render/`, scratch in `work/`; keep both ignored through `.git/info/exclude`.
 Pages are 1-based.
 
 ## The loop
