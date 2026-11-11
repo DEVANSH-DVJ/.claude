@@ -38,9 +38,9 @@ The standing rules are in `session.md`, and this skill holds the plan format and
   Its last bullet is the fixed closing bullet.
 - `## Shared files`, optional: one line naming the shared files the session may edit without asking.
 - `## Non-goals`, optional: what the session does not do, one bullet each.
-- `## Hints`, optional: at most five bullets under the fixed caveat, each pointing to one of these:
-  - a reference tree or a doc
-  - a decision, a trap, or a measurement in `PLAN.md`
+- `## Hints`, optional: at most ten bullets under the fixed caveat, each stating one of these in full:
+  - what a committed file or a reference tree shows, naming it
+  - a decision in force, a trap, or a measured figure with its setting
 
 ## What a plan says
 
@@ -50,6 +50,8 @@ The standing rules are in `session.md`, and this skill holds the plan format and
   - a function, a field, an env var, a CLI flag, or a command
   - an agent model or role
   - a file outside a Hints bullet and the Shared files line
+- A plan file is committed, so it names no uncommitted file: nothing under `work/`, and `PLAN.md` only in the fixed preamble.
+- A hint restates a decision, a trap, or a figure in the plan, and never cites it by its number in `PLAN.md`.
 - A plan has no questions section: launching a session is the owner's go-ahead for everything its plan names.
 - The session still asks first about anything the shared rules or `project.md` say to ask about and its plan does not name.
 
