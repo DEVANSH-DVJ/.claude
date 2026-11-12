@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 """
-PreToolUse hook: block edits to template-owned files.
-Protected: .claude/, docker/, format/, every .gitignore, every LICENSE file.
-Open: .claude/project.md, .claude/settings.local.json, docker/Dockerfile, docker/environment.yml,
-and everything under work/.
-Unlock: a .claude/.unlock file, created by hand, never by an agent.
-Bash: analysis.py finds the paths a command would write; a protected one blocks it.
-A target known only at run time counts every protected path the command names.
-Reads the hook JSON on stdin; exit 2 blocks the call.
+PreToolUse hook: block writes to template-owned .claude/, docker/, format/, .gitignore, LICENSE.
+Open: work/, .claude/{project.md,settings.local.json}, docker/{Dockerfile,environment.yml}.
+Bash: analysis.py finds the paths a command writes; inline code that names one counts as a write.
+Unlock: a hand-made .claude/.unlock. Reads the hook JSON on stdin; exit 2 blocks the call.
 """
 
 import json
@@ -35,21 +31,16 @@ PATH_TOOLS = {
     'MultiEdit': 'file_path',
     'NotebookEdit': 'notebook_path',
 }
-# names that mark a protected path in command text
-NAMES = r'\.claude/|docker/|format/|\.gitignore|LICENSE'
 # path-like runs that name a protected path; LICENSE takes only a . or - suffix
 TOKEN = r'[\w./~${}*?-]*(?:\.claude/|docker/|format/|\.gitignore|LICENSE(?!\w))[\w./*?\[\]-]*'
 
 
 def protected(path):
     """Repo-relative path if path is template-owned, else None."""
-    p = Path(path.strip('"\'`(<[{').rstrip('"\'`;:,.)]}>'))
-    if not p.is_absolute():
-        p = ROOT / p
-    try:
-        rel = Path(os.path.realpath(p)).relative_to(ROOT).as_posix()
-    except ValueError:
+    p = Path(os.path.realpath(ROOT / path.strip('"\'`(<[{').rstrip('"\'`;:,.)]}>')))
+    if not p.is_relative_to(ROOT):
         return None
+    rel = p.relative_to(ROOT).as_posix()
     name = rel.rsplit('/', 1)[-1]
     if rel in OPEN or rel.startswith('work/'):
         return None
@@ -58,25 +49,28 @@ def protected(path):
     return None
 
 
+def among(test, paths):
+    """The paths a test picks, joined for a message."""
+    return ', '.join(sorted({r for r in map(test, map(str, paths)) if r}))
+
+
 if __name__ == '__main__':
     if UNLOCK.exists():
         sys.exit(0)
     hook = json.load(sys.stdin)
-    tool = hook.get('tool_name', '')
-    args = hook.get('tool_input', {})
-    hits = []
-    if tool in PATH_TOOLS:
-        rel = protected(args.get(PATH_TOOLS[tool], ''))
-        hits = [rel] if rel else []
-    elif tool == 'Bash':
+    tool, args = hook.get('tool_name', ''), hook.get('tool_input', {})
+    found = [args.get(PATH_TOOLS[tool], '')] if tool in PATH_TOOLS else []
+    if tool == 'Bash':
         cwd = Path(hook.get('cwd') or ROOT)
-        found = analysis.targets(args.get('command', ''), cwd, ROOT, TOKEN, NAMES)
-        hits = sorted({r for r in map(protected, {str(f) for f in found}) if r})
-    if hits:
-        print(
-            f'blocked: {", ".join(hits)} is template-owned. Shared rule files, skills, docker, format, .gitignore and LICENSE files '
-            'change only in the template repo (github.com/devansh-dvj/.claude) and arrive here by sync. '
-            'Ask the user; only they may create .claude/.unlock.',
-            file=sys.stderr,
+        found = analysis.targets(args.get('command', ''), cwd, ROOT, TOKEN)
+        if code := among(protected, analysis.CODE):
+            analysis.block(
+                f'{code} is guarded, and inline code that names it counts as a write; '
+                'read it with cat instead.'
+            )
+    if hits := among(protected, found):
+        analysis.block(
+            f'{hits} is template-owned. Shared rule files, skills, docker, format, .gitignore and '
+            'LICENSE files change only in the template repo (github.com/devansh-dvj/.claude) and '
+            'arrive here by sync. Ask the user; only they may create .claude/.unlock.'
         )
-        sys.exit(2)

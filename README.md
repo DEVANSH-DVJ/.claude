@@ -61,6 +61,9 @@ The exact paths and Dockerfile blocks per category are the `MANIFEST` and `BLOCK
 - Blocked: any edit under `.claude/`, `docker/`, or `format/`, and to any `.gitignore` or `LICENSE`.
 - Open: `.claude/project.md`, `.claude/settings.local.json`, `docker/Dockerfile`, `docker/environment.yml`, and anything under `work/`.
 - A shell command is blocked only when what it writes, moves, or deletes is a blocked path; reading one or running its script is not.
+- Inline code, such as `python3 -c`, that names a blocked path counts as a write.
+- A write whose target is known only at run time is blocked, unless it starts inside the repo.
+- A command the hook cannot read, such as one with an unclosed quote, is blocked.
 - A hand-made, gitignored `.claude/.unlock` file lifts the block for the edit at hand: the owner creates it, and the session deletes it as soon as that edit is done.
 - `.claude/skills/review-diff/mdcheck.py` lists every markdown paragraph or list item over 200 characters as a lead for `/review-diff`, not a failure.
 

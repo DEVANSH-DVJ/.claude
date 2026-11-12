@@ -2,7 +2,7 @@
 """
 Run the protect.py hook against the case table beside this file and report mismatches.
 The hook and its analysis.py go to a scratch root, so ROOT is that root and no unlock file applies.
-The root holds docker/ and work/, beside a sibling repo and a home directory for the cd cases.
+The root holds docker/ and work/, beside a home directory for the ~ cases.
 Case line: expect<TAB>command[<TAB>cwd]; \\n, \\\\, @ROOT@, @TILDE@ and "@Tool path" expand.
 Usage: python3 test/hook/run_cases.py [hook]
 Without an argument the hook is .claude/hooks/protect.py of this repo.
@@ -30,9 +30,8 @@ if __name__ == '__main__':
         home = root.parent / 'home'
         tilde = '~/' + os.path.relpath(root, home)
         copy = root / '.claude' / 'hooks' / 'protect.py'
-        # directories the cd cases move into
-        away = (root.parent / 'other-repo', home / 'PROJECTS' / 'other-repo')
-        for made in (copy.parent, root / 'docker', root / 'work', *away):
+        # directories the hook and the cd cases need
+        for made in (copy.parent, root / 'docker', root / 'work', home):
             made.mkdir(parents=True)
         shutil.copy(hook, copy)
         # the analysis module beside the hook goes along

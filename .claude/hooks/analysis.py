@@ -1,33 +1,21 @@
 """
-Analyses a Bash command for the protect.py hook and returns the paths the command would write.
-The caller passes the repo root and the patterns of protected names, and decides what is protected.
+Analyses a Bash command for the protect.py hook: the paths it would write.
+The caller passes the repo root and the pattern of guarded path runs, and decides what is guarded.
+It also records the paths its inline code names.
+A command it cannot read, or a write target known only at run time, blocks outright.
 """
 
 import math
 import os
 import re
+import sys
 from itertools import dropwhile, pairwise, product, takewhile
 from pathlib import Path
 
-# repo root and the patterns of protected names, set per command
-ROOT = TOKEN_RE = SPAN_RE = NAMES_RE = None
+# repo root and the pattern of guarded path runs, set per command
+ROOT = TOKEN_RE = SPAN_RE = None
 # the path the project runner mounts the root at
 MOUNT_RE = re.compile(r'(?<![\w./~$}-])/workspace(?![\w.-])')
-# a verb counts as a command only at a command position
-CMD = r'(?:^|[;&|(\n][^\S\n]*|\bsudo\s+|\bxargs\s+(?:-\S+\s+)*)'
-# commands that write: in-place edits, file ops, one-liners, git reverts
-WRITERS = CMD + (
-    r'(?:'
-    r'(?:tee|mv|cp|rm|ln|install|rsync|truncate|chmod|chown|touch|mkdir|dd|patch)\b'
-    r'|sed\s+(?:-\S*i|--in-place)'
-    r'|perl\s+-\S*i'
-    r'|python[0-9.]*\s+(?:-\s*<<|<<|-c\b)'
-    r'|(?:perl|ruby|node)\s+-e\b'
-    r'|git\s+(?:checkout|restore|rm|mv|stash|clean|apply)\b'
-    r')'
-)
-# a quoted word of inline code
-LITERAL_RE = re.compile(r"(?<=['\"])[\w.-]+(?=['\"])")
 
 # shell text: plain word text, blanks, operators with the longest first
 LEX_RE = re.compile(
@@ -47,10 +35,13 @@ SKIP = {'if', 'then', 'else', 'elif', 'do', 'while', 'until', '!', '{'}
 # wrappers ahead of the verb, with their options that take a value
 WRAPS = {'sudo': '-[ug]', 'env': '-u', 'timeout': '-s', 'stdbuf': '-[ioe]', 'exec': '-a'}
 WRAPS |= dict.fromkeys(['nice', 'time', 'nohup', 'setsid', 'command', 'busybox'], '')
-# words, command words and work units of the command being scanned
-WORDS, CMDS, WORK = [], set(), []
+# paths inline code names; work units
+CODE, WORK = [], []
 # verbs that write every operand
-ALL_ARGS = {'rm', 'tee', 'truncate', 'touch', 'mkdir', 'patch'}
+ALL_ARGS = {'rm', 'rmdir', 'unlink', 'tee', 'truncate', 'touch', 'mkdir', 'patch'}
+# verbs that write the value of an output flag
+OUTPUTS = dict.fromkeys(['curl', 'sort', 'gcc', 'cc'], '-o|--output')
+OUTPUTS |= {'wget': '-[OP]|--output-document|--directory-prefix', 'unzip': '-d'}
 # verbs that copy sources onto a destination
 COPIES = {'cp', 'mv', 'ln', 'install', 'rsync'}
 GIT_WRITES = {'checkout', 'restore', 'rm', 'mv', 'stash', 'clean', 'apply'}
@@ -59,7 +50,7 @@ VERBS = ALL_ARGS | COPIES | SHELLS | {'chmod', 'chown', 'dd', 'sed', 'perl', 'ru
 
 
 def tokens(text):
-    """Path-like runs of a text that name a protected path."""
+    """Path-like runs of a text that name a guarded path."""
     return [t for m in SPAN_RE.finditer(text) for t in TOKEN_RE.findall(m[0])]
 
 
@@ -68,10 +59,16 @@ def base(word):
     return word.rsplit('/', 1)[-1]
 
 
+def block(why):
+    """Block the tool call: print the reason and exit 2."""
+    print(f'blocked: {why}', file=sys.stderr)
+    sys.exit(2)
+
+
 def spend(deep=0, units=1):
     """Count units of work; nesting or work past the bound raises."""
     if deep > 20 or len(WORK) + units > 50000:
-        raise RecursionError('bound')
+        raise RecursionError('nested or long past the bound')
     WORK.extend([deep] * units)
 
 
@@ -87,7 +84,8 @@ def at(cwd, paths):
     """Paths resolved against a directory, which $PWD names, with brace lists expanded."""
     paths = [b for p in paths for b in braces(p)]
     paths = [re.sub(r'\$PWD\b|\$\{PWD\}', lambda m: str(cwd), p) for p in paths]
-    return [cwd / os.path.expanduser(p) for p in paths]
+    # a leading expansion may hold any path, so it starts at /
+    return [cwd / os.path.expanduser(re.sub(r'^\$', '/$', p)) for p in paths]
 
 
 def isdir(cwd, path):
@@ -214,7 +212,7 @@ def writes(argv, cwd, deep=0, texts=(), pipe=()):
     verb = base(argv[0])
     # --flag=value splits into flag and value
     args = [p for a in argv[1:] for p in (a.split('=', 1) if a.startswith('--') else [a])]
-    pos, hits, tg, subs, code = plain(args), [], [], [], []
+    pos, hits, tg, subs = plain(args), [], [], []
     if verb in ('chmod', 'chown'):
         # the mode or owner leads the operands, or a reference file does
         tg = [a for a in args if not re.fullmatch(r'-[cfvRhHLP]+|--[\w-]+', a)][1:]
@@ -236,6 +234,19 @@ def writes(argv, cwd, deep=0, texts=(), pipe=()):
         tg = tg + srcs * (verb == 'mv')
     elif verb == 'dd':
         tg = [a[3:] for a in args if a.startswith('of=')]
+    elif verb in OUTPUTS:
+        # unzip extracts into the cwd without -d
+        tg = after(args, OUTPUTS[verb]) or ['.'] * (verb == 'unzip')
+    elif verb == 'zip':
+        # the archive leads the operands
+        tg = pos[:1]
+    elif verb == 'tar':
+        # create writes the -f archive; extract writes into -C, else the cwd
+        short = ''.join(a for a in args if re.fullmatch(r'-\w+', a))
+        if 'c' in short or '--create' in args:
+            tg = after(args, r'-\w*f|--file')
+        elif 'x' in short or '--extract' in args:
+            tg = after(args, '-C|--directory')[-1:] or ['.']
     elif verb in ('sed', 'perl', 'ruby') and any(
         re.match(r'-[nErsuzplaw0]*i|--in-place', a) for a in args
     ):
@@ -244,12 +255,17 @@ def writes(argv, cwd, deep=0, texts=(), pipe=()):
         tg = tg[1:] if tg == pos else tg
     elif verb == 'git':
         # paths of a reverting subcommand, after -- when given; -C moves the directory
-        sub = plain(args, '-[CcbBm]|--work-tree|--git-dir')
-        dry = sub[:1] == ['clean'] and any(re.fullmatch(r'-\w*n\w*|--dry-run', a) for a in args)
-        if sub[:1] and sub[0] in GIT_WRITES and not dry:
+        sub = plain(args, '-[CcbBm]|--work-tree|--git-dir') or ['']
+        dry = sub[0] == 'clean' and any(re.fullmatch(r'-\w*n\w*|--dry-run', a) for a in args)
+        if sub[0] in GIT_WRITES and not dry:
             tg = args[args.index('--') + 1 :] if '--' in args else sub[1:]
             # a :/ or :(top) pathspec starts at the root
             tg = [re.sub(r'^:(?:/|\(top\))', lambda m: f'{ROOT}/', t) for t in tg]
+        elif sub[0] in ('clone', 'init', 'reset', 'switch', 'merge', 'pull'):
+            # a new repo's last operand names its directory, else the repo they run in
+            tg = {'clone': sub[2:], 'init': sub[1:]}.get(sub[0], [])[-1:] or ['.']
+        elif sub[0] == 'archive':
+            tg = after(args, '-o|--output')
         cwd = cwd.joinpath(*after(args, '-C'))
     elif verb == 'find':
         # each start path stands in for {}; the options ahead of them go
@@ -270,7 +286,7 @@ def writes(argv, cwd, deep=0, texts=(), pipe=()):
         got = [a.replace('{}', str(xarg)) for a in sub] + [str(xarg)] * (not fill)
         got = writes(got, cwd, deep + 1)
         hits += [h for h in got if h != xarg]
-        # unknown operands: any word or protected token of the pipeline and stdin texts
+        # unknown operands: any word or guarded token of the pipeline and stdin texts
         seen = ' '.join([*pipe, *argv, *texts])
         tg = seen.split() + tokens(seen) if xarg in got else []
     # command strings recurse; inline code names its paths
@@ -290,28 +306,20 @@ def writes(argv, cwd, deep=0, texts=(), pipe=()):
             pairwise(['', *argv[1:]]),
         )
         head = [b for _, b in head] or ['-']
-        # stdin code: heredoc texts and the words piped in
-        code = head[1:2] if re.fullmatch(r'-\w*c', head[0]) else [*texts, *pipe] * (head[0] == '-')
-    elif verb in ('perl', 'ruby', 'node'):
-        # node takes code after -p too
-        code = after(args, r'-\w*[ep]|--eval|--print' if verb == 'node' else r'-\w*e|--eval')
-    elif verb == 'awk':
-        code = plain(args, '-[Fvf]')[:1]
+        # stdin code: heredoc texts
+        code = head[1:2] if re.fullmatch(r'-\w*c', head[0]) else [*texts] * (head[0] == '-')
+        CODE.extend(at(cwd, tokens('\n'.join(code))))
     elif verb not in ('find', 'xargs'):
         # a shell further along the words runs its -c string in place
         rest = dropwhile(lambda a: base(a) not in SHELLS, args)
         subs = after(list(rest), r'-\w*c')[:1]
-    code = '\n'.join(code)
-    # quoted words of inline code that name an owned directory
-    dirs = [w for w in LITERAL_RE.findall(code) if NAMES_RE.fullmatch(w + '/')]
-    tg = tg + tokens(code) + dirs
     return hits + at(cwd, tg) + [h for s in subs for h in walk(s, cwd, deep + 1)]
 
 
 def walk(cmd, cwd, deep=0):
     """Paths a shell command string, or its token list, writes to."""
     toks = cmd if isinstance(cmd, list) else lex(cmd.replace('\x08', ''))[0]
-    hits, stack, argv, outs, texts, pipe, redir, var, vals = [], [], [], [], [], [], '', None, []
+    hits, stack, argv, outs, texts, pipe, redir = [], [], [], [], [], [], ''
     # the directory before the last move, and those pushd left
     back, dirs = cwd, []
     for tok, op in [*toks, ('\n', True)]:
@@ -332,33 +340,25 @@ def walk(cmd, cwd, deep=0):
                 argv.pop()
         else:
             # separator ends the simple command
-            run, each = bare(argv), [(argv, outs)]
-            CMDS.update(run[:1])
-            WORDS.extend(argv + outs)
-            # a loop variable stands for each of its words
-            if vals and var.search(' '.join(argv + outs)):
-                each = [[[var.sub(lambda m: v, a) for a in part] for part in each[0]] for v in vals]
-            for words, files in each:
-                hits += writes(bare(words), cwd, deep, texts, pipe) + at(cwd, files)
-            if run[:1] == ['for'] and run[2:3] == ['in']:
-                var, vals = re.compile(r'\$(\{)?%s\b(?(1)\})' % re.escape(run[1])), run[3:]
+            run = bare(argv)
+            hits += writes(run, cwd, deep, texts, pipe) + at(cwd, outs)
             # cd and pushd move the directory for later commands
             if run[:1] in (['cd'], ['pushd']):
                 # a bare cd goes home, a bare pushd goes back
                 to = [a for a in run[1:] if a != '--'][:1] or ['~' if run[0] == 'cd' else '-']
                 # - names the directory before the last move
                 dest = back if to == ['-'] else Path(os.path.normpath(at(cwd, to)[0]))
-                # a missing directory moves nothing
-                if dest.is_dir():
+                # a missing directory moves nothing; a run-time one moves unchecked
+                if dest.is_dir() or '$' in str(dest):
                     dirs += [cwd] * (run[0] == 'pushd')
                     back, cwd = cwd, dest
             elif run[:1] == ['popd'] and dirs:
                 back, cwd = cwd, dirs.pop()
             pipe += argv
-            argv, outs = [], []
-            # words and heredoc texts last for the pipeline
+            argv, outs, texts = [], [], []
+            # words last for the pipeline
             if tok not in ('|', '|&'):
-                pipe, texts = [], []
+                pipe = []
             # a subshell keeps its own directories
             if tok == '(':
                 stack.append((cwd, back, [*dirs]))
@@ -368,33 +368,20 @@ def walk(cmd, cwd, deep=0):
     return hits
 
 
-def scan(cmd, cwd):
-    """Paths a Bash command writes to."""
-    for state in (WORDS, CMDS, DOCS, WORK):
-        state.clear()
-    hits = walk(cmd, cwd)
-    # run-time target: an expansion not already under work/
-    starts = [str(h).split('$')[0] + 'x' for h in hits if '$' in str(h)]
-    if any(not os.path.normpath(s).startswith(f'{ROOT}/work/') for s in starts):
-        # every protected token but a command word, less a leading expansion
-        text = ' '.join(w for w in WORDS if w not in CMDS)
-        text = re.sub(r'\$(\w+|\{\w+\}|\x08\d+\x08)/', '', text)
-        hits += at(cwd, [t for t in tokens(text) if t not in CMDS])
-    return hits
-
-
-def targets(cmd, cwd, root, token, names):
-    """Paths a Bash command would write, by a coarser rule when it cannot be read."""
-    global ROOT, TOKEN_RE, SPAN_RE, NAMES_RE
-    ROOT, TOKEN_RE, NAMES_RE = root, re.compile(token), re.compile(names)
+def targets(cmd, cwd, root, token):
+    """Paths a Bash command would write; an unreadable command or a run-time target blocks."""
+    global ROOT, TOKEN_RE, SPAN_RE
+    ROOT, TOKEN_RE = root, re.compile(token)
     # token runs back to back, from the start of a path-like word
     SPAN_RE = re.compile(r'(?<![\w./~${}*?-])(?:' + token + r')+')
+    for state in (CODE, DOCS, WORK):
+        state.clear()
     try:
-        return scan(cmd, cwd)
-    except ValueError:
-        # unparsable: any protected token, given a write verb or a redirect onto a name
-        wrote = re.search(r'>\|?\s*[^\s>]*(?:' + names + r')|' + WRITERS, cmd)
-        return tokens(cmd) if wrote else []
-    except RecursionError:
-        # nested too deep: any word or protected token
-        return cmd.split() + tokens(cmd)
+        hits = walk(cmd, cwd)
+    except (ValueError, RecursionError) as e:
+        block(f'the command cannot be read ({e}); split it into simpler commands.')
+    # a run-time target must start at a literal path in the repo
+    starts = [os.path.realpath(str(h).split('$')[0] + 'x') for h in hits if '$' in str(h)]
+    if any(not Path(s).is_relative_to(ROOT) for s in starts):
+        block('a write target is known only at run time; write to a literal path in the repo.')
+    return hits
