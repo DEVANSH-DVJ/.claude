@@ -2,6 +2,7 @@
 """
 PreToolUse hook: block writes to template-owned .claude/, docker/, format/, .gitignore, LICENSE.
 Open: work/, .claude/{project.md,settings.local.json}, docker/{Dockerfile,environment.yml}.
+Also blocked: writes to ~/.claude outside the repo, resolved after .. and symlinks; reads stay open.
 Bash: analysis.py finds the paths a command writes; inline code that names one counts as a write.
 Unlock: a hand-made .claude/.unlock. Reads the hook JSON on stdin; exit 2 blocks the call.
 """
@@ -18,6 +19,8 @@ import analysis
 
 ROOT = Path(__file__).resolve().parents[2]
 UNLOCK = ROOT / '.claude' / '.unlock'
+# settings and instructions every session loads
+HOME = Path(os.path.realpath(os.path.expanduser('~/.claude')))
 OPEN = {
     '.claude/project.md',
     '.claude/settings.local.json',
@@ -35,10 +38,14 @@ PATH_TOOLS = {
 TOKEN = r'[\w./~${}*?-]*(?:\.claude/|docker/|format/|\.gitignore|LICENSE(?!\w))[\w./*?\[\]-]*'
 
 
+def real(path):
+    """Resolved path, a relative one at the root, less quotes and brackets."""
+    return Path(os.path.realpath(ROOT / path.strip('"\'`(<[{').rstrip('"\'`;:,.)]}>')))
+
+
 def protected(path):
     """Repo-relative path if path is template-owned, else None."""
-    p = Path(os.path.realpath(ROOT / path.strip('"\'`(<[{').rstrip('"\'`;:,.)]}>')))
-    if not p.is_relative_to(ROOT):
+    if not (p := real(path)).is_relative_to(ROOT):
         return None
     rel = p.relative_to(ROOT).as_posix()
     name = rel.rsplit('/', 1)[-1]
@@ -47,6 +54,12 @@ def protected(path):
     if (rel + '/').startswith(OWNED) or name == '.gitignore' or name.startswith('LICENSE'):
         return rel
     return None
+
+
+def settings(path):
+    """Resolved path if path is under ~/.claude and outside the repo, else None."""
+    p = real(path)
+    return str(p) if p.is_relative_to(HOME) and not p.is_relative_to(ROOT) else None
 
 
 def among(test, paths):
@@ -63,7 +76,7 @@ if __name__ == '__main__':
     if tool == 'Bash':
         cwd = Path(hook.get('cwd') or ROOT)
         found = analysis.targets(args.get('command', ''), cwd, ROOT, TOKEN)
-        if code := among(protected, analysis.CODE):
+        if code := among(protected, analysis.CODE) or among(settings, analysis.CODE):
             analysis.block(
                 f'{code} is guarded, and inline code that names it counts as a write; '
                 'read it with cat instead.'
@@ -73,4 +86,9 @@ if __name__ == '__main__':
             f'{hits} is template-owned. Shared rule files, skills, docker, format, .gitignore and '
             'LICENSE files change only in the template repo (github.com/devansh-dvj/.claude) and '
             'arrive here by sync. Ask the user; only they may create .claude/.unlock.'
+        )
+    if hits := among(settings, found):
+        analysis.block(
+            f'{hits} is in ~/.claude, which holds settings and instructions that load into every '
+            'session. Ask the user; only they may create .claude/.unlock.'
         )

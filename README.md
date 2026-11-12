@@ -15,7 +15,7 @@ test/                     checks for derive.sh and the hooks; stays here
   project.md              the project's own context file
   settings.json           enables the document-skills plugin, wires the hooks
   .gitignore              ignores .unlock and settings.local.json
-  hooks/protect.py        blocks edits to template-owned files
+  hooks/protect.py        blocks edits to template-owned files and ~/.claude
   hooks/scratch.py        blocks writes to temp folders
   hooks/analysis.py       finds the paths a Bash command would write, for both hooks
   skills/                 the twelve skills of the table below
@@ -60,6 +60,7 @@ The exact paths and Dockerfile blocks per category are the `MANIFEST` and `BLOCK
 `.claude/hooks/protect.py` keeps the template-owned files as the template shipped them.
 
 - Blocked: any edit under `.claude/`, `docker/`, or `format/`, and to any `.gitignore` or `LICENSE`.
+- Also blocked: any write under `~/.claude`, whose settings and instructions load into every session.
 - Open: `.claude/project.md`, `.claude/settings.local.json`, `docker/Dockerfile`, `docker/environment.yml`, and anything under `work/`.
 - A shell command is blocked only when what it writes, moves, or deletes is a blocked path; reading one or running its script is not.
 - Inline code, such as `python3 -c`, that names a blocked path counts as a write.

@@ -50,9 +50,10 @@ if __name__ == '__main__':
             command = command.replace('@ROOT@', str(root)).replace('@TILDE@', tilde)
             cwd = str(root / rest[0] if rest else root)
             event = {'tool_name': 'Bash', 'tool_input': {'command': command}, 'cwd': cwd}
-            # "@Tool arg" sends a tool call
+            # "@Tool arg" sends a tool call, ~ at the scratch home
             if m := re.fullmatch(r'@(\w+) (.+)', command):
-                tool_input = {KEYS.get(m[1], 'file_path'): m[2]}
+                arg = re.sub(r'^~(?=/|$)', str(home), m[2])
+                tool_input = {KEYS.get(m[1], 'file_path'): arg}
                 event = {'tool_name': m[1], 'tool_input': tool_input, 'cwd': cwd}
             # every hook runs, up to a nonzero exit
             for h in [copy, copy.with_name('scratch.py')]:

@@ -69,10 +69,22 @@ BLOCK	mkdir -p /tmp/x
 BLOCK	mv /tmp/x work/x
 BLOCK	@NotebookEdit /tmp/x.ipynb
 BLOCK	@Write /tmp/claude-1000/-home-user-PROJECTS-repo/0000/scratchpad/helper.py
+# writes to ~/.claude are blocked
+BLOCK	echo x > ~/.claude/settings.json
+BLOCK	sed -i s/a/b/ ~/.claude/settings.json
+BLOCK	rm -rf ~/.claude/tmp
+BLOCK	cd && rm -rf .claude/tmp
+BLOCK	cp work/x ~/.claude/
+BLOCK	@Edit ~/.claude/settings.json
+BLOCK	@Write ~/.claude/CLAUDE.md
+BLOCK	mv ~/.claude/settings.json work/
+BLOCK	python3 -c "import os; os.remove(os.path.expanduser('~/.claude/settings.json'))"
 # reads outside the repo are allowed
+ALLOW	cat ~/.claude/settings.json
 ALLOW	cat /tmp/x > work/x
 ALLOW	tail -n 50 /tmp/claude-1000/-home-user-PROJECTS-repo/0000/tasks/b1.output
 ALLOW	diff -r work/a /var/tmp/b
+ALLOW	cp ~/.claude/settings.json work/
 ALLOW	cat ../other-repo/docker/build.sh > work/x
 ALLOW	echo x > /dev/null; ls .claude/
 ALLOW	echo x > /dev/stdout
