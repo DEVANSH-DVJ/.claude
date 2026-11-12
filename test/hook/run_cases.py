@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-Run the protect.py hook against the case table beside this file and report mismatches.
-The hook and its analysis.py go to a scratch root, so ROOT is that root and no unlock file applies.
-The root holds docker/ and work/, beside a home directory for the ~ cases.
-Case line: expect<TAB>command[<TAB>cwd]; \\n, \\\\, @ROOT@, @TILDE@ and "@Tool path" expand.
-Usage: python3 test/hook/run_cases.py [hook]
-Without an argument the hook is .claude/hooks/protect.py of this repo.
+Run protect.py and the scratch.py beside it on the case table here and report mismatches.
+The hooks go to a scratch root in work/, beside a home for the ~ cases.
+Case line: expect<TAB>command[<TAB>cwd]; \\n, \\\\, @ROOT@, @TILDE@ and "@Tool arg" expand.
+BLOCK is exit 2 with "blocked:" on stderr; any other nonzero exit is an ERROR.
+Usage: python3 test/hook/run_cases.py [hook], where hook defaults to .claude/hooks/protect.py.
 """
 
 import json
@@ -19,24 +18,28 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 HOOK = HERE.parents[1] / '.claude' / 'hooks' / 'protect.py'
-VERDICT = {0: 'ALLOW', 2: 'BLOCK'}
+# the tool_input key an "@Tool arg" line fills
+KEYS = {'NotebookEdit': 'notebook_path', 'EnterWorktree': 'name', 'Agent': 'isolation'}
 
 if __name__ == '__main__':
     hook = Path(sys.argv[1]) if len(sys.argv) > 1 else HOOK
     cases = bad = 0
-    with tempfile.TemporaryDirectory() as tmp:
+    # the scratch root goes in work/, outside /tmp
+    (work := HERE.parents[1] / 'work').mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=work) as tmp:
         # scratch root with the hook in place
         root = Path(tmp).resolve() / 'repo'
         home = root.parent / 'home'
         tilde = '~/' + os.path.relpath(root, home)
         copy = root / '.claude' / 'hooks' / 'protect.py'
-        # directories the hook and the cd cases need
+        # directories the hooks and the cd cases need
         for made in (copy.parent, root / 'docker', root / 'work', home):
             made.mkdir(parents=True)
         shutil.copy(hook, copy)
-        # the analysis module beside the hook goes along
-        if (module := hook.with_name('analysis.py')).exists():
-            shutil.copy(module, copy.parent)
+        # analysis.py and scratch.py beside the hook go along
+        for name in ('analysis.py', 'scratch.py'):
+            if (module := hook.with_name(name)).exists():
+                shutil.copy(module, copy.parent)
         for n, line in enumerate((HERE / 'cases.tsv').read_text().splitlines(), 1):
             # section names and blank lines hold no case
             if line.startswith('#') or not line.strip():
@@ -47,19 +50,24 @@ if __name__ == '__main__':
             command = command.replace('@ROOT@', str(root)).replace('@TILDE@', tilde)
             cwd = str(root / rest[0] if rest else root)
             event = {'tool_name': 'Bash', 'tool_input': {'command': command}, 'cwd': cwd}
-            # "@Tool path" sends a path tool call
+            # "@Tool arg" sends a tool call
             if m := re.fullmatch(r'@(\w+) (.+)', command):
-                key = 'notebook_path' if m[1] == 'NotebookEdit' else 'file_path'
-                event = {'tool_name': m[1], 'tool_input': {key: m[2]}, 'cwd': cwd}
-            run = subprocess.run(
-                [sys.executable, str(copy)],
-                input=json.dumps(event),
-                capture_output=True,
-                text=True,
-                check=False,
-                env={**os.environ, 'HOME': str(home)},
-            )
-            got = VERDICT.get(run.returncode, f'ERROR({run.returncode})')
+                tool_input = {KEYS.get(m[1], 'file_path'): m[2]}
+                event = {'tool_name': m[1], 'tool_input': tool_input, 'cwd': cwd}
+            # every hook runs, up to a nonzero exit
+            for h in [copy, copy.with_name('scratch.py')]:
+                run = subprocess.run(
+                    [sys.executable, str(h)],
+                    input=json.dumps(event),
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    env={**os.environ, 'HOME': str(home)},
+                )
+                if run.returncode:
+                    break
+            got = 'ALLOW' if not run.returncode else f'ERROR({run.returncode})'
+            got = 'BLOCK' if run.returncode == 2 and 'blocked:' in run.stderr else got
             cases += 1
             if got != expect:
                 bad += 1

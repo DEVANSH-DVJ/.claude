@@ -2,11 +2,12 @@
 # Test this working tree's derive.sh on scratch template and target repos.
 #   ./test/derive/run.sh
 # One function per scenario; each runs on its own copy of the fixture.
-# Scratch is a mktemp directory, removed on success and kept on failure.
+# Scratch is a directory under work/, removed on success and kept on failure.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "$0")/../.." && pwd)"
-SCRATCH=$(mktemp -d) || exit 1
+SCRATCH=$REPO/work/derive-test.$$
+mkdir -p "$SCRATCH" || exit 1
 FILL='PRUNE+=(! -path "./external/*")'
 PASS=0
 FAIL=0

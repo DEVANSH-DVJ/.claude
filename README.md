@@ -8,15 +8,16 @@ Canonical source: `github.com/devansh-dvj/.claude`.
 ```
 CLAUDE.md                 thin loader: @-includes the three rule files
 derive.sh                 copies categories into a repo, checks or syncs a derived repo; stays here
-test/                     checks for derive.sh and the protect hook; stays here
+test/                     checks for derive.sh and the hooks; stays here
 .claude/
   session.md              how I work in any session
   engineering.md          code/diff/comment/docs conventions
   project.md              the project's own context file
-  settings.json           enables the document-skills plugin, wires the protect hook
+  settings.json           enables the document-skills plugin, wires the hooks
   .gitignore              ignores .unlock and settings.local.json
   hooks/protect.py        blocks edits to template-owned files
-  hooks/analysis.py       finds the paths a Bash command would write, for protect.py
+  hooks/scratch.py        blocks writes to temp folders
+  hooks/analysis.py       finds the paths a Bash command would write, for both hooks
   skills/                 the twelve skills of the table below
 format/                   format.sh dispatcher + per-language configs
 docker/
@@ -65,6 +66,10 @@ The exact paths and Dockerfile blocks per category are the `MANIFEST` and `BLOCK
 - A write whose target is known only at run time is blocked, unless it starts inside the repo.
 - A command the hook cannot read, such as one with an unclosed quote, is blocked.
 - A hand-made, gitignored `.claude/.unlock` file lifts the block for the edit at hand: the owner creates it, and the session deletes it as soon as that edit is done.
+- `.claude/hooks/scratch.py`: blocks writes under `/tmp`, `/var/tmp`, and `/dev/shm`, so scratch goes in `work/`.
+  - It covers remote machines too, through `ssh`, `scp`, and `rsync`.
+  - Blocked outright: `mktemp`, `git worktree`, the `EnterWorktree` tool, and a subagent with worktree isolation.
+  - Reads stay open, and `.claude/.unlock` lifts this block too.
 - `.claude/skills/review-diff/mdcheck.py` lists every markdown paragraph or list item over 200 characters as a lead for `/review-diff`, not a failure.
 
 ## Skills
@@ -112,7 +117,7 @@ A repo takes the template in two commits and later picks up template changes wit
 
 - An import and a sync add `work/` to the repo's `.git/info/exclude` unless it is already ignored.
 - Both stop without printing a commit when the copied hook does not run.
-- `test/derive/run.sh` and `python3 test/hook/run_cases.py` check `derive.sh` and the hook. Run them before changing either.
+- `test/derive/run.sh` and `python3 test/hook/run_cases.py` check `derive.sh` and the hooks. Run them before changing either.
 
 The two prompts below drive this from a Claude Code session in the repo.
 

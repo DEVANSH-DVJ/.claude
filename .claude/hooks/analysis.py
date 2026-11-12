@@ -1,7 +1,7 @@
 """
-Analyses a Bash command for the protect.py hook: the paths it would write.
+Analyses a Bash command for the protect.py and scratch.py hooks: the paths it would write.
 The caller passes the repo root and the pattern of guarded path runs, and decides what is guarded.
-It also records the paths its inline code names.
+It also records the verbs a command runs, the paths its inline code names, and remote writes.
 A command it cannot read, or a write target known only at run time, blocks outright.
 """
 
@@ -35,15 +35,19 @@ SKIP = {'if', 'then', 'else', 'elif', 'do', 'while', 'until', '!', '{'}
 # wrappers ahead of the verb, with their options that take a value
 WRAPS = {'sudo': '-[ug]', 'env': '-u', 'timeout': '-s', 'stdbuf': '-[ioe]', 'exec': '-a'}
 WRAPS |= dict.fromkeys(['nice', 'time', 'nohup', 'setsid', 'command', 'busybox'], '')
-# paths inline code names; work units
-CODE, WORK = [], []
+# verbs run, git ones with their subcommand; paths inline code names; work units
+CMDS, CODE, WORK = set(), [], []
+# paths written on remote machines: by ssh, or to a host: of scp and rsync
+REMOTE = []
+# ssh strings being walked, whose directories cannot be checked here
+AWAY = 0
 # verbs that write every operand
 ALL_ARGS = {'rm', 'rmdir', 'unlink', 'tee', 'truncate', 'touch', 'mkdir', 'patch'}
 # verbs that write the value of an output flag
 OUTPUTS = dict.fromkeys(['curl', 'sort', 'gcc', 'cc'], '-o|--output')
 OUTPUTS |= {'wget': '-[OP]|--output-document|--directory-prefix', 'unzip': '-d'}
 # verbs that copy sources onto a destination
-COPIES = {'cp', 'mv', 'ln', 'install', 'rsync'}
+COPIES = {'cp', 'mv', 'ln', 'install', 'rsync', 'scp'}
 GIT_WRITES = {'checkout', 'restore', 'rm', 'mv', 'stash', 'clean', 'apply'}
 SHELLS = {'bash', 'sh', 'zsh', 'dash', 'ksh'}
 VERBS = ALL_ARGS | COPIES | SHELLS | {'chmod', 'chown', 'dd', 'sed', 'perl', 'ruby', 'git'}
@@ -207,9 +211,11 @@ def lex(text, i=0, sub=False):
 
 def writes(argv, cwd, deep=0, texts=(), pipe=()):
     """Paths one simple command writes to."""
+    global AWAY
     spend(deep)
     argv = argv or ['']
     verb = base(argv[0])
+    CMDS.add(verb)
     # --flag=value splits into flag and value
     args = [p for a in argv[1:] for p in (a.split('=', 1) if a.startswith('--') else [a])]
     pos, hits, tg, subs = plain(args), [], [], []
@@ -221,10 +227,13 @@ def writes(argv, cwd, deep=0, texts=(), pipe=()):
         tg = plain(args, r'-[rdt]|--reference|--date') if verb == 'touch' else pos
     elif verb in COPIES:
         # destination: the -t value, also of a flag cluster, else the last operand
-        held = r'-\w*t|-[mogS]|--target-directory' if verb != 'rsync' else None
+        held = r'-\w*t|-[mogS]|--target-directory' if verb not in ('rsync', 'scp') else None
         into = after(args, r'-\w*t|--target-directory')[:1] if held else []
         srcs = plain(argv[1:], held)
         srcs, tg = (srcs, into) if into else (srcs[:-1], srcs[-1:])
+        # a host: destination is remote, from the remote home
+        if not held and re.match(r'[^/]*:', ''.join(tg)):
+            REMOTE.append(Path.home() / tg.pop().split(':', 1)[1])
         # into a directory: a target per source name; the directory for a tree
         if tg and (into or isdir(cwd, tg[0])):
             deep_copy = any(re.fullmatch(r'-\w*[rRa]\w*|--recursive|--archive', a) for a in args)
@@ -256,6 +265,7 @@ def writes(argv, cwd, deep=0, texts=(), pipe=()):
     elif verb == 'git':
         # paths of a reverting subcommand, after -- when given; -C moves the directory
         sub = plain(args, '-[CcbBm]|--work-tree|--git-dir') or ['']
+        CMDS.add(f'git {sub[0]}')
         dry = sub[0] == 'clean' and any(re.fullmatch(r'-\w*n\w*|--dry-run', a) for a in args)
         if sub[0] in GIT_WRITES and not dry:
             tg = args[args.index('--') + 1 :] if '--' in args else sub[1:]
@@ -299,6 +309,18 @@ def writes(argv, cwd, deep=0, texts=(), pipe=()):
         subs = after(args, r'-\w*c')[:1] + list(texts)
     elif verb == 'eval':
         subs = [' '.join(argv[1:])]
+    elif verb == 'ssh':
+        # options, then the host; the words after it run from the remote home
+        head = dropwhile(
+            lambda p: re.fullmatch(r'-[BbcDEeFIiJLlmOoPpQRSWw]', p[0]) or p[1][:1] == '-',
+            pairwise(['', *argv[1:]]),
+        )
+        AWAY, code = AWAY + 1, len(CODE)
+        REMOTE.extend(walk(' '.join([b for _, b in head][1:]), Path.home(), deep + 1))
+        AWAY -= 1
+        # inline code there names remote paths
+        REMOTE.extend(CODE[code:])
+        del CODE[code:]
     elif re.fullmatch(r'python[0-9.]*', verb):
         # options, then -c CODE, -m MODULE, a script, or - for stdin
         head = dropwhile(
@@ -348,8 +370,8 @@ def walk(cmd, cwd, deep=0):
                 to = [a for a in run[1:] if a != '--'][:1] or ['~' if run[0] == 'cd' else '-']
                 # - names the directory before the last move
                 dest = back if to == ['-'] else Path(os.path.normpath(at(cwd, to)[0]))
-                # a missing directory moves nothing; a run-time one moves unchecked
-                if dest.is_dir() or '$' in str(dest):
+                # a missing directory moves nothing; a run-time or remote one moves unchecked
+                if dest.is_dir() or '$' in str(dest) or AWAY:
                     dirs += [cwd] * (run[0] == 'pushd')
                     back, cwd = cwd, dest
             elif run[:1] == ['popd'] and dirs:
@@ -374,7 +396,7 @@ def targets(cmd, cwd, root, token):
     ROOT, TOKEN_RE = root, re.compile(token)
     # token runs back to back, from the start of a path-like word
     SPAN_RE = re.compile(r'(?<![\w./~${}*?-])(?:' + token + r')+')
-    for state in (CODE, DOCS, WORK):
+    for state in (CMDS, CODE, DOCS, WORK, REMOTE):
         state.clear()
     try:
         hits = walk(cmd, cwd)

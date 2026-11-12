@@ -381,15 +381,19 @@ status() {
   fi
 }
 
-# Die unless the target's copied hook passes a Bash call and blocks a rules edit
+# Die unless each copied hook passes a Bash call and blocks an edit it guards
 hook_check() {
-  local hook=$1/.claude/hooks/protect.py err rc=0
-  err=$(python3 "$hook" 2>&1 >/dev/null <<<"{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"true\"},\"cwd\":\"$1\"}") || rc=$?
-  [ "$rc" -eq 0 ] || die "$hook exits $rc on a Bash call, not 0:"$'\n'"$err"
-  if [ ! -e "$1/.claude/.unlock" ]; then
-    err=$(python3 "$hook" 2>&1 >/dev/null <<<"{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"$1/.claude/session.md\"},\"cwd\":\"$1\"}") || rc=$?
-    [ "$rc" -eq 2 ] || die "$hook exits $rc on an edit of .claude/session.md, not 2:"$'\n'"$err"
-  fi
+  local pair hook path file err rc
+  for pair in protect.py:.claude/session.md scratch.py:/tmp/derive-check; do
+    hook=$1/.claude/hooks/${pair%%:*} path=${pair#*:} rc=0
+    err=$(python3 "$hook" 2>&1 >/dev/null <<<"{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"true\"},\"cwd\":\"$1\"}") || rc=$?
+    [ "$rc" -eq 0 ] || die "$hook exits $rc on a Bash call, not 0:"$'\n'"$err"
+    [ -e "$1/.claude/.unlock" ] && continue
+    # a relative path is in the target
+    [[ $path == /* ]] && file=$path || file=$1/$path
+    err=$(python3 "$hook" 2>&1 >/dev/null <<<"{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"$file\"},\"cwd\":\"$1\"}") || rc=$?
+    [ "$rc" -eq 2 ] || die "$hook exits $rc on an edit of $path, not 2:"$'\n'"$err"
+  done
 }
 
 # Add work/ to the target's .git/info/exclude unless already ignored; set EXCLUDED

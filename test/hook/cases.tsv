@@ -59,48 +59,97 @@ BLOCK	@Write @ROOT@/.claude/session.md
 BLOCK	@Edit .gitignore
 BLOCK	@NotebookEdit format/x.ipynb
 BLOCK	@MultiEdit LICENSE
+# writes to temp folders are blocked
+BLOCK	cat > /tmp/x
+BLOCK	cp work/x /tmp/
+BLOCK	rm -f /tmp/x
+BLOCK	echo x > /var/tmp/x
+BLOCK	cp work/x /dev/shm/x
+BLOCK	mkdir -p /tmp/x
+BLOCK	mv /tmp/x work/x
+BLOCK	@NotebookEdit /tmp/x.ipynb
+BLOCK	@Write /tmp/claude-1000/-home-user-PROJECTS-repo/0000/scratchpad/helper.py
 # reads outside the repo are allowed
+ALLOW	cat /tmp/x > work/x
+ALLOW	tail -n 50 /tmp/claude-1000/-home-user-PROJECTS-repo/0000/tasks/b1.output
+ALLOW	diff -r work/a /var/tmp/b
 ALLOW	cat ../other-repo/docker/build.sh > work/x
 ALLOW	echo x > /dev/null; ls .claude/
+ALLOW	echo x > /dev/stdout
+ALLOW	echo x 2> /dev/stderr
 ALLOW	ls docker/ 2>/dev/null >&2
+# temp folders on remote machines
+BLOCK	ssh gpu "python3 train.py > /tmp/train.log 2>&1"
+BLOCK	ssh -p 2222 user@gpu "cd /tmp && tar -xzf data.tgz"
+BLOCK	ssh gpu "cd /tmp/run && echo x > a"
+BLOCK	ssh gpu mktemp -d
+BLOCK	ssh gpu 'bash -c "rm -rf /dev/shm/x"'
+BLOCK	scp work/x gpu:/tmp/
+BLOCK	rsync -a work/x/ user@gpu:/var/tmp/x/
+ALLOW	ssh gpu "cat /tmp/a"
+ALLOW	ssh -i ~/.ssh/id gpu "tail -n 20 /tmp/train.log"
+ALLOW	scp gpu:/tmp/a work/
 # download, archive and build commands write where they are told
+BLOCK	curl -sSL -o /tmp/x.json https://example.com/x.json
+BLOCK	curl --output /var/tmp/x https://example.com/x
 BLOCK	curl -o docker/x.sh https://example.com/x.sh
 ALLOW	curl -o work/x.json https://example.com/x.json
 ALLOW	curl -s https://example.com/x.json
+BLOCK	wget -O /tmp/x.tgz https://example.com/x.tgz
 BLOCK	wget -O docker/x.tgz https://example.com/x.tgz
+BLOCK	wget -P /var/tmp https://example.com/x.tgz
 BLOCK	wget -P docker https://example.com/x.tgz
+BLOCK	sort -o /tmp/sorted.txt work/list
 BLOCK	sort -o docker/sorted.txt work/list
 ALLOW	sort -o work/sorted.txt work/list
+BLOCK	tar -czf /tmp/backup.tgz src
 BLOCK	tar -czf docker/backup.tgz src
 ALLOW	tar -czf work/backup.tgz src
+BLOCK	tar -xzf work/x.tgz -C /tmp/out
 BLOCK	tar -xzf work/x.tgz -C docker
 ALLOW	tar -xzf work/x.tgz -C work/out
 ALLOW	tar -tzf work/x.tgz
+BLOCK	tar -xzf x.tgz	/tmp
 BLOCK	tar -xzf x.tgz	docker
 ALLOW	tar -xzf x.tgz	work
+BLOCK	unzip -d /tmp/out x.zip
 BLOCK	unzip -d docker x.zip
 ALLOW	unzip -d work/out work/x.zip
+BLOCK	zip /tmp/a.zip work/x
 BLOCK	zip docker/a.zip work/x
+BLOCK	git clone https://example.com/r.git /tmp/r
 BLOCK	git clone https://example.com/r.git docker/r
 ALLOW	git clone https://example.com/r.git work/r
+BLOCK	git clone https://example.com/r.git	/tmp
+BLOCK	rmdir /tmp/x
 BLOCK	rmdir docker/x
 ALLOW	rmdir work/x
+BLOCK	unlink /tmp/x
 BLOCK	unlink docker/build.sh
 ALLOW	unlink work/x
+BLOCK	gcc -o /tmp/a.out work/a.c
 BLOCK	gcc -o docker/a.out work/a.c
 ALLOW	gcc -o work/a.out work/a.c
+BLOCK	git init /tmp/newrepo
 BLOCK	git init docker/newrepo
 ALLOW	git init work/newrepo
+BLOCK	git archive -o /tmp/src.tar HEAD
 BLOCK	git archive -o docker/src.tar HEAD
 ALLOW	git archive -o work/src.tar HEAD
 # git reset, switch, merge and pull write the repo they run in
 ALLOW	git reset HEAD~1
 ALLOW	git switch main
 ALLOW	git pull
+BLOCK	git -C /tmp/r pull
 BLOCK	git -C docker pull
+BLOCK	git -C /tmp/r reset --hard
+BLOCK	git reset --hard	/tmp
 BLOCK	git reset --hard	docker
+BLOCK	git switch main	/tmp
 BLOCK	git switch main	docker
+BLOCK	git merge topic	/tmp
 BLOCK	git merge topic	docker
+BLOCK	cd /tmp && git pull
 # git commands on owned paths
 BLOCK	git checkout -- docker/build.sh
 BLOCK	git restore format/format.sh
@@ -110,11 +159,27 @@ BLOCK	git -C docker checkout -- build.sh
 ALLOW	git stash push -m "docker/ tweaks" -- docker/Dockerfile
 ALLOW	git checkout docker/fonts -- README.md
 ALLOW	git clean -n -d -- docker/
+# mktemp and git worktree are blocked
+BLOCK	mktemp
+BLOCK	mktemp -p work
+BLOCK	d=$(mktemp -d); echo x > $d/a
+BLOCK	f=$(mktemp) && cat work/x > "$f"
+BLOCK	git worktree add ../wt
+BLOCK	git worktree list
+BLOCK	git worktree remove work/wt
+BLOCK	git -C work worktree prune
+BLOCK	@EnterWorktree wt
+BLOCK	@Agent worktree
+ALLOW	@Agent none
+ALLOW	grep -n mktemp work/x
+ALLOW	git commit -m 'scratch: block mktemp'
 # redirects and pipes are writes
 BLOCK	echo x 2>docker/err.log
 BLOCK	ls &> docker/out.txt
 BLOCK	./docker/exec.sh "pytest -q" 2>> format/err.log
 BLOCK	echo x | tee -a docker/build.sh >/dev/null
+BLOCK	ls 2> /tmp/err.log
+BLOCK	echo x | tee /var/tmp/log
 ALLOW	git diff | tee work/a.diff docs/b.diff
 ALLOW	grep -E 'a|b' docker/build.sh | tee work/out.txt
 ALLOW	> work/empty.txt
@@ -138,6 +203,7 @@ ALLOW	find docker -name '*.sh' -exec cp {} work/ \;
 BLOCK	find docker -type f -delete
 BLOCK	echo docker/build.sh | xargs rm
 BLOCK	ls work/*.sh | xargs -I{} cp {} docker/
+BLOCK	find /tmp -name '*.pyc' -delete
 ALLOW	rm -rf work/{a,b}
 BLOCK	rm -f {docker,format}/run.sh
 BLOCK	rm -f docker/{Dockerfile,build.sh}
@@ -186,8 +252,10 @@ BLOCK	rm "docker/build.sh"
 BLOCK	cat > docker/build.sh <<'EOF'\n#!/bin/bash\necho hi\nEOF
 BLOCK	cat <<EOF > work/x.txt\n$(rm -f docker/run.sh)\nEOF
 # inline code naming a guarded path counts as a write
+BLOCK	python3 -c "print(open('/tmp/x').read())"
 BLOCK	python3 -c "print(open('docker/build.sh').read())"
 BLOCK	python3 -c "open('docker/build.sh','w').write('x')"
+BLOCK	python3 -c "open('/var/tmp/x','w').write('x')"
 BLOCK	python3 -c "import os; os.remove('LICENSE')"
 BLOCK	python3 - <<'EOF'\nopen('.claude/session.md','w').write('x')\nEOF
 BLOCK	python3 - <<'EOF'\nprint(open('docker/build.sh').read())\nEOF
