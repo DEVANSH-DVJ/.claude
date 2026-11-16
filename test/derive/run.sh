@@ -228,6 +228,7 @@ implied_categories_added() {
   want copied "$(grep -c "^copied [0-9]* files (core, drawio, writing, paper-latex, slides-latex) into $N\$" <<<"$out")" 1
   want skills "$(LC_ALL=C ls "$N/.claude/skills" | tr '\n' ' ')" "beamer comment-style commit delegate drawio format latex pdf-addon plans review-diff writing "
   want blocks "$(blocks "$N")" "# ==== base ==== # ==== drawio ==== # ==== project ==== "
+  want 'settings keys' "$(grep -c -E 'extraKnownMarketplaces|enabledPlugins' "$N/.claude/settings.json")" 2
 }
 
 # Unnamed categories lose paths, Dockerfile blocks, settings keys
@@ -387,7 +388,7 @@ check_drift_reported() {
 check_failure_reported() {
   local out rc
   python3 -c 'import json, sys; d = json.load(open(sys.argv[1])); del d["enabledPlugins"]; json.dump(d, open(sys.argv[1], "w"))' "$T/.claude/settings.json"
-  out=$(check)
+  out=$(check writing)
   rc=$?
   want 'settings exit' "$rc" 1
   want 'settings reason' "$(tail -n 1 <<<"$out")" "KeyError: 'enabledPlugins'"

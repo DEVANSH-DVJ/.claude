@@ -44,7 +44,7 @@ docker/
 | slides-latex | skill `beamer`                                                                 | paper-latex     |
 
 LaTeX builds run on the host; the image is for diagram export and PDF review.
-A repo without slides-pptx gets `settings.json` without the plugin keys.
+A repo without drawio gets `settings.json` without the plugin keys.
 The exact paths and Dockerfile blocks per category are the `MANIFEST` and `BLOCKS` arrays in `derive.sh`.
 
 ## Images

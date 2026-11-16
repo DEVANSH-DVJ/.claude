@@ -45,13 +45,13 @@ MANIFEST=(
   core:docker/Dockerfile
   core:docker/environment.yml
   core:docker/entrypoint.sh
-  # drawio: diagram and pdf review skills, fonts
+  # drawio: diagram and pdf review skills, fonts; keeps the plugin keys in settings.json
   drawio:.claude/skills/drawio
   drawio:.claude/skills/pdf-addon
   drawio:docker/fonts
   # writing: prose review loop
   writing:.claude/skills/writing
-  # slides-pptx: deck skill; keeps the plugin keys in settings.json
+  # slides-pptx: deck skill
   slides-pptx:.claude/skills/pptx-addon
   # paper-latex: paper and talk builds on the host
   paper-latex:.claude/skills/latex
@@ -251,9 +251,9 @@ shared() {
   sed "/^$PROJECT_MARKER\$/,\$d"
 }
 
-# Print a path's template content; without slides-pptx, settings.json loses the plugin keys
+# Print a path's template content; without drawio, settings.json loses the plugin keys
 expected() {
-  if [[ $1 == .claude/settings.json && " ${SELECTED[*]} " != *" slides-pptx "* ]]; then
+  if [[ $1 == .claude/settings.json && " ${SELECTED[*]} " != *" drawio "* ]]; then
     python3 -c 'import json, sys; d = json.load(open(sys.argv[1])); del d["extraKnownMarketplaces"], d["enabledPlugins"]; json.dump(d, sys.stdout, indent=2); print()' "$TEMPLATE/$1"
   elif [[ $1 == docker/Dockerfile ]]; then
     dockerfile_blocks
