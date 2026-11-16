@@ -16,6 +16,13 @@ import tempfile
 from pathlib import Path
 
 
+def scratch():
+    # Scratch under the repo's work/
+    work = Path(__file__).resolve().parents[4] / 'work'
+    work.mkdir(exist_ok=True)
+    return work
+
+
 def parse_pages(spec, n):
     """'1,3-5' -> sorted unique 1-based pages within 1..n."""
     if not spec:
@@ -124,7 +131,7 @@ if __name__ == '__main__':
 
     n = page_count(pdf)
     pages = parse_pages(args.pages, n)
-    with tempfile.TemporaryDirectory(prefix='render-') as td:
+    with tempfile.TemporaryDirectory(prefix='render-', dir=scratch()) as td:
         pngs = to_pngs(pdf, pages, args.dpi, out, Path(td))
 
     print(f'{n} pages in document; rendered {len(pngs)} to {out}/')

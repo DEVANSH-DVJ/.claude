@@ -17,6 +17,13 @@ import tempfile
 from pathlib import Path
 
 
+def scratch():
+    # Scratch under the repo's work/
+    work = Path(__file__).resolve().parents[4] / 'work'
+    work.mkdir(exist_ok=True)
+    return work
+
+
 def page_count(pdf):
     info = subprocess.run(['pdfinfo', str(pdf)], check=True, capture_output=True, text=True)
     return int(re.search(r'^Pages:\s+(\d+)', info.stdout, re.MULTILINE).group(1))
@@ -64,7 +71,7 @@ if __name__ == '__main__':
     n_old, n_new = page_count(old), page_count(new)
     if n_old != n_new:
         print(f'page count: {n_old} -> {n_new}')
-    with tempfile.TemporaryDirectory(prefix='pdfdiff-') as td:
+    with tempfile.TemporaryDirectory(prefix='pdfdiff-', dir=scratch()) as td:
         tmp = Path(td)
         imgs_old, imgs_new = (
             page_images(old, args.dpi, tmp, 'old'),

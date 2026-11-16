@@ -22,6 +22,13 @@ import zipfile
 from pathlib import Path
 
 
+def scratch():
+    # Scratch under the repo's work/
+    work = Path(__file__).resolve().parents[4] / 'work'
+    work.mkdir(exist_ok=True)
+    return work
+
+
 def parse_slides(spec, n):
     """'1,3-5' -> sorted unique 1-based pages within 1..n."""
     if not spec:
@@ -194,7 +201,7 @@ if __name__ == '__main__':
     out.mkdir(parents=True, exist_ok=True)
 
     report_font_substitutions(pptx)
-    with tempfile.TemporaryDirectory(prefix='render-') as td:
+    with tempfile.TemporaryDirectory(prefix='render-', dir=scratch()) as td:
         tmp = Path(td)
         pdf = to_pdf(pptx, tmp)
         n = page_count(pdf)
