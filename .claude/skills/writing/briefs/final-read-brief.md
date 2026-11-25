@@ -5,9 +5,10 @@
 - Piece: <what the deliverable is>, met once by <its audience: a program committee member, a senior researcher in the room, a viewer at the poster, a newcomer to the repo>.
 - Mode: <reader | listener | viewer>.
 - Text: <the whole piece: source paths, or the extracted script>; renders: <dir and contact sheets | none>.
-- Plan and glossary: work/loop/<slug>/plan.md, or <the project's plan file>; voice: `.claude/skills/writing/voice.md` and <the project's voice files the owner's prompt or project.md names | none>.
+- Plan and glossary: work/loop/<slug>/plan.md, or <the committed project doc that holds the plan>.
+- Voice: `.claude/skills/writing/voice.md` and <the project's voice files the owner's prompt or project.md names | none>.
 - Owner comments and decisions: work/loop/<slug>/owner-comments.md and work/loop/<slug>/decisions.md.
-- Time budget, for a talk: <minutes>; total: <the speaker-script tool the owner's prompt or project.md names, which prints the total | none>.
+- Time budget, for a talk: <minutes>, against a total of <the talk's length as the project's script tool prints it | none>.
 - Report file: work/loop/<slug>/rounds/all-rF-final.md, at most 80 lines.
 
 You read the whole piece once, start to end, as its audience will, after every unit has passed its own review.
@@ -29,7 +30,7 @@ You read the whole piece once, start to end, as its audience will, after every u
 - Numbers: one quantity carries the same value, unit, and rounding everywhere it appears.
 - Form: titles, headings, labels, and captions are each consistent with themselves in capitalization and punctuation.
 - Voice: whether it reads, or sounds, like the owner or like machine text, with the three worst sentences quoted, each with a replacement in the owner's voice.
-- Time, for a talk: whether the budget holds by the printed total and by ear, and which sections run long or short.
+- Time, for a talk: whether the budget holds, by the printed total where one is given and by ear, and which sections run long or short.
 
 ## Report shape
 

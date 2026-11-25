@@ -2,12 +2,13 @@
 
 The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 
-- A project's own voice files, when the owner's prompt or `project.md` names them, and the owner's comments win where they disagree with this file.
+- Where they disagree with this file, the owner's comments win, and so do the project's own voice files that the owner's prompt or `project.md` names.
 - Numbers on length describe the owner's typical shape, never limits, and reviewers never count.
 
 ## Structure
 
-- A section opens with a signpost, "In this section, we first ... Next, ... Finally, ...", each step with its pointer, and a subsection with "Here, we ..." or one framing sentence.
+- A section opens with a signpost, "In this section, we first ... Next, ... Finally, ...", each step with its pointer.
+- A subsection opens with "Here, we ..." or one framing sentence.
 - A paragraph has one topic, opens on it and never with "Then", typically runs two to four sentences, and stands on its own; no block paragraphs.
 - A paragraph closes on a consequence ("Therefore, ...", "Thus, ..."), a pointer, a deferral ("We defer X to Appendix B."), or the claim in italics.
 - Every "what" carries its "why" in the same paragraph, attached with "since", "Therefore,", "Note that", or "For example,".
@@ -15,7 +16,7 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 - The reader never meets a term before its definition, a number before the object it measures, or a figure reference that does not say what the figure shows.
 - A sentence that only restates the previous one is cut, whoever wrote it, and so is detail the target reader does not need.
 - A design is stated with its positive reason, never framed against an alternative nobody raised.
-- A takeaway, the boxed or italic claim that closes an evaluation paragraph, is one claim with its number and its named comparison, never a trailing scope tail.
+- A takeaway, the boxed or italic claim that closes an evaluation paragraph, is one claim with its number and its named comparison, never a trailing clause that narrows its scope.
 - A sentence that waits on a result keeps its placeholder; the prose never admits incompleteness.
 - A plan note never stands as a sentence: no bare fragment ("to measure"), no label for the work ("this paper's proposal"), and no sentence saying what the paragraph will do instead of doing it.
 - Run-in headings are `\textbf{Title Case Noun Phrase.}` of one to four words with a period, prose on the next line, about one per two paragraphs; never one per paragraph, never a question, never a colon.
@@ -36,7 +37,7 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 - A comma is preferred to any dash; an em-dash is rare, always spaced " --- ", and only for an appositive after a complete clause.
 - "(i) ..., (ii) ..., and (iii) ..." marks parallel cases, at most three and often two, never (iv), while "(1) ..., (2) ..., (3) ..." marks stages referred to again by number.
 - Sequences run "First, ... Next, ... Then, ... Finally, ..."; never "Second," or "Third,".
-- Semicolons almost never appear; when one does, it carries "; instead," or "; rather,".
+- A semicolon never appears in LaTeX prose. Elsewhere it is rare and carries "; instead," or "; rather,".
 - Parentheses hold pointers, instances, symbols, and abbreviations, never commentary or hedges.
 - Double quotes (``...'' in LaTeX) mark only a coined label; never single quotes.
 - "X, i.e., Y" mid-sentence, with both commas, restates a definition, and "(e.g., X)" inside parentheses gives an instance; never "e.g." in running text, "In other words", or "that is".
@@ -45,7 +46,8 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 
 ## Numbers
 
-- "8K", "1M", and "5.7 MB" take a space, "50\%" is glued, ranges read "10--50", speedups read "12x", never `$\times$`, and thousands take no separator (`1000`, `12000`).
+- A unit takes a space ("5.7 MB"), a magnitude suffix does not ("8K", "1M"), and "50\%" is glued.
+- Ranges read "10--50", speedups read "12x", never `$\times$`, and thousands take no separator (`1000`, `12000`).
 - Counts up to nine are words unless tied to a unit or a result.
 - Each number appears once, in the sentence about the object it measures, and every ratio names what it divides by.
 - A number keeps its value of record; a missing one is a placeholder, never an estimate.
@@ -76,8 +78,8 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 - Every name comes from the plan's glossary; never coin an abbreviation or a category label for a slide.
 - Every number is measured and carries no mark or footnote; numbers go on a plot with each value at its bar, and no slide is a table alone.
 - A poster result reads "name: value (ratio)" or "A vs B" with the comparison named, rounded and loose.
-- A statement ends with a period, a label or other fragment never does, and no card ends on a closing sentence.
-- Emphasis matches importance: big numbers, their own tiles, and the accent color go only to major results.
+- A statement ends with a period, a label or other fragment never does, and no card (a boxed block of poster text) ends on a closing sentence.
+- Emphasis matches importance: big numbers, their own tiles (a box holding one number), and the accent color go only to major results.
 - No shape, type, or spec strings in prose or labels; a label names the thing, and a supporting statement is a logo or a few words.
 - What ships is ready: no placeholder, TODO, asterisk, hedge, or caution note, and a number the sources do not give is left out, not marked.
 
@@ -91,7 +93,7 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 - A note is said in one breath to a room: stacked clauses, paper phrasing, parentheses, and read-out lists of nouns are revised.
 - A formulaic opener ("To summarize,", "Now,", "So,") or a closing tagline stays only where the owner's own notes do the same.
 - Cues such as `<next slide>` and `<pause>` sit inline where the owner's earlier notes put them.
-- The cue spellings, the title note, and the register of a given talk live in the talk's voice file, when the owner's prompt or `project.md` names one.
+- The cue spellings, the note for the title page, and the register of a given talk live in the talk's voice file, when the owner's prompt or `project.md` names one.
 
 ## Connectives
 

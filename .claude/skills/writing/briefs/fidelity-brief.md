@@ -4,7 +4,7 @@
 
 - Target: unit <id> "<heading or opening words>", a <paragraph | slide | band | the whole talk | section>, in <source path> lines <a> to <b>.
 - Render: <png path | none>.
-- For a .pptx deck, the target and its witness are the slide's XML part plus its notesSlide part from pptx-addon's unpack.
+- For a .pptx deck, the target and its witness are the slide's XML part plus the XML part of its speaker notes, unpacked with pptx-addon's `unpack.py`.
 - Witnesses: work/loop/<slug>/witness/<name>.owner-last.<ext>, the reference for meaning, and <second witness | none>; the target's lines in them: <x to y>.
 - Plan entry, with its sources: "<quoted verbatim>".
 - Sources, in order: the owner's statements in work/loop/<slug>/owner-comments.md and <files>; then <code and data, the published paper, the repositories>; indexes such as a facts sheet: <paths | none>.
@@ -19,7 +19,8 @@ You check one unit for content fidelity: does it say what its witnesses said, no
 
 - A statement traced to the owner is a fact: never challenge it, never ask for evidence, and never mark it UNSUPPORTED; your one check is that the unit transcribes it with the same number, name, and comparison.
 - Where an owner statement and a source disagree, note the difference in one line under that claim and change nothing.
-- The code is the source of record for what a component does: a README sentence the code contradicts loses, and an index is cited only through the line it points at.
+- The code is the source of record for what a component does: a README sentence the code contradicts loses.
+- An index such as a facts sheet is never cited itself: follow it to the code or data line it points at, and cite that line.
 - When the piece has no witness, the plan entry's facts with their sources stand in for one.
 
 ## Method
@@ -53,7 +54,7 @@ C<k> (<line or position>, <element>): "<the claim, verbatim>"
   Fix: "<the corrected text, ready to paste>" | "owner: <the question>"   (CHANGED, UNSUPPORTED, WRONG, MISATTRIBUTED)
 ```
 
-For a whole talk, report only the claims that are not SAME or OWNER-FACT, then the clean pages packed as `p<N>`.
+For a whole talk, report only the claims that are not SAME or OWNER-FACT, then the clean pages on one line, such as `p3, p4, p7`.
 
 - DROPPED: each witness claim no longer stated, quoted with its line, and where it belongs or why dropping it is safe; the owner's own drops are listed once.
 - Numbers and references: every mismatch, or "all match".

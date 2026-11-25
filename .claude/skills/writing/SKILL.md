@@ -7,14 +7,15 @@ argument-hint: <deliverable path> [paper|slides|poster|notes|docs]
 
 # Writing loop
 
-Prose in the owner's voice is drafted once from a plan, then reviewed one unit at a time until no must-fix remains.
+Prose in the owner's voice is drafted once from a plan, then reviewed one unit at a time until no must remains.
 
-- The main session orchestrates: it adjudicates, applies or launches an applier, and commits when asked. Subagents read and report.
+- The main session orchestrates: it adjudicates, applies or launches an applier, and commits when asked.
+  Subagents draft, review, or apply, and report.
 - The house prose rules are in `voice.md`, and the launch texts are in `briefs/`.
 - The owner's prompt or the repo's `project.md` names, when they exist:
   - the project's voice files, exemplars, and glossary
   - model overrides
-  - the script tool
+  - the tool that extracts a talk's speaker script
 - Otherwise the loop proceeds without them.
 - It serves a new piece, a redraft the owner asked for, or a revision.
 - A wording fix the owner dictates needs no loop and is applied as given.
@@ -25,15 +26,34 @@ Prose in the owner's voice is drafted once from a plan, then reviewed one unit a
 ## Vocabulary
 
 - Owner: the person whose voice the piece is in; their comments bind.
-- Unit: the piece of text one round reviews (see the table); its id is `u<NN>-<name>`, assigned in `plan.md`, and distinct from the loop dir `<slug>`.
+- Unit: the piece of text one round reviews (see the table); its id is `u<NN>-<name>`, assigned in `plan.md`, and distinct from the loop directory name `<slug>`.
 - Element: the smallest thing a reviewer gives a verdict on, a sentence, a line, a label, a caption.
 - Witness: the text the unit must stay faithful to; owner-last is the owner's last version before the loop.
 - Frozen: a unit the owner has reviewed and approved, marked in `plan.md`. A prior piece counts as frozen only when the owner names it.
 - Any other draft, an earlier session's included, is unreviewed prose and never stands as the owner's voice.
-- Must or nit: a finding's severity, must for meaning, clarity, or a plan fact, nit for taste.
-- Clean: a unit with no must left; decided: an item the owner has ruled on or a call recorded in `decisions.md`.
+- Must or nit: a finding's severity, must for meaning, clarity, or a plan fact (a fact `plan.md` says the unit must carry), nit for taste.
+- Clean: a unit with no must left.
+- Decided: an item the owner has ruled on, a line marked `Decided:` in `owner-comments.md`, a call recorded in `decisions.md`, or a unit the owner edited.
 - Upstream: a finding about a clean unit, raised while reviewing a later one.
-- Voice verdicts are KEEP, REVISE, CUT, MOVE, OWNER; fidelity verdicts are SAME, CHANGED, NEW, UNSUPPORTED, WRONG, MISATTRIBUTED, OWNER-FACT, plus a DROPPED list.
+- Voice pair: voice-a and voice-b, two readers who judge each element against the owner's voice without seeing each other's report.
+- Fidelity: the reader who checks each claim against the witness and the sources.
+- Applier: the subagent that applies adopted changes exactly as given, then builds and renders.
+- Build-only applier: an applier launched with `none, build only` as its changes, to build and render.
+- Voice verdicts:
+  - KEEP: the element stays.
+  - REVISE: replaced by the reviewer's full text.
+  - CUT: removed.
+  - MOVE: moved where the reviewer says.
+  - OWNER: a question only the owner can answer.
+- Fidelity verdicts:
+  - SAME: the witness's meaning, and no source contradicts it.
+  - CHANGED: the meaning shifted.
+  - NEW: no witness states it, but a source supports it.
+  - UNSUPPORTED: neither a witness nor a source states it.
+  - WRONG: a source contradicts it.
+  - MISATTRIBUTED: true, but credited to the wrong component, paper, or person.
+  - OWNER-FACT: the owner stated it.
+- DROPPED: a witness claim the piece no longer states.
 
 ## Units
 
@@ -42,22 +62,35 @@ Prose in the owner's voice is drafted once from a plan, then reviewed one unit a
 | Paper         | paragraph                             | sentence                                      | page PNG via `pdf-addon`, only when the paragraph references a figure or table |
 | Slides        | slide, with all its builds            | title, line, label, caption, its speaker note | slide PNG via `pptx-addon` or `pdf-addon`                                      |
 | Poster        | band, one full-width row of the sheet | heading, title, tile, chart label, caption    | sheet PNG at a dpi where the band reads                                        |
-| Speaker notes | the whole talk                        | each page's note and each hand-off            | page renders beside the script                                                 |
+| Speaker notes | the whole talk                        | each page's note and its hand-off to the next | page renders beside the script                                                 |
 | Docs          | section                               | sentence and heading                          | none                                                                           |
 
 - Units run top-down, one at a time; the next opens only when the current one is clean.
 - A paper's section titles, captions, and floats belong to the unit whose text they sit beside.
-- A paragraph's page is found with `./docker/exec.sh "pdftotext -layout '<pdf>' -" | awk '/\f/{p++} index($0,"<first words>"){print p+1; exit}'`; a beamer frame's page, by the same search on its title.
-- A beamer slide with builds `-A`, `-B` is one unit, and its `\speakernote` text is an element of it in a slides loop and part of the whole talk in a speaker-notes loop.
-  - The script is `perl -0ne 'print "$2\n\n" while /\\speakernote(\{((?:[^{}]++|(?1))*)\})/g' tex/*/*.tex`, or the tool the owner's prompt or `project.md` names.
+- To find the PDF page that holds a paragraph, or a beamer frame by its title, put its first words in this command:
+
+  ```bash
+  ./docker/exec.sh "pdftotext -layout '<pdf>' -" | awk '/\f/{p++} index($0,"<first words>"){print p+1; exit}'
+  ```
+
+- A beamer build is one animation step of a slide, not a compile: its own file, suffixed `-A`, `-B`, ..., and its own PDF page.
+- A beamer slide with builds `-A`, `-B` is one unit.
+  In a slides loop its `\speakernote` text is one of its elements, and in a speaker-notes loop that text is part of the whole talk.
+  - The talk's speaker script is extracted by the tool the owner's prompt or `project.md` names, else by this, run from the deck directory:
+
+    ```bash
+    perl -0ne 'print "$2\n\n" while /\\speakernote(\{((?:[^{}]++|(?1))*)\})/g' tex/*/*.tex
+    ```
 
 Decks (`.pptx`):
 
-- The unit is one slide, and its text is the slide's XML part plus its notesSlide part.
-- Those parts are unpacked to `work/loop/<slug>/deck/` with `.claude/skills/pptx-addon/scripts/unpack.py` and mapped by `slidemap.py`.
+- A `.pptx` is a ZIP of XML files called parts.
+- The unit is one slide, and its text is the slide's XML part plus the XML part of its speaker notes.
+- Those parts are unpacked to `work/loop/<slug>/deck/` with `.claude/skills/pptx-addon/scripts/unpack.py`.
+- `slidemap.py` maps a slide number to its slide part, and that part's `.rels` file names its speaker-notes part.
 - The witness is the same parts from the owner-last deck.
-- The applier edits those parts, packs in place with `pack.py`, and `pptcheck.py` must exit 0.
-- The scope proof is `deckdiff.py old.pptx new.pptx` listing only those parts.
+- The applier edits those parts, packs them back into the deck file with `pack.py`, and `pptcheck.py` must exit 0.
+- The proof that nothing else changed is `deckdiff.py old.pptx new.pptx` listing only those parts.
 - Renders come from pptx-addon's `render.py`.
 
 ## Roles
@@ -65,6 +98,7 @@ Decks (`.pptx`):
 Defaults, which the owner's prompt or the repo's `project.md` may override.
 
 - Every launch runs in the background as `subagent_type: general-purpose`, except a writer launched as a fork when the thread holds the plan discussion.
+  - A fork is a subagent that inherits the whole conversation.
 - Every launch sets the model, and the effort where the launch mechanism accepts it.
 
 | Role     | Model           | Effort | Brief                                                                       |
@@ -78,24 +112,26 @@ Defaults, which the owner's prompt or the repo's `project.md` may override.
 
 ## Loop records
 
-Everything the loop writes lives in `work/loop/<slug>/` at the repo root, never committed.
+Every loop record lives in `work/loop/<slug>/` at the repo root, never committed.
 
 - `<slug>`: the deck's file stem for a `.pptx`, else the deliverable's directory name with spaces and colons replaced by `-`.
-- If `work/` is not ignored, ask the owner to ignore it. Never edit a `.gitignore` yourself.
-- Rounds are numbered per unit, r1 to r3; after r3 what remains goes to the owner.
+- If `work/` is not ignored, add it to `.git/info/exclude`, never to a `.gitignore`.
+- Rounds are numbered per unit, r1 to r3.
 - `decisions.md` gets a unit's calls as they are made at adjudication, and the record closes when the unit is clean or sent to the owner.
 - In-flight state lives in `rounds/` and in the Loop position block, the summary at the top of `decisions.md` shown below.
 
 Every report is written to `rounds/` the moment its agent finishes, as:
 
-| Report                         | For                                                                                  |
-| ------------------------------ | ------------------------------------------------------------------------------------ |
-| `rounds/<unit>-r<k>-<role>.md` | voice-a, voice-b, fidelity, and the applier of round k                               |
-| `rounds/all-r0-writer.md`      | the writer                                                                           |
-| `rounds/all-r0-applier.md`     | a build-only applier (an applier launched with no changes, only to build and render) |
-| `rounds/all-rF-final.md`       | the final read                                                                       |
+| Report                         | For                                                    |
+| ------------------------------ | ------------------------------------------------------ |
+| `rounds/<unit>-r<k>-<role>.md` | voice-a, voice-b, fidelity, and the applier of round k |
+| `rounds/all-r0-writer.md`      | the writer                                             |
+| `rounds/all-r0-applier.md`     | a build-only applier launched before round 1           |
+| `rounds/all-rF-final.md`       | the final read                                         |
 
-- `plan.md`: the unit list with ids, each unit's job, the facts it must carry with their `path:line` sources, the glossary; a committed project plan, when one exists, is referenced instead.
+- `r0` is the round before round 1, and `rF` is the final read.
+- `plan.md`: the unit list with ids, each unit's job, the facts it must carry with their `path:line` sources, the glossary.
+  - A committed project doc that holds the same, when one exists, is referenced instead.
 - `owner-comments.md`: the owner's comments verbatim, from the conversation, filed per unit or under "All".
   - A note the owner leaves in the source is not for the loop: never read as a comment, never edited, never removed.
   - A line marked `Decided:` is closed.
@@ -105,6 +141,7 @@ Every report is written to `rounds/` the moment its agent finishes, as:
 - `briefs/<unit>-r<k>-<role>.md`: every filled brief, saved here before its launch, so a round can be relaunched exactly.
 - `rounds/`: the reports, named as above.
 - `pre/<unit>-r<k>/`: the applier's copy of the write paths before its edit.
+  - The applier formats every write path before taking this copy and again after its edit, so the scope proof sees only the edited lines.
 - `decisions.md`: the Loop position block, rewritten after every launch, apply, and commit, then one record per unit.
 
 Loop position block:
@@ -122,24 +159,28 @@ Per-unit record; drop a line only when it has nothing to hold:
 - Adopted: per change, the exact old text and the exact new text.
 - Calls: each cut or tie-break made here, and its reason.
 - Owner questions: asked, and the answer once it lands.
-- Rebuild: build line, layout verdict, output freshness, clean or what is still wrong.
+- Rebuild: the build's result line, the layout verdict, whether the output is newer than its sources, and clean or what is still wrong.
 - Commit: the subject, or "not asked".
+
+## Launching a brief
+
+Fill every `<...>` in the brief's Launch section, save the filled copy under `work/loop/<slug>/briefs/`, then launch it as the prompt with the role's model and effort.
 
 ## The loop
 
 1. Plan.
-   - Write `plan.md` or reference the project's plan.
+   - Write `plan.md`, or reference the committed project doc that holds the same.
    - Collect `owner-comments.md`.
    - Save the witnesses before anything changes.
    - Create `decisions.md`.
    - Before any sentence is drafted, `plan.md` lists the owner's approved text on the subject (the prompt, the frozen units, the prior pieces the owner names) as the voice sample and first source.
    - Settle with the owner any call only the owner can make.
    - End with a current build and render. When the build is long, a build-only applier makes it.
-2. Draft, when the piece is new or rejected.
+2. Draft, when the piece is new or the owner asked for a redraft.
    - The writer drafts the whole piece from the plan in one pass, builds, renders, and reports the passages it is least sure of.
    - A skeleton or outline of headings and placeholder sentences is a draft like any other, and its units get the same voice and fidelity rounds.
 3. Round k: voice pair and fidelity, launched in one message, each with its filled brief and its own report file.
-   Fidelity runs whenever the unit's text changed since it last passed, and is skipped otherwise.
+   - Fidelity runs in round 1, and in a later round only when the unit's text changed since fidelity last passed.
 4. Adjudicate in the main session by the rules below, and record every call in `decisions.md`.
 5. Apply.
    - A few lines: exact-string edits in the main session, then a build-only applier.
@@ -157,17 +198,20 @@ Per-unit record; drop a line only when it has nothing to hold:
 ## Adjudication
 
 - An owner comment is applied, not weighed; a proposal that contradicts one is dropped.
-- A decided item is not reopened: a `Decided:` line, a call in `decisions.md`, or a unit the owner edited.
+- A decided item is not reopened.
 - Both readers agree: adopt verbatim.
   They differ: prefer the wording that matches the owner's own earlier text or exemplars, then the shorter.
 - A must raised by one reader is applied unless the other reader explicitly KEEPs the same element; then the orchestrator decides and records why.
 - Readers split on severity: the higher one holds.
 - KEEP against REVISE with a replacement: adopt the replacement only when it fixes a stated must, else KEEP.
 - The owner's earlier wording is a tie-break, not a shield: a restatement is cut whoever wrote it.
-- The owner's exact wording is applied as given, substituting only the value the sources give; it is never expanded with a clause or trimmed of a name.
+- The owner's exact wording is applied as given, with only a value corrected to what the sources give.
+  It is never expanded with a clause or trimmed of a name.
 - Every term is the owner's, from the prompt, the frozen units, or the glossary.
   A term a reader proposes is recorded as a finding, never adopted as a rename.
-- Never adopt text that adds a fact no witness or source states; a fidelity NEW that is a textbook gloss the plan asked for may stay.
+- Never adopt text that adds a fact no witness or source states.
+- A fidelity NEW that is a textbook gloss the plan asked for may stay.
+  A textbook gloss is general background that claims nothing about this work.
 - A fidelity WRONG, CHANGED, or MISATTRIBUTED is corrected from its source first, and the voice rewrite goes on top of the corrected text.
 - A DROPPED claim is restored unless the owner dropped it or the plan moves it elsewhere.
 - A cut on text the owner has not flagged is the orchestrator's call, made and recorded, never queued for the owner.
@@ -181,7 +225,8 @@ Per-unit record; drop a line only when it has nothing to hold:
 
 ## Commits
 
-The loop commits only when the owner asks, by the rules in `session.md`; `work/loop/` is never committed, and a file the owner edits by hand changes only in the lines asked for, in a commit of its own.
+- The loop commits only when the owner asks, with the `commit` skill.
+- In a file the owner edits by hand, the loop changes only the lines the owner asked for, and commits them on their own.
 
 ## Resume after compaction
 
@@ -197,7 +242,3 @@ Resume prompt, for the owner to paste as the first message after a compaction:
 ```
 Continue the writing loop on <deliverable>. Follow the Resume section of .claude/skills/writing/SKILL.md with the records in work/loop/<slug>/, report where the loop is, then <wait for my go | continue unattended to the end>.
 ```
-
-## Launching a brief
-
-Fill every `<...>` in the brief, save the filled copy under `work/loop/<slug>/briefs/`, then launch it as the prompt with the role's model and effort.

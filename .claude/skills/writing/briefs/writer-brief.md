@@ -4,7 +4,7 @@
 
 - Piece: <what the deliverable is, its audience, and its venue or room>; medium: <paper | slides | poster | notes | docs>.
 - Write paths, and nothing else: <the source files the draft goes into>.
-- Plan and glossary: work/loop/<slug>/plan.md, or <the project's plan file>.
+- Plan and glossary: work/loop/<slug>/plan.md, or <the committed project doc that holds the plan>.
 - Voice files: `.claude/skills/writing/voice.md`, then <the project's voice files the owner's prompt or project.md names | none>.
 - Exemplars: <the owner's approved text on the subject: the prompt, the frozen units, the prior pieces the owner names. Never an unreviewed draft or an inferred list>.
 - Witness: work/loop/<slug>/witness/<name>.owner-last.<ext> | none for a new piece.
@@ -16,7 +16,7 @@ You draft the whole piece once, in the owner's voice, from the plan; the loop th
 
 ## Read first, fully, in this order
 
-1. `.claude/engineering.md`, `.claude/project.md`, and `.claude/skills/comment-style/SKILL.md`, before your first edit.
+1. `.claude/engineering.md` and `.claude/project.md`, before your first edit.
 2. The voice files, then the exemplars, until you hear the owner's cadence.
 3. The owner comments: each binds.
 4. The plan: every unit's job, the facts it must carry with their sources, and the glossary.
@@ -45,6 +45,6 @@ You draft the whole piece once, in the owner's voice, from the plan; the loop th
 - Per unit, one line: its id and what it now says, in five to ten words.
 - The passages you are least sure of, each quoted with the doubt in one line.
 - Every placeholder you left, with what it waits for.
-- The build line and the render paths.
+- The build's result line and the render paths.
 
 Write the report to the report file and return only the doubts and the placeholders.
