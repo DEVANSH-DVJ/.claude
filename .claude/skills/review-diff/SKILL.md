@@ -15,8 +15,8 @@ Review the working diff of this repository and report findings. Change nothing.
 3. Review every hunk, in priority order:
    - correctness bugs and behavior changes not implied by the task,
    - violations of the loaded rules (diff discipline, comment style, dependency additions, non-ASCII characters in any text file),
-   - markdown blobs: one finding per line of `python3 .claude/skills/review-diff/mdcheck.py --diff <each changed .md file>`, which skips blocks the diff did not touch,
-   - missing symmetry the rules imply (a "why" comment that belongs in the living docs),
+   - markdown paragraphs or list items over 200 characters of source: one finding per line of `python3 .claude/skills/review-diff/mdcheck.py --diff <each changed .md file>`, which skips untouched blocks,
+   - a "why" comment that belongs in the living docs, not the code,
    - style only when it obscures meaning.
 4. Report one line per finding: `SEVERITY file:line -- issue -- suggested fix`. Severities: BLOCKER / MAJOR / MINOR / NIT. End with a one-paragraph verdict.
 
