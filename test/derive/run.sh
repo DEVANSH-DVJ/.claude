@@ -366,21 +366,22 @@ slug_without_placeholder_refused() {
 
 # -- check --
 
-# --check reports drift by exit code, writes nothing
+# --check reports drift by exit code, writes nothing; a filled skips line is no drift
 check_drift_reported() {
   local out rc
   out=$(check)
   rc=$?
-  want 'exit on drift' "$rc" 1
+  want 'exit without drift' "$rc" 0
   want 'head lines' "$(head -n 2 <<<"$out")" "categories: core drawio"$'\n'"slug: demo"
-  want 'drift lines' "$(grep -E '^(differs|missing|extra) ' <<<"$out")" "differs   format"
+  want 'skips line filled' "$(grep -c -E '^filled +format$' <<<"$out")" 1
+  want 'no drift lines' "$(grep -E '^(differs|missing|extra) ' <<<"$out")" ""
   want status "$(git -C "$G" status --porcelain)" ""
 
-  sed -i 's|^PRUNE+=.*|PRUNE+=()|' "$G/format/format.sh"
+  echo '# a local line' >>"$G/format/format.sh"
   out=$(check)
   rc=$?
-  want 'exit without drift' "$rc" 0
-  want 'no drift lines' "$(grep -E '^(differs|missing|extra) ' <<<"$out")" ""
+  want 'exit on drift' "$rc" 1
+  want 'drift lines' "$(grep -E '^(differs|missing|extra) ' <<<"$out")" "differs   format"
   want 'status after' "$(git -C "$G" status --porcelain)" " M format/format.sh"
 }
 
@@ -432,13 +433,24 @@ changed_file_copied() {
   want 'commit command' "$(grep -c "^git commit -m 'template: sync core, drawio from devansh-dvj/.claude@$(git -C "$T" rev-parse --short HEAD)' " <<<"$out")" 1
 }
 
-# A copy over a local change is noted first
-local_change_noted() {
+# A copied format.sh keeps the skips line, with no local note
+skips_line_kept() {
   local out
   append_template format/format.sh '# trailing template line' 'format: add a line'
   out=$(sync)
+  want listing "$(listing "$out")" "copy   format/format.sh"
+  want content "$(cmp <(sed "s|^PRUNE+=()\$|$FILL|" "$T/format/format.sh") "$G/format/format.sh" 2>&1)" ""
+}
+
+# A copy over a local change is noted first
+local_change_noted() {
+  local out
+  echo '# a local line' >>"$G/format/format.sh"
+  git -C "$G" commit -q -am 'format: add a local line'
+  append_template format/format.sh '# trailing template line' 'format: add a line'
+  out=$(sync)
   want listing "$(listing "$out")" "local  format/format.sh"$'\n'"copy   format/format.sh"
-  want content "$(cmp "$T/format/format.sh" "$G/format/format.sh" 2>&1)" ""
+  want content "$(cmp <(sed "s|^PRUNE+=()\$|$FILL|" "$T/format/format.sh") "$G/format/format.sh" 2>&1)" ""
 }
 
 # A local change equal to the template's is not noted
@@ -505,7 +517,7 @@ shallow_template_fully_synced() {
   cp -p "$T/derive.sh" "$D/shallow/derive.sh"
   out=$("$D/shallow/derive.sh" --sync "$G" 2>&1)
   want 'first line' "$(head -n 1 <<<"$out")" "full sync: template commit $BASE is not in $D/shallow"
-  want listing "$(listing "$out")" "copy   docker/run.sh"$'\n'"copy   format/format.sh"
+  want listing "$(listing "$out")" "copy   docker/run.sh"
   want 'commit command' "$(grep -c "^git commit -m 'template: sync core, drawio from " <<<"$out")" 1
 }
 
@@ -515,7 +527,7 @@ unknown_base_fully_synced() {
   git -C "$G" commit -q --allow-empty -m 'template: sync core, drawio from devansh-dvj/.claude@deadbee'
   out=$(sync)
   want 'first line' "$(head -n 1 <<<"$out")" "full sync: template commit deadbee is not in $T"
-  want listing "$(listing "$out")" "copy   format/format.sh"
+  want listing "$(listing "$out")" ""
 
   rm -rf "$G/.git"
   git init -q "$G"
@@ -706,7 +718,7 @@ for s in \
   unrecorded_categories_refused commit_body_ignored old_category_refused \
   slug_without_placeholder_refused \
   check_drift_reported check_failure_reported \
-  up_to_date_target_untouched changed_file_copied local_change_noted equal_change_unnoted \
+  up_to_date_target_untouched changed_file_copied skips_line_kept local_change_noted equal_change_unnoted \
   rename_delete_chmod_applied project_parts_kept shallow_template_fully_synced unknown_base_fully_synced \
   sync_without_slug_refused \
   exclude_created gitignore_untouched own_ignore_respected existing_exclude_kept unended_exclude_appended \

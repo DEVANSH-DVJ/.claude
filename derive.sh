@@ -293,11 +293,17 @@ owned() {
   esac
 }
 
+# format.sh with the project's skips line emptied
+unprune() {
+  sed 's/^PRUNE+=(.*)$/PRUNE+=()/'
+}
+
 # Equal to the template once the commit 2 placeholders are filled
 filled() {
   local t=$TEMPLATE/$2 g=$1/$2
   case $2 in
     CLAUDE.md) cmp -s <(claude_body "$t") <(claude_body "$g") ;;
+    format/format.sh) same_mode "$t" "$g" && cmp -s "$t" <(unprune <"$g") ;;
     docker/*/*) return 1 ;;
     docker/*.sh) [ -n "$SLUG" ] && same_mode "$t" "$g" && cmp -s <(sed "s/myproject/$SLUG/g" "$t") "$g" ;;
     *) return 1 ;;
@@ -323,6 +329,11 @@ local_change() {
   else
     old=$(git -C "$TEMPLATE" show "$BASE:$f" | git hash-object --stdin)
   fi || die "cannot read $f at template commit $BASE"
+  # the skips line is the project's own
+  if [[ $f == format/format.sh ]]; then
+    [ "$old" != "$(unprune <"$1/$f" | git hash-object --stdin)" ]
+    return
+  fi
   [ "$old" != "$(git hash-object --stdin <"$1/$f")" ]
 }
 
@@ -464,7 +475,7 @@ derive() {
 
 # Copy the template's changes since BASE into a derived target; every path without a BASE
 sync_target() {
-  local target=$1 e p f sha cats msg merged files=() gone=() line n=0
+  local target=$1 e p f sha cats msg merged prune= files=() gone=() line n=0
   local -A drift=()
   shift
   read_last "$target"
@@ -483,6 +494,10 @@ sync_target() {
   read_base "$target"
   template_diff
 
+  # the project's skips line, read before any overwrite
+  if [ -f "$target/format/format.sh" ]; then
+    prune=$(sed -n '/^PRUNE+=(.*)$/{p;q}' "$target/format/format.sh")
+  fi
   # note local changes before any overwrite; remove what the template dropped
   for f in "${!CHANGED[@]}"; do
     if local_change "$target" "$f"; then
@@ -540,6 +555,11 @@ sync_target() {
       sed -i "s/myproject/$SLUG/g" "$target/$f"
     fi
   done
+  # the skips line goes back into a copied format.sh
+  if [[ -n $prune && " ${files[*]} " == *" format/format.sh "* ]]; then
+    merged=$(LINE=$prune awk '/^PRUNE\+=\(.*\)$/ { $0 = ENVIRON["LINE"] } { print }' "$target/format/format.sh" && echo .)
+    printf '%s' "${merged%.}" >"$target/format/format.sh"
+  fi
 
   # index back to HEAD; every change under the roots is the sync's own
   git -C "$target" reset -q -- "${ROOTS[@]}"
