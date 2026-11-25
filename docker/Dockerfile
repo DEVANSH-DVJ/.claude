@@ -60,7 +60,7 @@ RUN curl -fsSL "https://github.com/jgraph/drawio-desktop/releases/download/v${DR
 RUN apt-get update && apt-get install -y --no-install-recommends poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# pdf python tools for the pdf addon
+# pdf python tools for the pdf addon and the plugin's pdf skill
 RUN pip install --no-cache-dir pdf2image pillow
 
 # fontconfig and licensed fonts, last so font edits rebuild little
