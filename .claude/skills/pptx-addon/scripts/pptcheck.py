@@ -2,8 +2,8 @@
 """
 Flag pptx constructs PowerPoint lays out differently from LibreOffice:
 an <a:endParaRPr> before a paragraph's last child, a stored normAutofit scale,
-and, wrapping greedily at spaces, a line or a line plus the word wrapped after it
-within 97-103% of the box's inner width.
+a run whose font or size does not resolve, and, wrapping greedily at spaces,
+a line or a line plus the word wrapped after it within 97-103% of the box's inner width.
 Prints one line per hit and exits 1 if any.
 
 Usage:

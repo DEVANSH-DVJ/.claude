@@ -9,7 +9,8 @@ user-invocable: true
 Look at pages as images, read the text, and compare versions page by page.
 
 - Extraction, creation, merging, splitting, forms, and OCR belong to Anthropic's `pdf` skill, invoked as `/document-skills:pdf`.
-- `.claude/settings.json` installs its plugin.
+- `.claude/settings.json` registers its marketplace and enables the plugin.
+- If it is missing on a machine, run `/plugin marketplace add anthropics/skills` and `/plugin install document-skills@anthropic-agent-skills`.
 
 ## Environment
 
@@ -19,13 +20,15 @@ Every command runs through the project runner from the repo root:
 ./docker/exec.sh "<command>"
 ```
 
-Scripts live at `.claude/skills/pdf-addon/scripts/`; paths in this file are repo-relative.
-Renders go in `render/`, scratch in `work/`; keep both ignored through `.git/info/exclude`.
-Pages are 1-based.
+- Scripts live at `.claude/skills/pdf-addon/scripts/`.
+- Paths in this file are repo-relative.
+- Renders go in `render/` and scratch in `work/`.
+  If either is not ignored, add it to `.git/info/exclude`, never to a `.gitignore`.
+- Pages are 1-based.
 
 ## The loop
 
-1. **Render** the pages in question and look at the contact sheet first, then the pages:
+1. **Render** the pages in question and look at the contact sheet (`grid.png`, every rendered page as a thumbnail) first, then the pages:
    ```bash
    ./docker/exec.sh "python .claude/skills/pdf-addon/scripts/render.py paper.pdf --grid"
    ./docker/exec.sh "python .claude/skills/pdf-addon/scripts/render.py paper.pdf --pages 3-5 --dpi 150"
@@ -41,7 +44,7 @@ Pages are 1-based.
 
 ## Scripts
 
-- `render.py doc.pdf [--pages 1,3-5] [--dpi 110] [--grid --cols 4] [--out DIR]`: `page-NN.png` per requested page into `render/<doc path>/`, plus `grid.png`.
+- `render.py doc.pdf [--pages 1,3-5] [--dpi 110] [--grid --cols 4] [--out DIR]`: `page-NN.png` per requested page into `render/<the PDF's repo path without .pdf>/`, plus `grid.png` with `--grid`.
 - `pdfdiff.py old.pdf new.pdf [--dpi 40] [--text]`: one line per changed page with text lines and pixel fraction changed; `--text` adds the unified text diff.
 
 ## Image requirements
