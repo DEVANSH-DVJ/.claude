@@ -10,7 +10,7 @@ CLAUDE.md                 thin loader: @-includes the three rule files
 derive.sh                 copies categories into a repo, checks or syncs a derived repo; stays here
 test/                     checks for derive.sh and the hooks; stays here
 .claude/
-  session.md              how I work in any session
+  session.md              how a session works
   engineering.md          code/diff/comment/docs conventions
   project.md              the project's own context file
   settings.json           enables the document-skills plugin, wires the hooks
@@ -23,13 +23,13 @@ format/                   format.sh dispatcher + per-language configs
 docker/
   build.sh                builds the image
   run.sh                  interactive shell in an ephemeral or --persistent container
-  exec.sh                 one command in a throwaway container: ./docker/exec.sh "<cmd>"
+  exec.sh                 one command in a throwaway container, named on stderr: ./docker/exec.sh "<cmd>"
   chown.sh                hands the repo's files back to the host user
   cleanup.sh              removes, on confirmation, each container of the project image
   Dockerfile              the image, in marked blocks
   environment.yml         the conda env the project image installs
   entrypoint.sh           the image's interactive entrypoint
-  fonts/                  licensed fonts for the drawio block
+  fonts/                  licensed fonts for the drawio block, and texmf/ for host LaTeX
 ```
 
 ## Categories
@@ -43,9 +43,10 @@ docker/
 | paper-latex  | skill `latex`                                                                  | drawio, writing |
 | slides-latex | skill `beamer`                                                                 | paper-latex     |
 
-LaTeX builds run on the host; the image is for diagram export and PDF review.
-A repo without drawio gets `settings.json` without the plugin keys.
-The exact paths and Dockerfile blocks per category are the `MANIFEST` and `BLOCKS` arrays in `derive.sh`.
+LaTeX builds run on the host, and the image does diagram export and PDF review.
+
+- A repo without drawio gets `settings.json` without the plugin keys.
+- The exact paths and Dockerfile blocks per category are the `MANIFEST` and `BLOCKS` arrays in `derive.sh`.
 
 ## Images
 
@@ -75,22 +76,22 @@ The exact paths and Dockerfile blocks per category are the `MANIFEST` and `BLOCK
 
 ## Skills
 
-Every skill loads when its description matches the task, and every one but the comment doctrine can also be invoked by name.
+Every skill loads when its description matches the task, and every one but `comment-style` can also be invoked by name.
 
-| Skill           | Category     | Does                                                                   |
-| --------------- | ------------ | ---------------------------------------------------------------------- |
-| `/review-diff`  | core         | reviews the working diff against this project's rule files             |
-| `/commit`       | core         | makes one pathspec-safe commit                                         |
-| `/format`       | core         | formats files, folders, or globs with the project formatter            |
-| `/delegate`     | core         | runs a session as the orchestrator of its subagents                    |
-| `/plans`        | core         | writes, runs, and closes one prompt file per planned session           |
-| `comment-style` | core         | sets the terse-comment doctrine                                        |
-| `/drawio`       | drawio       | draws native `.drawio` diagrams, exported headlessly in the image      |
-| `/pdf-addon`    | drawio       | reviews a PDF by contact sheet and page-by-page diff of two versions   |
-| `/writing`      | writing      | drafts and reviews prose, one unit at a time, through the review loop  |
-| `/pptx-addon`   | slides-pptx  | edits a few slides of a deck and proves the rest unchanged             |
-| `/latex`        | paper-latex  | builds, reviews, and diffs LaTeX papers and talks with host `make`     |
-| `/beamer`       | slides-latex | writes, builds, and reviews a beamer deck, one frame per file          |
+| Skill           | Category     | Does                                                                  |
+| --------------- | ------------ | --------------------------------------------------------------------- |
+| `/review-diff`  | core         | reviews the working diff against `engineering.md` and `project.md`    |
+| `/commit`       | core         | makes one pathspec-safe commit                                        |
+| `/format`       | core         | formats files, folders, or globs with the project formatter           |
+| `/delegate`     | core         | runs a session as the orchestrator of its subagents                   |
+| `/plans`        | core         | writes, runs, and closes one prompt file per planned session          |
+| `comment-style` | core         | sets the terse-comment doctrine                                       |
+| `/drawio`       | drawio       | draws native `.drawio` diagrams, exported headlessly in the image     |
+| `/pdf-addon`    | drawio       | reviews a PDF by contact sheet and page-by-page diff of two versions  |
+| `/writing`      | writing      | drafts and reviews prose, one unit at a time, through the review loop |
+| `/pptx-addon`   | slides-pptx  | edits a few slides of a deck and proves the rest unchanged            |
+| `/latex`        | paper-latex  | builds, reviews, and diffs LaTeX papers and talks with host `make`    |
+| `/beamer`       | slides-latex | writes, builds, and reviews a beamer deck, one frame per file         |
 
 Claude Code loads a personal `~/.claude/skills/<name>` over a project skill of the same name, so keep no personal copies of these.
 
@@ -106,10 +107,12 @@ A repo takes the template in two commits and later picks up template changes wit
 - `derive.sh <repo> <category>...` copies the files for commit 1.
 - `derive.sh --replace <repo> <category>...` does the same for an existing repo, removing its tracked files under `CLAUDE.md`, `.claude/`, `docker/`, and `format/` first.
 - `derive.sh --slug <slug> <repo>` writes the slug into `docker/*.sh` and prints the commit 2 commands.
-- `derive.sh --check <repo> [<category>...]` prints one status per template path: `identical`, `filled` (a project-owned part), `differs`, `missing`, or `extra` (a category the repo did not take); exit 1 on `differs` or `missing`.
+- `derive.sh --check <repo> [<category>...]` prints one status per template path and exits 1 on `differs` or `missing`.
+  - The statuses are `identical`, `filled` (a project-owned part), `differs`, `missing`, and `extra` (a category the repo did not take).
   - It checks the categories named after the repo, else those the repo's last `template:` commit records.
   - When that commit records none, or there is none, it stops and names the fix: `derive.sh --check <repo> <category>...`.
-- `derive.sh --sync <repo> [<category>...]` copies what the template changed since the repo's last `template:` commit, removes what it dropped, leaves every other file as the repo has it, and keeps the project-owned parts.
+- `derive.sh --sync <repo> [<category>...]` copies what the template changed since the repo's last `template:` commit and removes what it dropped.
+  - It leaves every other file as the repo has it, and keeps the project-owned parts.
   - It takes its categories as `--check` does and stops the same way, naming `derive.sh --sync <repo> <category>...`.
   - It prints the sync commit, which records the categories as the import commit does.
   - Naming the categories on an up-to-date repo prints an empty commit that records them, unless the last `template:` commit already records that list.
@@ -132,8 +135,9 @@ The two prompts below drive this from a Claude Code session in the repo.
 >    Then wait for my confirmation.
 > 4. Run `work/template/derive.sh . <categories>` and make commit 1 with exactly the commands it prints.
 >    - If a `derive.sh` command fails, show me its output and wait.
-> 5. Run `work/template/derive.sh --slug <slug> .`, fill `.claude/project.md` from my answer and the repo, and fill the two placeholders at the top of `CLAUDE.md`.
->    Make commit 2 with exactly the commands `--slug` printed.
+> 5. Run `work/template/derive.sh --slug <slug> .`, then:
+>    - Fill `.claude/project.md` from my answer and the repo, and the two placeholders at the top of `CLAUDE.md`.
+>    - Make commit 2 with exactly the commands `--slug` printed.
 > 6. Run `./docker/build.sh` in the background, tell me whether it built or found an existing image of that name, and remove `work/template`.
 
 ## Sync prompt (existing repo)
