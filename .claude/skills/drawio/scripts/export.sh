@@ -1,7 +1,7 @@
 #!/bin/bash
 # Headless draw.io export, run inside the container via exec.sh.
 # Usage: export.sh <in.drawio> <out.png or out.pdf> [scale] [page]
-# Format from the extension (.pdf, else png); page is 1-based; scale is png only.
+# Format from the extension, .png or .pdf; page is 1-based; scale is png only.
 set -euo pipefail
 
 IN=${1:?usage: export.sh <in.drawio> <out.png or out.pdf> [scale] [page]}
@@ -23,6 +23,13 @@ fail() {
   echo "drawio-export: $1" >&2
   exit 1
 }
+
+# PDF is vector and cropped to the drawing; PNG is transparent and scaled.
+case "${OUT##*.}" in
+  pdf) FLAGS=(-f pdf --crop) ;;
+  png) FLAGS=(-f png -t -s "$SCALE") ;;
+  *) fail "$OUT: extension must be .png or .pdf" ;;
+esac
 
 # First display with neither socket nor lock.
 for n in $(seq 90 119); do
@@ -49,12 +56,6 @@ rm -f "$OUT"
 # Electron runs against this display and no session bus.
 export DISPLAY=":$DISP"
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
-
-# PDF is vector and cropped to the drawing; PNG is transparent and scaled.
-case "${OUT##*.}" in
-  pdf) FLAGS=(-f pdf --crop) ;;
-  *) FLAGS=(-f png -t -s "$SCALE") ;;
-esac
 
 timeout -k 5 "$DEADLINE" drawio --no-sandbox --disable-gpu --disable-dev-shm-usage \
   -x "${FLAGS[@]}" -p "$PAGE" -e -b 0 -o "$OUT" "$IN" >/dev/null 2>&1 ||
