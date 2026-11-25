@@ -78,7 +78,7 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 - The title is in the owner's own title style; a clever assertion headline, a slogan, or a punchline is revised even when true.
 - No body line restates the title, explains, qualifies, disclaims, or narrates; no semicolon-joined clauses, no metaphors, no slogan rhythm.
 - The reason, the caveat, the scope, the second example, and the aside belong in the notes; the slide keeps the claim, the number, and the picture.
-- Every name comes from the plan's glossary; never coin an abbreviation or a category label for a slide.
+- Every name comes from the glossary; never coin an abbreviation or a category label for a slide.
 - Every number is measured and carries no mark or footnote; numbers go on a plot with each value at its bar, and no slide is a table alone.
 - A poster result reads "name: value (ratio)" or "A vs B" with the comparison named, rounded and loose.
 - A statement ends with a period, a label or other fragment never does, and no card (a boxed block of poster text) ends on a closing sentence.

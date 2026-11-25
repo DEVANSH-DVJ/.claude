@@ -6,7 +6,7 @@
 - Render: <png path | none>.
 - For a .pptx deck, the target and its witness are the slide's XML part plus the XML part of its speaker notes, unpacked with pptx-addon's `unpack.py`.
 - Witnesses: work/loop/<slug>/witness/<name>.owner-last.<ext>, the reference for meaning, and <second witness | none>; the target's lines in them: <x to y>.
-- Plan entry, with its sources: "<quoted verbatim>".
+- Unit entry, with its sources: "<quoted verbatim>".
 - Sources, in order:
   - the owner's statements in work/loop/<slug>/owner-comments.md and <files>
   - then <code and data, the published paper, the repositories>
@@ -25,7 +25,7 @@ You check one unit for content fidelity: does it say what its witnesses said, no
 - Where an owner statement and a source disagree, note the difference in one line under that claim and change nothing.
 - The code is the source of record for what a component does: a README sentence the code contradicts loses.
 - An index such as a facts sheet is never cited itself: follow it to the code or data line it points at, and cite that line.
-- When the piece has no witness, the plan entry's facts with their sources stand in for one.
+- When the piece has no witness, the unit entry's facts with their sources stand in for one.
 
 ## Method
 

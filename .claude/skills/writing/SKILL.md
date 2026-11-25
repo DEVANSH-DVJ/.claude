@@ -26,12 +26,12 @@ Prose in the owner's voice is drafted once from a plan, then reviewed one unit a
 ## Vocabulary
 
 - Owner: the person whose voice the piece is in; their comments bind.
-- Unit: the piece of text one round reviews (see the table); its id is `u<NN>-<name>`, assigned in `plan.md`, and distinct from the loop directory name `<slug>`.
+- Unit: the piece of text one round reviews (see the table); its id is `u<NN>-<name>`, assigned in `units.md`, and distinct from the loop directory name `<slug>`.
 - Element: the smallest thing a reviewer gives a verdict on, a sentence, a line, a label, a caption.
 - Witness: the text the unit must stay faithful to; owner-last is the owner's last version before the loop.
-- Frozen: a unit the owner has reviewed and approved, marked in `plan.md`. A prior piece counts as frozen only when the owner names it.
+- Frozen: a unit the owner has reviewed and approved, marked in `units.md`. A prior piece counts as frozen only when the owner names it.
 - Any other draft, an earlier session's included, is unreviewed prose and never stands as the owner's voice.
-- Must or nit: a finding's severity, must for meaning, clarity, or a plan fact (a fact `plan.md` says the unit must carry), nit for taste.
+- Must or nit: a finding's severity, must for meaning, clarity, or a plan fact (a fact `units.md` says the unit must carry), nit for taste.
 - Clean: a unit with no must left.
 - Decided: an item the owner has ruled on, a line marked `Decided:` in `owner-comments.md`, a call recorded in `decisions.md`, or a unit the owner edited.
 - Upstream: a finding about a clean unit, raised while reviewing a later one.
@@ -130,7 +130,7 @@ Every report is written to `rounds/` the moment its agent finishes, as:
 | `rounds/all-rF-final.md`       | the final read                                         |
 
 - `r0` is the round before round 1, and `rF` is the final read.
-- `plan.md`: the unit list with ids, each unit's job, the facts it must carry with their `path:line` sources, the glossary.
+- `units.md`: the unit list with ids, each unit's job, the facts it must carry with their `path:line` sources, the glossary.
   - A committed project doc that holds the same, when one exists, is referenced instead.
 - `owner-comments.md`: the owner's comments verbatim, from the conversation, filed per unit or under "All".
   - A note the owner leaves in the source is not for the loop: never read as a comment, never edited, never removed.
@@ -169,11 +169,11 @@ Fill every `<...>` in the brief's Launch section, save the filled copy under `wo
 ## The loop
 
 1. Plan.
-   - Write `plan.md`, or reference the committed project doc that holds the same.
+   - Write `units.md`, or reference the committed project doc that holds the same.
    - Collect `owner-comments.md`.
    - Save the witnesses before anything changes.
    - Create `decisions.md`.
-   - Before any sentence is drafted, `plan.md` lists the owner's approved text on the subject (the prompt, the frozen units, the prior pieces the owner names) as the voice sample and first source.
+   - Before any sentence is drafted, `units.md` lists the owner's approved text on the subject (the prompt, the frozen units, the prior pieces the owner names) as the voice sample and first source.
    - Settle with the owner any call only the owner can make.
    - End with a current build and render. When the build is long, a build-only applier makes it.
 2. Draft, when the piece is new or the owner asked for a redraft.
@@ -231,7 +231,7 @@ Fill every `<...>` in the brief's Launch section, save the filled copy under `wo
 
 ## Resume after compaction
 
-1. Read this file, then the Loop position block and the last three records of `decisions.md`, `owner-comments.md`, and the plan entry of the unit in review.
+1. Read this file, then the Loop position block and the last three records of `decisions.md`, `owner-comments.md`, and the unit's entry in `units.md`.
 2. Run `git status --short <deliverable>`.
 3. Find the unit by its heading with `grep -n`, never by a recorded line number.
 4. For each agent in flight, run its check command; if its report file is missing after its expected minutes, relaunch the last round from its saved brief.

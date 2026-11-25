@@ -6,7 +6,7 @@
 - Target: unit <id> "<heading or opening words>", a <paragraph | slide | band | the whole talk | section>, in <source path> lines <a> to <b>; clean before it: <unit ids>.
 - Render: <png path | none>.
 - For a .pptx deck, the target text is its slide's XML part plus the XML part of its speaker notes, unpacked with pptx-addon's `unpack.py`: <paths | not a deck>.
-- Plan and glossary: work/loop/<slug>/plan.md, or <the committed project doc that holds the plan>; entry quoted: "<the target's entry>".
+- Units and glossary: work/loop/<slug>/units.md, or <the committed project doc that holds the same>; entry quoted: "<the target's entry>".
 - Voice files: `.claude/skills/writing/voice.md`, then <the project's voice files the owner's prompt or project.md names | none>, and <the project's numbered list of the owner's habits | none>.
 - Exemplars: <the owner's earlier work>.
 - Owner comments and decisions: work/loop/<slug>/owner-comments.md and work/loop/<slug>/decisions.md.
@@ -25,7 +25,7 @@ You are a reader, not a script: word counts, frequency statistics, and every oth
 1. The voice files: binding, and the project's own files win where they disagree with `voice.md`; cite a rule by its section heading, such as "Sentences", and a listed habit by its number.
 2. The owner comments: each binds, a comment that names the target is decided, and a line marked `Decided:` is closed.
 3. The decisions record: a decided call is not relitigated unless this round broke it.
-4. The plan: the target's entry and the glossary; then the exemplars, to calibrate your ear.
+4. The units file: the target's entry and the glossary; then the exemplars, to calibrate your ear.
 5. The clean units above the target: the target follows from them and uses their names; propose nothing inside them except under Upstream.
 6. The target: when the launch gives a render, view it with the Read tool before you judge a word.
    - Then read its source with line numbers, so every replacement is ready to paste.
@@ -42,7 +42,7 @@ An element, by medium:
 | Band        | a heading, title, number with its label, chart or figure label, or caption |
 | Talk        | a page's note and its hand-off to the next page                            |
 
-- Does it do the job its plan entry gives it, carrying every fact the entry requires and none it does not?
+- Does it do the job its unit entry gives it, carrying every fact the entry requires and none it does not?
 - Does it open on what the reader already holds and end on the new thing, with the agent as subject and the action in the verb?
 - Voice: would the owner have written it this way, and which rule or listed habit does a rewrite honor?
 - Clarity: where would a first-time reader, a listener, or a viewer at a glance stumble, meet a term before its definition, or ask "why?" with no answer in reach?
@@ -55,7 +55,7 @@ For each element in reading order (for a whole talk, only the pages that are not
 ```
 E<k> (<kind>, <line or position>): "<verbatim text>"
   Verdict: KEEP | REVISE | CUT | MOVE | OWNER
-  Severity: must | nit   (a must changes meaning, clarity, or a fact the plan entry requires; a nit is taste)
+  Severity: must | nit   (a must changes meaning, clarity, or a fact the unit entry requires; a nit is taste)
   Reason: one line naming the rule, the listed habit, the plan fact, the owner comment, or the reader's stumble.
   Proposed: "<the complete replacement, ready to paste>"   (REVISE; MOVE also says where it goes)
   Question: "<the one question only the owner can answer, about a fact or a decision, never a name or a wording>"   (OWNER)
@@ -63,8 +63,8 @@ E<k> (<kind>, <line or position>): "<verbatim text>"
 
 Then, each as a short block:
 
-- Unit verdict: whether it does the job its plan entry gives it, opens on its topic, and closes on a consequence, a pointer, or a hand-off.
-  - Each missing fact the plan entry requires goes here as the text to add and where.
+- Unit verdict: whether it does the job its unit entry gives it, opens on its topic, and closes on a consequence, a pointer, or a hand-off.
+  - Each missing fact the unit entry requires goes here as the text to add and where.
 - Flow: does it follow from the unit above and hand off to the next?
 - Names: every term that is not the owner's (the prompt, the frozen units, the glossary) or differs from the clean units, with the owner's form.
   - A term you would rather use goes here, never into a Proposed text.

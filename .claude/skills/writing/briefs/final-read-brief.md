@@ -5,7 +5,7 @@
 - Piece: <what the deliverable is>, met once by <its audience: a program committee member, a senior researcher in the room, a viewer at the poster, a newcomer to the repo>.
 - Mode: <reader | listener | viewer>.
 - Text: <the whole piece: source paths, or the extracted script>; renders: <dir and contact sheets | none>.
-- Plan and glossary: work/loop/<slug>/plan.md, or <the committed project doc that holds the plan>.
+- Units and glossary: work/loop/<slug>/units.md, or <the committed project doc that holds the same>.
 - Voice: `.claude/skills/writing/voice.md` and <the project's voice files the owner's prompt or project.md names | none>.
 - Owner comments and decisions: work/loop/<slug>/owner-comments.md and work/loop/<slug>/decisions.md.
 - Time budget, for a talk: <minutes>, against a total of <the talk's length as the project's script tool prints it | none>.
