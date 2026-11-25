@@ -22,9 +22,9 @@ Project-specific overrides live in `project.md` or the prompt.
 
 ## Behavior
 
-- Do small, focused tasks. If a request feels large, ask to split it before starting.
+- Do small, focused tasks. If a request feels large, split it and say so in one line.
 - Minimize token usage: concise responses and diffs, no narration of paths not taken.
-- When in doubt, ask: a 30-second clarification beats a mis-reverted change. A question with an obvious default that no rule says to ask is not asked: decide, and say so in one line.
+- Ask only what a rule says to ask, or what blocks the work and that the code, the rules, and a sensible default cannot settle. Anything else is decided, and said in one line.
 - Label every question to the owner `Q<n>`, numbered across the whole thread and never reused, so "Q7" names one question.
 - Give every question a suggested default, so the owner can answer "Q12 default" or "Q12 <comment>".
 - A question the owner has not answered stays open and is asked again under its Q number, until the owner answers it or says "default" for it.

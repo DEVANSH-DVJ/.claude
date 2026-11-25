@@ -1,6 +1,6 @@
 ---
 name: writing
-description: Draft, revise, or review a prose deliverable the owner asks for -- a paper, slide text, a poster, speaker notes, or a doc -- one unit at a time through a review loop of plan, draft, a two-reader voice review, a fidelity check, adjudication, apply, further rounds, and a final whole-piece read, in the shape the owner confirms first. Use when the owner asks to draft or review such a piece, or asks for the loop, a voice review, or a fidelity check; a doc edit that rides along with a code change does not use it.
+description: Draft, revise, or review a prose deliverable the owner asks for -- a paper, slide text, a poster, speaker notes, or a doc -- one unit at a time through a review loop of plan, draft, a two-reader voice review, a fidelity check, adjudication, apply, further rounds, and a final whole-piece read, in the shape the session states first. Use when the owner asks to draft or review such a piece, or asks for the loop, a voice review, or a fidelity check; a doc edit that rides along with a code change does not use it.
 user-invocable: true
 argument-hint: <deliverable path> [paper|slides|poster|notes|docs]
 ---
@@ -19,7 +19,7 @@ Prose in the owner's voice is drafted once from a plan, then reviewed one unit a
 - Otherwise the loop proceeds without them.
 - It serves a new piece, a redraft the owner asked for, or a revision.
 - A wording fix the owner dictates needs no loop and is applied as given.
-- The full loop is the default shape, not a mandate: before the first round, the session proposes the shape and the owner confirms it.
+- The full loop is the default shape, not a mandate: before the first round, the session states the shape in one line and proceeds unless the owner objects.
 - What sets the shape: the piece's state, the urgency, the scope of the review, and which units are frozen.
 - A shape may drop a pass, run one pass alone, or cover the open units only.
 
@@ -136,7 +136,7 @@ Every report is written to `rounds/` the moment its agent finishes, as:
   - A note the owner leaves in the source is not for the loop: never read as a comment, never edited, never removed.
   - A line marked `Decided:` is closed.
 - `witness/<name>.owner-last.<ext>`: the owner's last version before the loop.
-  - It comes from the working tree when that differs from HEAD and the owner confirms the edits are theirs, else from `git show HEAD:<path>`.
+  - It comes from the working tree when the owner's prompt or comments say its uncommitted edits are theirs, else from `git show HEAD:<path>`.
 - `witness/<name>.<label>.<ext>`: an older second witness. Owner-last wins where they differ.
 - `briefs/<unit>-r<k>-<role>.md`: every filled brief, saved here before its launch, so a round can be relaunched exactly.
 - `rounds/`: the reports, named as above.
