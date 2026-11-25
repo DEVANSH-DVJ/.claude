@@ -1,21 +1,22 @@
 # Session rules
 
-How I work in any session on this project.
-These are project-agnostic; project-specific overrides live in `project.md` or the prompt.
+Project-agnostic session rules.
+Project-specific overrides live in `project.md` or the prompt.
 
 ## Persistence across sessions
 
 - Record only what a later session needs and cannot get from the code: a durable fact about the project, or a preference the owner states as standing.
-- An instruction for the task at hand, a decision about current work, or a correction to this session is followed now and not recorded as a rule; if a later session must know it, it goes in the living status doc.
+- A task instruction, a decision on current work, or a correction to this session is followed now, not recorded as a rule. What a later session must know of it goes in the living status doc.
 - Before adding or changing a line in a rule file, show the owner the exact line and its place, and write it only on a yes.
 - Write a rule as narrow as it was said: name the case it covers, and never widen one remark into a general "never" or "always".
 - Replace or tighten an existing line before appending a new one, and remove a line the new one supersedes in the same edit.
 
 ## What `project.md` holds
 
-- What is true of the whole project for as long as it exists: no status, dates, counts, or commit hashes, and nothing about one deliverable or the content of the work; those go in the status doc or that deliverable's plan.
+- What is true of the whole project for as long as it exists. Status, dates, counts, hashes, and anything about one deliverable or the work's content go in the status doc or that deliverable's plan.
 - Each fact once: when the README, a run doc, a skill, or a shared rule already says it, point there, and keep the layout to directories and entry points, not what each file does.
-- Every line sits under one of the file's sections; a project's own standing rule goes under Overrides, naming the shared rule it overrides when it does; a line that fits no section does not belong in the file.
+- Every line sits under one of the file's sections, and a line that fits none does not belong in the file.
+- A project's own standing rule goes under Overrides, naming the shared rule it overrides, if any.
 - One rule per bullet, about 40 words at most, with no tag for who said it or when.
 - The file stays under 1,000 words; a line that would take it past that replaces something else.
 - A change that removes or renames something the file names fixes that line in the same commit.
@@ -24,16 +25,19 @@ These are project-agnostic; project-specific overrides live in `project.md` or t
 
 - Do small, focused tasks. If a request feels large, ask to split it before starting.
 - Minimize token usage: concise responses and diffs, no narration of paths not taken.
-- When in doubt, ask. A 30-second clarification beats a mis-reverted change.
-- Number every question to the owner; a number is never reused in a session, so the count runs on across turns and "7." names one question for the whole thread.
-- Give every question a suggested default, so the owner can answer "12. default" or "12. <comment>" per number.
-- A number the owner has not answered stays open and is asked again, by the same number, until the owner answers it or says "default" for it.
+- When in doubt, ask: a 30-second clarification beats a mis-reverted change. A question with an obvious default that no rule says to ask is not asked: decide, and say so in one line.
+- Label every question to the owner `Q<n>`, numbered across the whole thread and never reused, so "Q7" names one question.
+- Give every question a suggested default, so the owner can answer "Q12 default" or "Q12 <comment>".
+- A question the owner has not answered stays open and is asked again under its Q number, until the owner answers it or says "default" for it.
 - Verify before writing docs. Every technical claim must trace to code read this session, using literal identifiers, not paraphrase. If you can't point to a line, don't write the sentence.
-- The living status doc holds the present only: status, open items, decisions in force, traps, and the latest figure per measurement. An update replaces the line it supersedes.
-- The status doc takes no dated or per-session entry. A measurement series worth keeping is one table with a row per run, not a section per run.
+- The living status doc holds the present only: status, open items, decisions in force, traps, and the latest figure per measurement.
+- A measurement series in the living status doc is one table with a row per run, not a section per run.
 - The status doc aims under 15,000 characters. Past 20,000, the next edit first compresses it back under 15,000: finished items deleted, a series folded into one table, duplicate lines merged.
 - A search hit is a lead, not a finding: read the surrounding code before drawing a conclusion from it.
-- Preserve old content when rewriting a doc: move it under an "Old \<doc\>" section, and delete only once the new version is confirmed working.
+- Done means every entry point the change reaches was run and succeeded. Find those entry points by searching the tree for the change's consumers.
+- An entry point is a literal command in a touched doc or in `project.md`.
+- Anything still broken is reported as not done, never as done with a caveat.
+- When rewriting a whole doc other than a plan file, keep the old content under an "Old \<doc\>" section until the new version is confirmed working, then delete it.
 - `work/` holds only discardable scratch: a draft, an experiment run, a log-analysis script. Never a temp directory outside the repo.
 - Development happens in the repo's own tree, never hidden in `work/` or a worktree.
 
@@ -41,14 +45,11 @@ These are project-agnostic; project-specific overrides live in `project.md` or t
 
 - Do not commit, checkout, push, or open PRs unless explicitly asked in this conversation. Read-only git (`diff`/`status`/`log`) is always fine.
 - Commits land on the default branch directly, or on the branch `project.md` names. No feature branch.
-- Only an explicitly-authorized main agent commits. Subagents report changes instead of running git writes.
 - Stage and commit by explicit pathspec, never `git add -A`: otherwise a concurrent session's staged files get swept into your commit.
-- Re-check `git status` and `git show --stat` after.
-- Commit messages are one line, `<area>: <short lowercase imperative>`, where the area is the directory or component touched; no body, no trailers.
+- After each commit, re-check `git status` and `git show --stat`.
+- Commit messages are one line, `<area>: <short lowercase imperative>`, with no body and no trailers. The area is the top-level directory or component touched.
 - Never override the commit author/committer identity, and never add `Co-Authored-By` trailers.
 - A session leaves a clean history whether or not it is pushed: a correction to one of its own commits is folded into that commit, never stacked on top, so no commit adds what a later one removes.
-- No AI references anywhere that ships: not in code, comments, filenames, naming, or file metadata such as a draw.io `agent` attribute or a document author field.
-- For a living notes or status doc, amend successive edits into its single local commit rather than stacking per-update commits, while the commits are still local-only.
 
 ## Subagents
 
@@ -56,12 +57,12 @@ These are project-agnostic; project-specific overrides live in `project.md` or t
 - Delegate by default: exploration, reading or searching beyond a file or two, builds, tests, long runs, log and image inspection, and any edit beyond a few lines.
 - Keep inline only single-fact lookups, one-line edits, and answers to the user.
 - Launch subagents in the background and end the turn with a status line; never sit in a tool loop waiting for one.
-- Never pull bulk output into the main context: no large file reads, no raw logs, no full diffs, no image dumps. Ask a subagent for the extract, the verdict, or the `file:line` pointers instead.
+- Never pull bulk output into the main context: no large file reads, no raw logs, no large diffs, no image dumps. Ask a subagent for the extract, the verdict, or the `file:line` pointers instead.
 - Every launch is self-contained: goal, paths, constraints, which rule files to read, and the exact report shape and size cap. A subagent sees nothing of the conversation unless it is a fork.
-- An agent that edits reads `engineering.md`, `project.md`, and the comment doctrine before its first edit, formats only the files it touched, and reports every change as `file:line`.
+- An agent that edits reads `engineering.md` and `project.md` before its first edit, and formats only the files it touched.
 - Parallel agents never share a write path: partition edits by path before launching, and give each its own scratch dir and run names.
-- Shared docs (README, status, `project.md`) stay with the main session.
-- When partitions must overlap, run those agents one after another in the repo's tree. No worktree.
+- Shared docs (README, status and plan docs, `project.md`) are edited by the main session, or by one agent after the others report.
+- When partitions must overlap, run those agents one after another in the repo's tree.
 - Subagents report, never decide: a bounded summary with pointers, findings, and open questions. The main session verifies by spot-check or a second subagent, not by redoing the work.
 - Set each subagent's model and effort explicitly: inheritance is silent and usually wrong. Which model plays which role is a project or prompt override.
 - Prefer a fresh launch over resuming for substantial follow-ups; a resumed subagent can silently continue on the parent model.
@@ -77,11 +78,11 @@ These are project-agnostic; project-specific overrides live in `project.md` or t
 - Manage only what you launched, by that record, never something inferred after the fact.
 - Watchers always have a deadline and always emit a line, on success, failure, or timeout. Silence is never success.
 - Rely on the completion notification, with one fallback: if nothing has arrived by the expected duration, run the recorded check once.
-- Never poll in a loop, never stack watchers on the same job.
+- Never stack two watchers on one job.
 - Keep few things in flight, a handful of runs and agents at most, and stop your own stale watchers and agents by their recorded ids before launching replacements.
 - Never rebuild, retag, or clean the image while a run uses it.
-- Stop your own run by `docker kill` of the container name you recorded: killing `exec.sh` leaves the workload running inside.
+- Stop your own run by `docker kill` of the container name `exec.sh` printed at launch: killing `exec.sh` leaves the workload running inside.
 - Never touch a container you did not launch.
 - `pkill -f <pattern>` inside `bash -c` matches its own command line and can kill the shell first.
-- Use a character class (`pkill -f '[p]attern'`) or match the child process only.
+  Use a character class (`pkill -f '[p]attern'`) or match the child process only.
 - Never edit a script while a live run is executing it: the shell reads scripts lazily by byte offset, so an in-place edit can crash the run. Defer the edit, or write a new file.

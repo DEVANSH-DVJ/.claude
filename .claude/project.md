@@ -1,9 +1,6 @@
 # Project context
 
-<!-- This is the ONE file you fill in per project.
-     session.md and engineering.md are shared and agnostic, normally left untouched.
-     Keep this lean: durable facts and pointers, not the current task, and not a spec.
-     The current focus or goal belongs in the PROMPT and the living status/plan docs, never here.
+<!-- The project's own context file, written by the rules under "What project.md holds" in session.md.
      Delete any section that doesn't apply. -->
 
 ## What this project is
@@ -24,11 +21,12 @@
      Avoid a top-level docs/ folder: it collides with docker/ on tab-completion. Prefer notes/. -->
 
 - `README.md`: orientation + layout
+- `<path>`: the living status doc, read before a session and updated before its end
 - <`run.md` for run commands, `notes/` for deeper guides, or whatever this project keeps; delete what does not exist>
 
 ## Environment & commands
 
-<How to build, run, and test this project: the exact commands, run through the project runner (e.g. `./docker/exec.sh "<cmd>"`), plus `./format/format.sh` to format.>
+<How to build, lint, test, format, and run this project: the exact commands, through the project runner (e.g. `./docker/exec.sh "<cmd>"`).>
 
 ## Machines
 
@@ -40,8 +38,8 @@
 
 ## Subagents
 
-<Which model plays which role here: the main session, the agents that write, the agents that only read, and how many run at once. Delete the section when the shared rule, model and effort set explicitly per launch, is enough.>
+<Which model plays which role: the main session, writers, readers, and how many run at once. Delete when per-launch model and effort suffice.>
 
 ## Overrides to the shared rules
 
-<Anywhere this project deliberately deviates from session.md / engineering.md, state the rule and why. If empty, the shared rules apply as written.>
+<One bullet per standing rule of this project, naming the shared rule it overrides, if any. If empty, the shared rules apply as written.>
