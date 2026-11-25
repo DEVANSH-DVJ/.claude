@@ -2,11 +2,12 @@
 """Flag markdown blocks that render as a blob on GitHub.
 
 A block is a paragraph (consecutive plain lines) or a list item with
-its continuation lines; its size is the characters GitHub renders.
+its continuation lines; its size is its stripped source characters, less list and quote markers.
 Prints path:start-end: size for every block over LIMIT, as leads.
 With --diff, only blocks that touch a line the working tree added or changed
 against HEAD count, so an untouched paragraph is never a lead.
 """
+
 import re
 import subprocess
 import sys
@@ -18,13 +19,11 @@ QUOTE = re.compile(r'^\s*(?:>\s?)+')
 
 
 def blocks(lines):
-    """Yield (start, end, size, opening) for each paragraph or list item."""
+    """Yield (start, end, size) for each paragraph or list item."""
     fence = False
     front = lines[:1] == ['---']
     comment = False
     start = size = 0
-    opening = True
-    in_item = False
     for i, raw in enumerate(lines, 1):
         # a quoted line renders like an unquoted one
         raw = QUOTE.sub('', raw)
@@ -40,34 +39,32 @@ def blocks(lines):
             fence = not fence
             s = ''
         elif fence or OTHER.match(s):
-            # the opening ends at the first `##`
-            opening = opening and not s.startswith('## ')
             s = ''
         item = bool(ITEM.match(raw))
         # a bullet or a break ends the open block
         if (item or not s) and start:
-            yield start, i - 1, size, opening and not in_item
-            opening = opening and in_item
+            yield start, i - 1, size
             start = size = 0
         if not s:
             continue
         if item:
             s = ITEM.sub('', raw).strip()
-            in_item = True
-        elif not start:
-            in_item = False
         start = start or i
         size += len(s) + 1
     if start:
-        yield start, len(lines), size, opening and not in_item
+        yield start, len(lines), size
 
 
 def changed_lines(path):
     """Line numbers the working tree added or changed against HEAD; None if untracked."""
-    tracked = subprocess.run(['git', 'ls-files', '--error-unmatch', '--', path], capture_output=True)
+    tracked = subprocess.run(
+        ['git', 'ls-files', '--error-unmatch', '--', path], capture_output=True
+    )
     if tracked.returncode:
         return None
-    out = subprocess.run(['git', 'diff', '-U0', 'HEAD', '--', path], capture_output=True, text=True, check=True)
+    out = subprocess.run(
+        ['git', 'diff', '-U0', 'HEAD', '--', path], capture_output=True, text=True, check=True
+    )
     changed = set()
     # hunk header: @@ -a,b +c,d @@ ; d defaults to 1
     for m in re.finditer(r'^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@', out.stdout, re.M):
@@ -84,7 +81,7 @@ def check(path, limit=LIMIT, diff=False):
         changed = changed_lines(path)
         if changed is not None:
             hits = [b for b in hits if any(n in changed for n in range(b[0], b[1] + 1))]
-    for start, end, size, _ in hits:
+    for start, end, size in hits:
         print(f'{path}:{start}-{end}: {size} chars')
     return len(hits)
 
@@ -104,7 +101,9 @@ if __name__ == '__main__':
             sys.exit(f'unknown flag: {args[0]}')
     # no paths: every tracked markdown file
     if not args:
-        out = subprocess.run(['git', 'ls-files', '-z', '--', '*.md'], capture_output=True, text=True, check=True)
+        out = subprocess.run(
+            ['git', 'ls-files', '-z', '--', '*.md'], capture_output=True, text=True, check=True
+        )
         args = [p for p in out.stdout.split('\0') if p]
     for p in args:
         check(p, limit, diff)
