@@ -6,14 +6,14 @@ Project-specific overrides live in `project.md` or the prompt.
 ## Persistence across sessions
 
 - Record only what a later session needs and cannot get from the code: a durable fact about the project, or a preference the owner states as standing.
-- A task instruction, a decision on current work, or a correction to this session is followed now, not recorded as a rule. What a later session must know of it goes in the living status doc.
+- A task instruction, a decision on current work, or a correction to this session is followed now, not recorded as a rule. What a later session must know of it goes in `STATUS.md`.
 - Before adding or changing a line in a rule file, show the owner the exact line and its place, and write it only on a yes.
 - Write a rule as narrow as it was said: name the case it covers, and never widen one remark into a general "never" or "always".
 - Replace or tighten an existing line before appending a new one, and remove a line the new one supersedes in the same edit.
 
 ## What `project.md` holds
 
-- What is true of the whole project for as long as it exists. Status, dates, counts, hashes, and anything about one deliverable or the work's content go in the status doc or that deliverable's plan.
+- What is true of the whole project for as long as it exists. Status, dates, counts, hashes, and anything about one deliverable or the work's content go in `STATUS.md` or that deliverable's plan.
 - Each fact once: when the README, a run doc, a skill, or a shared rule already says it, point there, and keep the layout to directories and entry points, not what each file does.
 - Every line sits under one of the file's sections, and a line that fits none does not belong in the file.
 - A project's own standing rule goes under Overrides, naming the shared rule it overrides, if any.
@@ -30,9 +30,6 @@ Project-specific overrides live in `project.md` or the prompt.
 - Give every question a suggested default, so the owner can answer "Q12 default" or "Q12 <comment>".
 - A question the owner has not answered stays open and is asked again under its Q number, until the owner answers it or says "default" for it.
 - Verify before writing docs. Every technical claim must trace to code read this session, using literal identifiers, not paraphrase. If you can't point to a line, don't write the sentence.
-- The living status doc holds the present only: status, open items, decisions in force, traps, and the latest figure per measurement.
-- A measurement series in the living status doc is one table with a row per run, not a section per run.
-- The status doc aims under 15,000 characters. Past 20,000, the next edit first compresses it back under 15,000: finished items deleted, a series folded into one table, duplicate lines merged.
 - A search hit is a lead, not a finding: read the surrounding code before drawing a conclusion from it.
 - Done means every entry point the change reaches was run and succeeded. Find those entry points by searching the tree for the change's consumers.
 - An entry point is a literal command in a touched doc or in `project.md`.
@@ -40,6 +37,14 @@ Project-specific overrides live in `project.md` or the prompt.
 - When rewriting a whole doc other than a plan file, keep the old content under an "Old \<doc\>" section until the new version is confirmed working, then delete it.
 - `work/` holds only discardable scratch: a draft, an experiment run, a log-analysis script. Never a temp directory outside the repo.
 - Development happens in the repo's own tree, never hidden in `work/` or a worktree.
+
+## `STATUS.md`
+
+- `STATUS.md`: the living status doc, at the repo root, read at a session's start and updated before its end.
+- `STATUS.md` is never committed: if it is not ignored, add it to `.git/info/exclude`, never to a `.gitignore`.
+- `STATUS.md` holds the present only: status, open items, decisions in force, traps, and the latest figure per measurement.
+- A measurement series in `STATUS.md` is one table with a row per run, not a section per run.
+- `STATUS.md` aims under 15,000 characters. Past 20,000, the next edit first compresses it back under 15,000: finished items deleted, a series folded into one table, duplicate lines merged.
 
 ## Git / commits
 
@@ -61,13 +66,13 @@ Project-specific overrides live in `project.md` or the prompt.
 - Every launch is self-contained: goal, paths, constraints, which rule files to read, and the exact report shape and size cap. A subagent sees nothing of the conversation unless it is a fork.
 - An agent that edits reads `engineering.md` and `project.md` before its first edit, and formats only the files it touched.
 - Parallel agents never share a write path: partition edits by path before launching, and give each its own scratch dir and run names.
-- Shared docs (README, status and plan docs, `project.md`) are edited by the main session, or by one agent after the others report.
+- Shared docs (README, `STATUS.md`, plan files, `project.md`) are edited by the main session, or by one agent after the others report.
 - When partitions must overlap, run those agents one after another in the repo's tree.
 - Subagents report, never decide: a bounded summary with pointers, findings, and open questions. The main session verifies by spot-check or a second subagent, not by redoing the work.
 - Set each subagent's model and effort explicitly: inheritance is silent and usually wrong. Which model plays which role is a project or prompt override.
 - Prefer a fresh launch over resuming for substantial follow-ups; a resumed subagent can silently continue on the parent model.
 - Subagents never run git writes; they report changes and the main session commits when asked.
-- Checkpoint the thread's running state (done, decided, next) into the living status doc, not only into context, so a summarized or resumed thread picks up cleanly.
+- Checkpoint the thread's running state (done, decided, next) into `STATUS.md`, not only into context, so a summarized or resumed thread picks up cleanly.
 
 ## Runs, watchers, and staying reachable
 

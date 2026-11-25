@@ -20,13 +20,13 @@ Project commands, layout, and toolchain specifics live in `project.md`.
 - Comment what the code does, or a non-obvious invariant or constraint, never the conversation. No "added for X", no "fixes Y", no "tried Z", no `// previously:`.
 - File header: none when the name says the purpose, 4-5 lines normally, 8-10 only for a long or central file. Longer means split the file.
 - Keep public-API docstrings short (5 lines max): state the contract, not the history.
-- The "why the code is the way it is" does not belong in code. It goes in the living status or plan docs (see Docs discipline).
+- The "why the code is the way it is" does not belong in code. It goes in `STATUS.md` or a plan file (see Docs discipline).
 
 ## Docs discipline
 
 - Never leak session discussion or decision history into any committed file: code, README, configs, or these rule docs. State what a thing IS, not how we arrived at it or what we tried.
 - No AI references anywhere that ships: not in code, comments, filenames, naming, or file metadata such as a draw.io `agent` attribute or a document author field.
-- Rationale and "why" that must persist go only to the living status or plan docs, kept minimal. Code comments, README, and configs stay free of it.
+- Rationale and "why" that must persist go only to `STATUS.md` or a plan file, kept minimal. Code comments, README, and configs stay free of it.
 - An edit to a doc replaces the line it supersedes and deletes a finished or stale item in the same edit. Nothing is appended beside the text it replaces.
 - A doc records no history: no dated entry, no per-session note, no finished row kept in full. A finished item is deleted or reduced to one line.
 - A list that changes over time (models, targets, machines) lives in one doc, and other docs point there. A new item joins that list, never a sentence as one more clause.

@@ -21,7 +21,7 @@
      Avoid a top-level docs/ folder: it collides with docker/ on tab-completion. Prefer notes/. -->
 
 - `README.md`: orientation + layout
-- `<path>`: the living status doc, read before a session and updated before its end
+- `STATUS.md`: the living status doc, as `session.md` defines it
 - <`run.md` for run commands, `notes/` for deeper guides, or whatever this project keeps; delete what does not exist>
 
 ## Environment & commands

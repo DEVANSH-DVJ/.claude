@@ -26,7 +26,7 @@ The latex skill holds the log and Type 3 font checks.
 - Every frame carries a speaker note in `\speakernote{...}`, what is said aloud on that page.
   - Its cues are `<next slide>`, `<quick next slide>`, and `<pause>`, unless a talk voice file the owner's prompt or `project.md` names spells them otherwise.
 - A figure not drawn yet is a visible placeholder box, and the delivered PDF holds none.
-  - Until drawn, it is listed in `work/loop/<slug>/plan.md` when the writing skill runs on the deck, else in the project's living status doc.
+  - Until drawn, it is listed in `work/loop/<slug>/plan.md` when the writing skill runs on the deck, else in `STATUS.md`.
 
 ## Figures
 

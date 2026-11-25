@@ -91,7 +91,7 @@ Ask the subagent for the extract, the verdict, or `file:line` pointers instead.
 
 - Verify by spot-check (one targeted question, one file, or one command) or by a second subagent that did not do the work.
 - Never redo the work in the main context.
-- Checkpoint the running state (done, decided, next) in the project's living status doc (`PLAN.md` when the project uses the plans skill), so a summarized or resumed session picks up cleanly.
+- Checkpoint the running state (done, decided, next) in `STATUS.md`, so a summarized or resumed session picks up cleanly.
 - For a substantial follow-up, launch fresh with an updated brief rather than resuming: a resumed subagent can silently continue on the parent model.
 
 ## Keep agents out of each other's way
@@ -99,7 +99,7 @@ Ask the subagent for the extract, the verdict, or `file:line` pointers instead.
 - Partition before launching: each parallel agent owns a disjoint set of paths, named in its brief as the only paths it may write.
   Two agents with a write path in common run in sequence.
   - Each works in the repo's own tree, never in a worktree.
-- Shared docs (README, status and plan docs, `project.md`) are edited by the main session, or by one agent after the others have reported.
+- Shared docs (README, `STATUS.md`, plan files, `project.md`) are edited by the main session, or by one agent after the others have reported.
 - Scratch and runs are per agent: its own `work/<task>/` dir, unique container and log names, and never the same build or test target in the same tree as another agent at the same time.
 - Formatting is per touched file: `./docker/exec.sh "./format/format.sh <paths>"`, run from the repo root with repo-relative paths.
   - The whole-tree mode is for the main session, with no unstaged or untracked change.

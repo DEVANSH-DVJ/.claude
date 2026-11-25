@@ -1,10 +1,10 @@
 ---
 name: plans
-description: Write, read, run, or close a session plan -- one committed prompt file per planned session that says what must be true and never how, beside the local `PLAN.md` status doc. Use when a session writes, reads, runs, or closes a plan file.
+description: Write, read, run, or close a session plan -- one committed prompt file per planned session that says what must be true and never how, beside the local `STATUS.md`. Use when a session writes, reads, runs, or closes a plan file.
 user-invocable: true
 ---
 
-A plan system: one committed prompt file per planned session, and one local status doc every session reads and updates.
+A plan system: one committed prompt file per planned session, and the local `STATUS.md` every session reads and updates.
 This skill holds the plan format and a session's life around it.
 
 ## Files
@@ -12,15 +12,7 @@ This skill holds the plan format and a session's life around it.
 - `plans/<NN>-<slug>.md`: one session's prompt, saying what the session is for and how it knows it is done.
 - `plans/README.md`: the committed index, holding the line table (one row per line of work) and the sequence table.
 - The plan files are the committed record: terse, and free of session history.
-- `PLAN.md`: the living status doc, at the repo root and never committed, read at a session's start and updated before its end.
-  It holds:
-  - the status, the open items, and the latest figure per measurement
-  - the traps a session reads before starting
-  - the owner's decisions in force, one numbered row each, with the reasoning behind them
-- `PLAN.md` is ignored by a line in `.git/info/exclude`, never in `.gitignore`, like `work/`.
-- `PLAN.md` holds the present only: a finished item is deleted, a superseded line is replaced, and a measurement series is one table with a row per run.
-- `PLAN.md` aims under 15,000 characters.
-  Past 20,000, the next edit first compresses it back under 15,000: finished items deleted, a series folded into one table, duplicate lines merged.
+- `STATUS.md`: the living status doc that `session.md` defines, holding the owner's decisions in force as one numbered row each, with the reasoning behind them.
 
 ## Numbers and the sequence
 
@@ -53,8 +45,8 @@ This skill holds the plan format and a session's life around it.
 - The session finds its own route, and everything the change affects, from the latest state of the tree.
 - A plan names no function, field, env var, CLI flag, command, agent model, or role.
 - It names a file only in the fixed text, the worked example of the Kind line, a Hints bullet, or the Shared files line.
-- A plan file is committed, so it names no uncommitted file: nothing under `work/`, and `PLAN.md` only in the fixed preamble and the Measure kind line.
-- A hint writes out the decision, trap, or figure in full, never as a reference such as "decision 7 in `PLAN.md`".
+- A plan file is committed, so it names no uncommitted file: nothing under `work/`, and `STATUS.md` only in the fixed preamble and the Measure kind line.
+- A hint writes out the decision, trap, or figure in full, never as a reference such as "decision 7 in `STATUS.md`".
 - A plan has no questions section: launching a session is the owner's go-ahead for everything its plan names.
 - The session still asks first about these, unless its plan names them:
   - adding a dependency
@@ -70,7 +62,7 @@ This skill holds the plan format and a session's life around it.
 
 ```
 Read the rules in `.claude/` and the `plans` skill, then `plans/README.md`.
-Then read `PLAN.md` and `README.md`.
+Then read `STATUS.md` and `README.md`.
 Reply in one line before starting.
 ```
 
@@ -95,22 +87,22 @@ Verify each against the tree before relying on it, and take any route not listed
 - `Build, learning from <a worked example>.`: the session learns from that example and from the tree, and lands the change the way the example landed.
   - A worked example is a past commit or file that made a similar change.
 - `Figure-out: <the open question>, settled with the owner, then built.`: the session brings evidence and proposes.
-  - It records each decision the owner makes as a numbered row in `PLAN.md`.
+  - It records each decision the owner makes as a numbered row in `STATUS.md`.
   - Its first proof is the smallest thing that shows the decision holds.
   - Its kind line ends with ", then built" only when the session builds the rest itself.
     Without it, a later plan builds the rest, or nothing is built.
-- `Measure: nothing in the repo changes but a fix found along the way, and the figures go to PLAN.md.`: the session lands only that fix.
+- `Measure: nothing in the repo changes but a fix found along the way, and the figures go to STATUS.md.`: the session lands only that fix.
 
 ## A session's start and end
 
 - The owner launches a session with one plan file as its prompt.
-- It reads what the preamble names, `PLAN.md`'s traps and decisions among them, and replies in one line.
+- It reads what the preamble names, `STATUS.md`'s traps and decisions among them, and replies in one line.
 - It runs as an orchestrator by the `delegate` skill: subagents do the work, and the session keeps the plan and the verdicts.
   It drives the work to completion.
 - It never ends its turn to wait unless a job it launched is still running to send the notification, and never ends with work half done.
 - It leaves three things behind:
   - the change
-  - a current `PLAN.md`, by the rules under Files
+  - a current `STATUS.md`, by the rules in `session.md`
   - its plan file deleted, or, if part of the plan is left for later, rewritten to what is still open
 - A finished plan's file and its sequence row are deleted in one edit, never kept with a `done` marker.
   Git history is where a past session lives.
@@ -127,7 +119,7 @@ A project states these in `project.md`, machines under Machines and the rest und
 | the wording of the fixed text, and docs the preamble adds       | as above                 |
 | columns the sequence table adds, such as a goal                 | none                     |
 | what keeps two lines apart, such as paths or machines           | none                     |
-| a store for raw measurements beside `PLAN.md`                   | none                     |
+| a store for raw measurements beside `STATUS.md`                 | none                     |
 | whether a session commits as each piece lands                   | only when the owner asks |
 | machines, reference trees, and directories a session may create | none                     |
 | plan parts beyond these, such as a link to a release list       | none                     |
