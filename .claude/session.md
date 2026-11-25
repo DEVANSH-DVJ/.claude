@@ -34,8 +34,9 @@ Project-specific overrides live in `project.md` or the prompt.
 - An entry point is a literal command in a touched doc or in `project.md`.
 - Anything still broken is reported as not done, never as done with a caveat.
 - When rewriting a whole doc other than a plan file, keep the old content under an "Old \<doc\>" section until the new version is confirmed working, then delete it.
-- `work/` holds only discardable scratch: a draft, an experiment run, a log-analysis script. Never a temp directory outside the repo.
-- Development happens in the repo's own tree, never hidden in `work/` or a worktree.
+- `work/` holds only scratch that no deliverable depends on: run output, a log-analysis script, a clone, the writing loop's records.
+- Scratch never goes in a temp directory outside the repo.
+- Development happens in the repo's own tree, never hidden in `work/` or a worktree: every change, draft, and fix lands in the file it is for.
 
 ## `STATUS.md`
 
