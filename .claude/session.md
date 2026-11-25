@@ -77,7 +77,11 @@ Project-specific overrides live in `project.md` or the prompt.
 - Parallel agents never share a write path: partition edits by path before launching, and give each its own scratch dir and run names.
 - Shared docs (README, `STATUS.md`, plan files, `project.md`) are edited by the main session, or by one agent after the others report.
 - When partitions must overlap, run those agents one after another in the repo's tree.
-- Subagents report, never decide: a bounded summary with pointers, findings, and open questions. The main session verifies by spot-check or a second subagent, not by redoing the work.
+- Subagents report, never decide: a bounded summary with pointers, findings, and open questions.
+- A subagent's report is a claim, not a fact. The main session verifies what it acts on, by spot-check or a second subagent, not by redoing the work.
+- Every review finding is weighed on its merits and adopted, reworded, or rejected, never accepted blindly.
+- A critical decision, one that is hard to undo or that commits later work to one path, is the main session's to make and never rests on one agent's view alone.
+- The main session's own call on a critical decision is checked by a subagent that did not propose it, before the call is acted on.
 - Set each subagent's model and effort explicitly: inheritance is silent and usually wrong. Which model plays which role is a project or prompt override.
 - Prefer a fresh launch over resuming for substantial follow-ups; a resumed subagent can silently continue on the parent model.
 - Subagents never run git writes; they report changes and the main session commits when asked.
