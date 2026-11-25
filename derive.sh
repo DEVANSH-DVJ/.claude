@@ -517,7 +517,7 @@ sync_target() {
       gone+=("${e#*:}")
     fi
   done
-  if [ -e "$target/CLAUDE.md" ] && { [ -z "$BASE" ] || [ -n "${CHANGED[CLAUDE.md]:-}" ]; }; then
+  if [ -e "$target/CLAUDE.md" ] && { [ -z "$BASE" ] || [ -n "${CHANGED["CLAUDE.md"]:-}" ]; }; then
     # trailing dot keeps the final newlines
     merged=$(claude_merge "$target/CLAUDE.md" && echo .)
     printf '%s' "${merged%.}" >"$target/CLAUDE.md"
