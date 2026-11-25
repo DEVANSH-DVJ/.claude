@@ -7,7 +7,6 @@ Project-specific overrides live in `project.md` or the prompt.
 
 - Record only what a later session needs and cannot get from the code: a durable fact about the project, or a preference the owner states as standing.
 - A task instruction, a decision on current work, or a correction to this session is followed now, not recorded as a rule. What a later session must know of it goes in `STATUS.md`.
-- Before adding or changing a line in a rule file, show the owner the exact line and its place, and write it only on a yes.
 - Write a rule as narrow as it was said: name the case it covers, and never widen one remark into a general "never" or "always".
 - Replace or tighten an existing line before appending a new one, and remove a line the new one supersedes in the same edit.
 
@@ -45,6 +44,15 @@ Project-specific overrides live in `project.md` or the prompt.
 - `STATUS.md` holds the present only: status, open items, decisions in force, traps, and the latest figure per measurement.
 - A measurement series in `STATUS.md` is one table with a row per run, not a section per run.
 - `STATUS.md` aims under 15,000 characters. Past 20,000, the next edit first compresses it back under 15,000: finished items deleted, a series folded into one table, duplicate lines merged.
+
+## Owner review
+
+- The owner never opens `STATUS.md` or anything under `work/`, and is never asked to read or approve either.
+- A rule-file edit, `project.md` included, or any other edit that needs the owner's review, sits uncommitted in the repo's own tree for `git diff`, never in the reply or under `work/`.
+- Before an edit reaches the owner, a reviewer subagent that did not write it checks that it is minimal and stable.
+- The reviewer's adopted findings are applied before the reply.
+- The reply names the changed files and the gist in a few lines, and the diff carries the rest.
+- A question for the owner goes in the reply, never only in a file.
 
 ## Git / commits
 

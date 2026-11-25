@@ -33,7 +33,7 @@ This skill holds the plan format and a session's life around it.
   The last says what does not change.
 - `## Done`: two to four observable results that close the session, never a list of commands.
   Its last bullet is the fixed closing bullet.
-- `## Shared files`, optional: one line naming the shared files the session may edit without asking.
+- `## Shared files`, optional: one line naming the shared files the session edits, beyond `STATUS.md` and its own plan file.
 - `## Non-goals`, optional: what the session does not do, one bullet each.
 - `## Hints`, optional: at most ten bullets under the fixed caveat, each stating one of these in full:
   - what a committed file or a reference tree (a checkout of another project that the session reads and never changes) shows, naming it
@@ -50,7 +50,7 @@ This skill holds the plan format and a session's life around it.
 - A plan has no questions section: launching a session is the owner's go-ahead for everything its plan names.
 - The session still asks first about these, unless its plan names them:
   - adding a dependency
-  - editing a `.gitignore`, a `LICENSE`, or a rule file under `.claude/`
+  - editing a `.gitignore` or a `LICENSE`
   - changing a test or a golden output to make a change pass
   - committing, checking out, pushing, or opening a PR
   - anything else the shared rules or `project.md` say to ask about

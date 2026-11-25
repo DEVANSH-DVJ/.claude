@@ -216,7 +216,7 @@ Fill every `<...>` in the brief's Launch section, save the filled copy under `wo
 - A fidelity WRONG, CHANGED, or MISATTRIBUTED is corrected from its source first, and the voice rewrite goes on top of the corrected text.
 - A DROPPED claim is restored unless the owner dropped it or the plan moves it elsewhere.
 - A cut on text the owner has not flagged is the orchestrator's call, made and recorded, never queued for the owner.
-- An OWNER verdict, or an UNSUPPORTED only the owner can settle, goes to `decisions.md` as a question; the unit keeps its current text, and the loop moves on.
+- An OWNER verdict, or an UNSUPPORTED only the owner can settle, is asked in the reply under its Q number and recorded in `decisions.md`; the unit keeps its current text, and the loop moves on.
 
 ## Exit criteria
 
