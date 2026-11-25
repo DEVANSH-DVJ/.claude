@@ -21,10 +21,14 @@ if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1 &&
   GPU_FLAGS=(--gpus all)
 fi
 
+# Unique container name, printed for docker kill
+CONTAINER_NAME="myproject-exec-$$-${RANDOM}"
+echo "container: ${CONTAINER_NAME}" >&2
+
 trap './chown.sh >/dev/null 2>&1' EXIT
 
 docker run --rm --entrypoint bash \
-  --name "myproject-exec-$$-${RANDOM}" \
+  --name "${CONTAINER_NAME}" \
   "${GPU_FLAGS[@]}" \
   -v "${HOST_MOUNT}:/workspace:rw" \
   -w /workspace \
