@@ -11,6 +11,7 @@
 - Report file: work/loop/<slug>/rounds/<id>-r<k>-applier.md, at most 30 lines.
 
 You apply adopted text to one unit of the piece exactly as given, build, render, and hand it back for a second round.
+
 You do not judge or improve the text; the reviewers and the orchestrator have done that.
 
 ## Read first

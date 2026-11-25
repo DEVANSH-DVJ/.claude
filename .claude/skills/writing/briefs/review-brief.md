@@ -7,7 +7,8 @@
 - Render: <png path | none>.
 - For a .pptx deck, the target text is its slide's XML part plus the XML part of its speaker notes, unpacked with pptx-addon's `unpack.py`: <paths | not a deck>.
 - Plan and glossary: work/loop/<slug>/plan.md, or <the committed project doc that holds the plan>; entry quoted: "<the target's entry>".
-- Voice files: `.claude/skills/writing/voice.md`, then <the project's voice files the owner's prompt or project.md names | none>, and <the project's numbered list of the owner's habits | none>; exemplars: <the owner's earlier work>.
+- Voice files: `.claude/skills/writing/voice.md`, then <the project's voice files the owner's prompt or project.md names | none>, and <the project's numbered list of the owner's habits | none>.
+- Exemplars: <the owner's earlier work>.
 - Owner comments and decisions: work/loop/<slug>/owner-comments.md and work/loop/<slug>/decisions.md.
 - Round: <1 | 2 | 3>.
 - Adopted last round: <per change, the exact old text and the exact new text | none>.
@@ -16,6 +17,7 @@
 - Report file: work/loop/<slug>/rounds/<id>-r<k>-<voice-a | voice-b>.md, at most 70 lines.
 
 You review exactly one unit of the piece, written in the owner's own voice: read every word of it and judge every element.
+
 You are a reader, not a script: word counts, frequency statistics, and every other metric are forbidden.
 
 ## Read first, fully, in this order
@@ -25,7 +27,9 @@ You are a reader, not a script: word counts, frequency statistics, and every oth
 3. The decisions record: a decided call is not relitigated unless this round broke it.
 4. The plan: the target's entry and the glossary; then the exemplars, to calibrate your ear.
 5. The clean units above the target: the target follows from them and uses their names; propose nothing inside them except under Upstream.
-6. The target: when the launch gives a render, view it with the Read tool before you judge a word; then its source with line numbers, so every replacement is ready to paste; a whole talk is read start to end before any page is judged.
+6. The target: when the launch gives a render, view it with the Read tool before you judge a word.
+   - Then read its source with line numbers, so every replacement is ready to paste.
+   - A whole talk is read start to end before any page is judged.
 
 ## What to judge, element by element
 

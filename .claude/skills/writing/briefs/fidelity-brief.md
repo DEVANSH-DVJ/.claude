@@ -7,7 +7,10 @@
 - For a .pptx deck, the target and its witness are the slide's XML part plus the XML part of its speaker notes, unpacked with pptx-addon's `unpack.py`.
 - Witnesses: work/loop/<slug>/witness/<name>.owner-last.<ext>, the reference for meaning, and <second witness | none>; the target's lines in them: <x to y>.
 - Plan entry, with its sources: "<quoted verbatim>".
-- Sources, in order: the owner's statements in work/loop/<slug>/owner-comments.md and <files>; then <code and data, the published paper, the repositories>; indexes such as a facts sheet: <paths | none>.
+- Sources, in order:
+  - the owner's statements in work/loop/<slug>/owner-comments.md and <files>
+  - then <code and data, the published paper, the repositories>
+  - indexes such as a facts sheet: <paths | none>
 - Check in particular: <every number and unit, identifier, arrow, attribution, and phrase at risk>.
 - Report file: work/loop/<slug>/rounds/<id>-r<k>-fidelity.md, at most 50 lines.
 
@@ -17,7 +20,8 @@ You check one unit for content fidelity: does it say what its witnesses said, no
 
 ## Authority
 
-- A statement traced to the owner is a fact: never challenge it, never ask for evidence, and never mark it UNSUPPORTED; your one check is that the unit transcribes it with the same number, name, and comparison.
+- A statement traced to the owner is a fact: never challenge it, never ask for evidence, and never mark it UNSUPPORTED.
+  - Your one check is that the unit transcribes it with the same number, name, and comparison.
 - Where an owner statement and a source disagree, note the difference in one line under that claim and change nothing.
 - The code is the source of record for what a component does: a README sentence the code contradicts loses.
 - An index such as a facts sheet is never cited itself: follow it to the code or data line it points at, and cite that line.
@@ -25,7 +29,8 @@ You check one unit for content fidelity: does it say what its witnesses said, no
 
 ## Method
 
-1. Split the target into claims: every fact, definition, number with its unit, mechanism, reason, pointer, label, arrow, and caption, including the parts joined by "since", "i.e.", or a participle tail; a sentence often holds two or three.
+1. Split the target into claims: every fact, definition, number with its unit, mechanism, reason, pointer, label, arrow, and caption.
+   - This includes the parts joined by "since", "i.e.", or a participle tail, and a sentence often holds two or three.
 2. For each claim, find the witness sentence that states it, owner-last first, and quote both.
 3. Check each claim against the sources: a number by its value, unit, configuration, baseline, and direction, and a ratio names what it divides by.
 4. A diagram: the direction of each arrow, what each box takes in and produces, and that the step on a box is done by the component named on it.
@@ -60,6 +65,6 @@ For a whole talk, report only the claims that are not SAME or OWNER-FACT, then t
 - Numbers and references: every mismatch, or "all match".
 - Verdict: FAITHFUL, or a numbered list of the items the orchestrator must resolve, each with its correction in the owner's wording where possible.
 
-Quote exactly, and propose no stylistic change.
-Write the full report to the report file; return only the claims that are not SAME or OWNER-FACT and the blocks after them.
-Edit no other file, do not build, and never run git.
+- Quote exactly, and propose no stylistic change.
+- Write the full report to the report file; return only the claims that are not SAME or OWNER-FACT and the blocks after them.
+- Edit no other file, do not build, and never run git.

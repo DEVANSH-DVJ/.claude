@@ -86,7 +86,8 @@ Use this for every "change slides X..Y" request. Change only what was asked; eve
 
 - Text lives in `<a:t>` inside runs `<a:r>`, inside paragraphs `<a:p>`, inside `<p:txBody>`. Change the text, keep the run's `<a:rPr>` so font, size, and color survive.
 - Escape `&`, `<`, and `>` in text; keep `xml:space="preserve"` where it already is.
-- Shapes are `<p:sp>` with `<p:nvSpPr>` (id and name), `<p:spPr>` (position `<a:off>`, size `<a:ext>`, in EMU; 914400 per inch), and the text body. Pictures are `<p:pic>` and reference media through the slide's `.rels`.
+- Shapes are `<p:sp>` with `<p:nvSpPr>` (id and name), `<p:spPr>` (position `<a:off>`, size `<a:ext>`, in EMU; 914400 per inch), and the text body.
+- Pictures are `<p:pic>` and reference media through the slide's `.rels`.
 - A new image needs three things: the file under `ppt/media/`, a `Relationship` in `ppt/slides/_rels/slideN.xml.rels`, and a `Default` or `Override` entry in `[Content_Types].xml` for its extension.
 - Speaker notes are `ppt/notesSlides/notesSlideN.xml`; theme fonts and colors are `ppt/theme/theme1.xml`; layouts and masters are `ppt/slideLayouts/` and `ppt/slideMasters/`.
 
@@ -94,8 +95,10 @@ Use this for every "change slides X..Y" request. Change only what was asked; eve
 
 A LibreOffice render is not proof of the PowerPoint look: PowerPoint differs in three ways a render cannot show, so run `pptcheck.py` before every hand-off.
 
-- PowerPoint lays out text about 1% wider than LibreOffice, so a box sized exactly to its measured text wraps in PowerPoint though it fits in the render: give the box a few percent of slack, or `wrap="none"` for a one-line label.
-- PowerPoint ignores a stored `normAutofit` `fontScale` or `lnSpcReduction` and draws the text at full size, while LibreOffice applies the shrink: never rely on autofit, state the font size explicitly and use `<a:noAutofit/>`.
+- PowerPoint lays out text about 1% wider than LibreOffice, so a box sized exactly to its measured text wraps in PowerPoint though it fits in the render.
+  - Give the box a few percent of slack, or `wrap="none"` for a one-line label.
+- PowerPoint ignores a stored `normAutofit` `fontScale` or `lnSpcReduction` and draws the text at full size, while LibreOffice applies the shrink.
+  - Never rely on autofit: state the font size explicitly and use `<a:noAutofit/>`.
 - PowerPoint drops the runs after an `<a:endParaRPr>` that is not the last child of its `<a:p>`, while LibreOffice shows them: `<a:endParaRPr>` is always the paragraph's last child.
 
 ## Deck conventions
@@ -112,4 +115,7 @@ The project image (the Dockerfile's drawio and pptx blocks) must provide:
 - apt: `libreoffice-impress poppler-utils fontconfig`, plus the deck's font families copied from `docker/fonts` into the image and `fc-cache -f` (the Dockerfile's drawio block).
   - A family the image lacks shows up as `font SUBSTITUTED` in the render output.
 - conda or pip: `python-pptx pillow lxml markitdown[pptx]`.
-- Only for the plugin's html2pptx workflow: Node 20 or newer with `pptxgenjs playwright sharp react-icons react react-dom`, `npx playwright install --with-deps chromium`, and `NODE_PATH=/usr/local/lib/node_modules`.
+- Only for the plugin's html2pptx workflow:
+  - Node 20 or newer with `pptxgenjs playwright sharp react-icons react react-dom`
+  - `npx playwright install --with-deps chromium`
+  - `NODE_PATH=/usr/local/lib/node_modules`

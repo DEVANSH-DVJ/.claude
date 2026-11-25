@@ -58,8 +58,8 @@ Ask for this shape, capped at a few hundred words unless the task is a review:
 Never pull bulk output into the main context: no large file read, raw log, large diff, or image dump.
 Ask the subagent for the extract, the verdict, or `file:line` pointers instead.
 
-Anything bigger (a full log, a long diff, a rendered image set) goes to a file under `work/` and the report names the path.
-The subagent's final report is not shown to the user; relay what matters in your own words.
+- Anything bigger (a full log, a long diff, a rendered image set) goes to a file under `work/` and the report names the path.
+- The subagent's final report is not shown to the user; relay what matters in your own words.
 
 ## Stay reachable
 

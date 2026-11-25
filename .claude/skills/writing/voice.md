@@ -19,7 +19,8 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 - A takeaway, the boxed or italic claim that closes an evaluation paragraph, is one claim with its number and its named comparison, never a trailing clause that narrows its scope.
 - A sentence that waits on a result keeps its placeholder; the prose never admits incompleteness.
 - A plan note never stands as a sentence: no bare fragment ("to measure"), no label for the work ("this paper's proposal"), and no sentence saying what the paragraph will do instead of doing it.
-- Run-in headings are `\textbf{Title Case Noun Phrase.}` of one to four words with a period, prose on the next line, about one per two paragraphs; never one per paragraph, never a question, never a colon.
+- Run-in headings are `\textbf{Title Case Noun Phrase.}` of one to four words with a period, prose on the next line, about one per two paragraphs.
+  - Never one per paragraph, never a question, never a colon.
 
 ## Sentences
 
@@ -29,7 +30,8 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 - In an evaluation, "we" is right, what was run is in the past tense, and claims are in the present.
 - A pronoun "this" or "it" never points at a whole previous sentence; name the thing.
 - Sentences vary and typically run 12 to 30 words.
-- A run of three clipped declaratives is a defect, and so are a long chain of subordinate clauses, a punchline of a few words, ", so" chains, sentence-medial "therefore", "X, not Y" tails, and clefts ("That is what ...").
+- A run of three clipped declaratives is a defect.
+- So are a long chain of subordinate clauses, a punchline of a few words, ", so" chains, sentence-medial "therefore", "X, not Y" tails, and clefts ("That is what ...").
 
 ## Punctuation and glosses
 
@@ -56,7 +58,8 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 
 - A figure sentence has the figure as subject and says in full what it shows: "Fig.~\ref{fig:overview} shows how the compiler lowers one kernel to the device.", never "Figure 3 shows the loop.".
 - A caption opens with a noun phrase ("Overview of ...", "Snippet of ...") and adds one or two full sentences with the color key or a "Note that" caveat.
-- The color key makes the colored objects the subjects, "Rose boxes are the inputs, and the blue box is the scheduler.", never "Rose marks A, blue B."; diagrams and plots share one palette with one meaning per color.
+- The color key makes the colored objects the subjects, "Rose boxes are the inputs, and the blue box is the scheduler.", never "Rose marks A, blue B.".
+- Diagrams and plots share one palette with one meaning per color.
 - Text never repeats what a figure shows: a caption that narrates the figure's boxes is cut.
 - A code excerpt shows its source lines verbatim, never re-wrapped or re-indented; a long line is elided at its end with `...`.
 
@@ -88,7 +91,8 @@ The owner's prose rules for papers, slides, posters, speaker notes, and docs.
 - A note is what the owner says aloud, in the first person and the spoken phrasing of the owner's earlier notes, never terse written prose.
 - A note says what its slide cannot (why it matters, how it connects to the last point, what to look at, and what it means) and never reads out what the slide already shows.
 - A note runs as long as its point needs, and a figure is walked along its flow in plain words, with no pile of jargon and no numbers beyond the slide's point.
-- The notes in order are one argument, the problem, why it is hard, the insight, how it works, the evidence, and what it changes; build pages are one slide revealed in steps, so their notes continue one thought.
+- The notes in order are one argument, the problem, why it is hard, the insight, how it works, the evidence, and what it changes.
+- Build pages are one slide revealed in steps, so their notes continue one thought.
 - Each point is said once; a repetition is cut unless it is a deliberate callback.
 - A note is said in one breath to a room: stacked clauses, paper phrasing, parentheses, and read-out lists of nouns are revised.
 - A formulaic opener ("To summarize,", "Now,", "So,") or a closing tagline stays only where the owner's own notes do the same.

@@ -193,7 +193,8 @@ Fill every `<...>` in the brief's Launch section, save the filled copy under `wo
 7. Next unit, once this one is clean or sent to the owner.
    An Upstream finding is adjudicated like any other and, when adopted, reopens its unit through steps 5 and 6.
 8. Final read, when every unit is clean: the final reader goes through the whole piece as its audience would.
-   Its adopted fixes go through steps 5 and 6 for each unit they touch; a second final read runs only when the owner asks.
+   - Its adopted fixes go through steps 5 and 6 for each unit they touch.
+   - A second final read runs only when the owner asks.
 
 ## Adjudication
 
